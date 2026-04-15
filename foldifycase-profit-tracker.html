@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoldifyCase — Profit Tracking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   TOKENS — exact match to Warehouse Hub
+══════════════════════════════════════════ */
+:root {
+  --ink:         #1C1B18;
+  --ink-2:       #252420;
+  --ink-3:       #2E2D28;
+  --ink-4:       #3A3930;
+  --cream:       #F0EDE3;
+  --cream-2:     #E8E4D8;
+  --cream-3:     #DDD8C8;
+  --gold:        #C8A96E;
+  --gold-2:      #B8944E;
+  --gold-dim:    rgba(200,169,110,0.15);
+  --gold-bg:     rgba(200,169,110,0.08);
+  --green:       #5A9E72;
+  --green-dim:   rgba(90,158,114,0.14);
+  --red:         #D95454;
+  --red-dim:     rgba(217,84,84,0.12);
+  --orange:      #D4874A;
+  --orange-dim:  rgba(212,135,74,0.13);
+  --blue:        #4A7FC1;
+  --blue-dim:    rgba(74,127,193,0.12);
+  --purple:      #7E6DB5;
+  --purple-dim:  rgba(126,109,181,0.12);
+  /* text on dark */
+  --t1: #F0EDE3;
+  --t2: rgba(240,237,227,0.62);
+  --t3: rgba(240,237,227,0.36);
+  --t4: rgba(240,237,227,0.18);
+  /* text on cream */
+  --c1: #1C1B18;
+  --c2: rgba(28,27,24,0.58);
+  --c3: rgba(28,27,24,0.36);
+  /* layout */
+  --topbar-h:  52px;
+  --sidebar-w: 282px;
+  --r:   8px;
+  --r-s: 5px;
+  /* fonts */
+  --dis:  'Syne', sans-serif;
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; }
+body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var(--t1); overflow-x:hidden; }
+
+/* ════════════════════════  TOPBAR  */
+.topbar {
+  position:fixed; top:0; left:0; right:0;
+  height:var(--topbar-h);
+  background:var(--ink);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex; align-items:center;
+  z-index:200;
+}
+
+.topbar-logo {
+  display:flex; align-items:center; gap:10px;
+  padding:0 20px;
+  height:100%;
+}
+.logo-icon-wrap {
+  width:32px; height:32px; flex-shrink:0;
+  background:#000;
+  border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.logo-icon-wrap img { width:26px; height:26px; object-fit:contain; }
+.logo-wordmark {
+  font-family:var(--dis); font-weight:800;
+  font-size:15px; letter-spacing:0.1em;
+  color:var(--t1); text-transform:uppercase;
+}
+
+/* ════════════════════════  LAYOUT  */
+.layout {
+  display:flex;
+  margin-top:var(--topbar-h);
+  min-height:calc(100vh - var(--topbar-h));
+}
+
+.sdot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* ════════════════════════  MAIN CONTROLS BAR  */
+.main-controls {
+  display:flex; align-items:center; gap:8px;
+  padding:16px 28px 0;
+  flex-wrap:wrap;
+}
+.rp {
+  padding:6px 14px; background:#fff;
+  border:1px solid var(--cream-3); color:var(--c3);
+  border-radius:var(--r-s); font-family:var(--mono);
+  font-size:11px; cursor:pointer; transition:all 0.14s; letter-spacing:0.04em;
+}
+.rp:hover { color:var(--c2); border-color:rgba(28,27,24,0.25); }
+.rp.active { background:var(--ink); border-color:var(--ink); color:var(--t1); }
+.mkt {
+  padding:6px 11px; background:#fff;
+  border:1px solid var(--cream-3);
+  border-radius:var(--r-s); font-family:var(--mono);
+  font-size:11px; cursor:pointer; transition:all 0.14s;
+  letter-spacing:0.05em; color:var(--c3);
+}
+.mkt:hover { border-color:rgba(28,27,24,0.25); color:var(--c2); }
+.mkt.active { background:var(--gold); border-color:var(--gold); color:var(--ink); font-weight:600; }
+.controls-divider { width:1px; height:22px; background:var(--cream-3); flex-shrink:0; }
+.ctrl-right { margin-left:auto; display:flex; gap:8px; }
+
+/* ════════════════════════  DONUT CHART  */
+.donut-grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:14px; padding:16px 18px;
+}
+.donut-item { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.donut-svg-wrap { position:relative; width:86px; height:86px; flex-shrink:0; }
+.donut-svg-wrap svg { width:86px; height:86px; transform:rotate(-90deg); }
+.donut-center {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.donut-pct { font-family:var(--dis); font-weight:700; font-size:14px; line-height:1; color:var(--c1); }
+.donut-name { font-size:10px; color:var(--c3); font-family:var(--mono); text-align:center; line-height:1.3; margin-top:2px; }
+.donut-amt { font-family:var(--mono); font-size:12px; font-weight:500; color:var(--c2); }
+
+/* ════════════════════════  SIDEBAR  */
+.sidebar {
+  width:var(--sidebar-w); flex-shrink:0;
+  background:var(--ink-2);
+  border-right:1px solid rgba(255,255,255,0.06);
+  position:sticky; top:var(--topbar-h);
+  height:calc(100vh - var(--topbar-h));
+  overflow-y:auto;
+  display:flex; flex-direction:column;
+}
+
+.sb-label {
+  font-family:var(--dis); font-size:9px;
+  font-weight:600; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--gold); padding:16px 18px 8px;
+}
+
+/* 2x2 stat cards — matches Hub exactly */
+.sb-stats {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:8px; padding:0 14px 14px;
+}
+.sb-stat {
+  background:var(--ink-3);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:var(--r); padding:12px 14px;
+  cursor:default; transition:border-color 0.15s;
+}
+.sb-stat:hover { border-color:rgba(200,169,110,0.3); }
+.sb-stat-val {
+  font-family:var(--dis); font-weight:700;
+  font-size:22px; line-height:1; margin-bottom:4px;
+  letter-spacing:-0.01em;
+}
+.sv-gold   { color:var(--gold); }
+.sv-green  { color:var(--green); }
+.sv-red    { color:var(--red); }
+.sv-cream  { color:var(--t1); }
+.sb-stat-label { font-size:10px; color:var(--t3); }
+
+/* Auto-sync toggle */
+.sb-toggle-row {
+  margin:0 14px 14px;
+  background:rgba(90,158,114,0.09);
+  border:1px solid rgba(90,158,114,0.22);
+  border-radius:var(--r);
+  padding:10px 13px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.sb-toggle-label {
+  display:flex; align-items:center; gap:7px;
+  font-size:12px; color:var(--green); font-weight:500;
+}
+.toggle { position:relative; width:38px; height:22px; flex-shrink:0; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-track {
+  position:absolute; inset:0;
+  background:rgba(255,255,255,0.1);
+  border-radius:22px; cursor:pointer;
+  transition:background 0.25s;
+}
+.toggle input:checked ~ .toggle-track { background:var(--green); }
+.toggle-thumb {
+  position:absolute; width:16px; height:16px;
+  background:#fff; border-radius:50%;
+  top:3px; left:3px;
+  transition:transform 0.25s; pointer-events:none;
+}
+.toggle input:checked ~ .toggle-thumb { transform:translateX(16px); }
+
+.sb-div { height:1px; background:rgba(255,255,255,0.06); margin:4px 0 12px; }
+
+/* Nav items */
+.sb-nav-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 18px; cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all 0.12s;
+}
+.sb-nav-item:hover { background:rgba(255,255,255,0.04); }
+.sb-nav-item.active {
+  background:var(--gold-dim);
+  border-left-color:var(--gold);
+}
+.sb-nav-left {
+  display:flex; align-items:center; gap:9px;
+  font-size:12px; font-weight:500; color:var(--t3);
+}
+.sb-nav-item.active .sb-nav-left { color:var(--gold); }
+.sb-nav-item:not(.active):hover .sb-nav-left { color:var(--t2); }
+.sb-nav-icon { font-size:11px; width:15px; text-align:center; }
+.sb-nav-badge {
+  font-size:9px; font-family:var(--mono);
+  padding:2px 7px; border-radius:20px;
+  background:rgba(255,255,255,0.09); color:var(--t3);
+}
+.sb-nav-item.active .sb-nav-badge {
+  background:var(--gold); color:var(--ink);
+}
+
+/* Shopify connection block */
+.sb-shopify {
+  margin:auto 14px 14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:var(--r); padding:13px;
+}
+.sb-shopify-title {
+  font-size:9px; letter-spacing:0.16em;
+  text-transform:uppercase; color:var(--gold);
+  font-family:var(--mono); margin-bottom:9px;
+  display:flex; align-items:center; gap:6px;
+}
+.sb-shopify input {
+  width:100%; padding:7px 10px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:var(--r-s); color:var(--t1);
+  font-family:var(--mono); font-size:11px;
+  outline:none; transition:border-color 0.2s; margin-bottom:8px;
+}
+.sb-shopify input:focus { border-color:var(--gold); }
+.sb-shopify input::placeholder { color:var(--t4); }
+.btn-conn {
+  width:100%; padding:7px; background:var(--gold);
+  color:var(--ink); border:none; border-radius:var(--r-s);
+  font-family:var(--dis); font-weight:700; font-size:11px;
+  letter-spacing:0.08em; cursor:pointer; transition:all 0.2s;
+}
+.btn-conn:hover { background:var(--gold-2); color:#fff; }
+.conn-live {
+  font-size:10px; color:var(--green);
+  margin-top:7px; display:flex; align-items:center; gap:5px;
+  font-family:var(--mono);
+}
+
+/* ════════════════════════  MAIN  */
+.main {
+  flex:1; background:var(--cream);
+  min-height:calc(100vh - var(--topbar-h));
+  overflow-y:auto;
+}
+
+/* Page header */
+.page-hd {
+  padding:26px 28px 0;
+  display:flex; align-items:flex-start;
+  justify-content:space-between; gap:20px;
+}
+.page-title {
+  font-family:var(--dis); font-weight:800;
+  font-size:27px; letter-spacing:-0.01em;
+  line-height:1; color:var(--c1);
+}
+.page-title .gold { color:var(--gold-2); }
+.page-sub {
+  font-size:12px; color:var(--c3);
+  margin-top:6px; line-height:1.5; max-width:500px;
+}
+.page-hd-btns { display:flex; gap:8px; flex-shrink:0; }
+.btn-out {
+  padding:8px 16px; background:transparent;
+  border:1.5px solid rgba(28,27,24,0.18);
+  border-radius:var(--r-s); font-family:var(--sans);
+  font-size:12px; font-weight:500; color:var(--c1);
+  cursor:pointer; transition:all 0.15s;
+  display:flex; align-items:center; gap:5px;
+}
+.btn-out:hover { background:var(--ink); color:var(--t1); border-color:var(--ink); }
+.btn-ink {
+  padding:8px 18px; background:var(--ink);
+  border:none; border-radius:var(--r-s);
+  font-family:var(--dis); font-weight:700;
+  font-size:12px; letter-spacing:0.05em;
+  color:var(--t1); cursor:pointer; transition:all 0.2s;
+}
+.btn-ink:hover { background:var(--ink-4); }
+.btn-ink.syncing { opacity:0.65; pointer-events:none; }
+
+/* ── Section label ── */
+.sec {
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--c3); display:flex; align-items:center; gap:10px;
+  margin-bottom:12px;
+}
+.sec::after { content:''; flex:1; height:1px; background:rgba(28,27,24,0.1); }
+
+/* Padding wrapper */
+.pad { padding:22px 28px; }
+.pad-t { padding-top:22px; }
+
+/* ════════════════════════  KPI STRIP  */
+/* 5 equal KPI cards in a row */
+.kpi-strip {
+  display:grid; grid-template-columns:repeat(5,1fr);
+  gap:10px; margin-bottom:0;
+}
+.kpi {
+  background:#fff;
+  border:1px solid rgba(28,27,24,0.1);
+  border-radius:var(--r); padding:16px 16px 14px;
+  position:relative; overflow:hidden;
+  transition:border-color 0.15s; cursor:default;
+}
+.kpi:hover { border-color:rgba(200,169,110,0.5); }
+.kpi::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+}
+.kpi.k-profit::before  { background:var(--green); }
+.kpi.k-revenue::before { background:var(--gold); }
+.kpi.k-spend::before   { background:var(--red); }
+.kpi.k-margin::before  { background:var(--blue); }
+.kpi.k-aov::before     { background:var(--purple); }
+.kpi.k-roas::before    { background:var(--orange); }
+
+.kpi-label {
+  font-family:var(--mono); font-size:8.5px;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--c3); margin-bottom:9px;
+  display:flex; align-items:center; gap:6px;
+}
+.kpi-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.kpi-val {
+  font-family:var(--dis); font-weight:800;
+  font-size:26px; line-height:1;
+  letter-spacing:-0.02em; color:var(--c1);
+  margin-bottom:6px;
+}
+.kpi-val.green  { color:var(--green); }
+.kpi-val.gold   { color:var(--gold-2); }
+.kpi-val.red    { color:var(--red); }
+.kpi-val.blue   { color:var(--blue); }
+.kpi-val.purple { color:var(--purple); }
+.kpi-val.orange { color:var(--orange); }
+
+.kpi-change {
+  font-family:var(--mono); font-size:11px;
+  display:flex; align-items:center; gap:3px;
+}
+.kpi-change.up   { color:var(--green); }
+.kpi-change.down { color:var(--red); }
+.kpi-change.neu  { color:var(--c3); }
+.kpi-sub { font-size:10px; color:var(--c3); margin-top:1px; }
+
+/* ════════════════════════  TWO-COLUMN GRID  */
+.two-col { display:grid; grid-template-columns:1.55fr 1fr; gap:12px; }
+.three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+
+/* ── Card shell ── */
+.card {
+  background:#fff;
+  border:1px solid rgba(28,27,24,0.1);
+  border-radius:var(--r); overflow:hidden;
+}
+.card-hd {
+  padding:13px 16px;
+  border-bottom:1px solid rgba(28,27,24,0.07);
+  background:var(--cream-2);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.card-title {
+  font-family:var(--dis); font-weight:700;
+  font-size:12px; color:var(--c1); letter-spacing:0.01em;
+}
+.badge {
+  font-family:var(--mono); font-size:9px;
+  padding:2px 8px; border-radius:20px; border:1px solid;
+}
+.badge.gold   { border-color:rgba(200,169,110,0.4); color:var(--gold-2); background:var(--gold-bg); }
+.badge.green  { border-color:rgba(90,158,114,0.35); color:var(--green); background:var(--green-dim); }
+.badge.red    { border-color:rgba(217,84,84,0.3);   color:var(--red);   background:var(--red-dim); }
+.badge.blue   { border-color:rgba(74,127,193,0.3);  color:var(--blue);  background:var(--blue-dim); }
+.badge.orange { border-color:rgba(212,135,74,0.3);  color:var(--orange);background:var(--orange-dim); }
+
+.card-body { padding:14px 16px; }
+
+/* ════════════════════════  MINI SPARKLINE  */
+.sparkline-wrap { position:relative; height:70px; margin-bottom:10px; }
+svg.spark { width:100%; height:100%; }
+
+/* ════════════════════════  COST BREAKDOWN  */
+.cost-rows { }
+.cost-row {
+  display:flex; align-items:center;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid rgba(28,27,24,0.06);
+}
+.cost-row:last-child { border-bottom:none; }
+.cost-left { }
+.cost-name { font-size:12px; color:var(--c1); margin-bottom:2px; }
+.cost-pct  { font-family:var(--mono); font-size:10px; color:var(--c3); }
+.cost-right { display:flex; align-items:center; gap:8px; }
+.cost-bar-track {
+  width:72px; height:4px;
+  background:var(--cream-3);
+  border-radius:2px; overflow:hidden;
+}
+.cost-bar-fill { height:100%; border-radius:2px; }
+.cost-amount { font-family:var(--mono); font-size:12px; font-weight:500; min-width:58px; text-align:right; }
+
+/* ════════════════════════  AD PLATFORM CARDS  */
+.ad-card {
+  background:#fff;
+  border:1px solid rgba(28,27,24,0.1);
+  border-radius:var(--r); padding:16px;
+  position:relative; overflow:hidden;
+  transition:border-color 0.15s;
+}
+.ad-card:hover { border-color:rgba(200,169,110,0.4); }
+.ad-card::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+}
+.ad-card.google::before { background:linear-gradient(90deg,#4285F4,#34A853,#FBBC05,#EA4335); }
+.ad-card.meta::before   { background:linear-gradient(90deg,#1877F2,#E1306C); }
+.ad-card.ms::before     { background:linear-gradient(90deg,#00A4EF,#107C10,#FFB900); }
+
+.ad-pname {
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--c3); margin-bottom:10px;
+  display:flex; align-items:center; gap:6px;
+}
+.ad-pip { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.google .ad-pip { background:#4285F4; }
+.meta   .ad-pip { background:#1877F2; }
+.ms     .ad-pip { background:#00A4EF; }
+
+.ad-spend {
+  font-family:var(--dis); font-weight:800;
+  font-size:22px; color:var(--c1); letter-spacing:-0.02em;
+  line-height:1; margin-bottom:2px;
+}
+.ad-spend-sub { font-size:10px; color:var(--c3); margin-bottom:12px; }
+
+.ad-mets {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:8px; padding-top:10px;
+  border-top:1px solid rgba(28,27,24,0.07);
+}
+.am-l {
+  font-family:var(--mono); font-size:8.5px;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--c3); margin-bottom:2px;
+}
+.am-v { font-family:var(--mono); font-size:13px; font-weight:500; color:var(--c2); }
+.am-v.good { color:var(--green); }
+.am-v.warn { color:var(--orange); }
+.am-v.bad  { color:var(--red); }
+
+/* ROAS gauge mini */
+.roas-bar-track {
+  height:3px; background:var(--cream-3);
+  border-radius:2px; overflow:hidden; margin-top:4px;
+}
+.roas-bar-fill { height:100%; border-radius:2px; }
+
+/* ════════════════════════  DAILY TABLE  */
+.tbl-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+thead tr { background:var(--cream-2); }
+th {
+  padding:9px 14px; text-align:left;
+  font-family:var(--mono); font-size:8.5px;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--c3); font-weight:400;
+  border-bottom:1px solid rgba(28,27,24,0.08);
+  white-space:nowrap;
+}
+th.r { text-align:right; }
+td {
+  padding:11px 14px; border-bottom:1px solid rgba(28,27,24,0.06);
+  vertical-align:middle;
+}
+td.r { text-align:right; }
+td.mono { font-family:var(--mono); font-size:12px; }
+tr:last-child td { border-bottom:none; }
+tbody tr:hover td { background:rgba(200,169,110,0.04); }
+
+.chip {
+  display:inline-flex; align-items:center;
+  padding:3px 9px; border-radius:20px;
+  font-family:var(--mono); font-size:11px; font-weight:500;
+}
+.chip-g { background:var(--green-dim); color:var(--green); }
+.chip-r { background:var(--red-dim);   color:var(--red); }
+.chip-o { background:var(--orange-dim);color:var(--orange); }
+
+.mgn-badge {
+  display:inline-block; font-family:var(--mono);
+  font-size:9px; padding:2px 6px; border-radius:4px;
+}
+.mgn-g { background:rgba(90,158,114,0.08);  color:var(--green); }
+.mgn-w { background:rgba(212,135,74,0.1);   color:var(--orange); }
+.mgn-r { background:rgba(217,84,84,0.08);   color:var(--red); }
+
+/* ════════════════════════  LOG ENTRY FORM  */
+.log-form {
+  background:var(--ink);
+  border-radius:var(--r); padding:20px 22px;
+}
+.lf-title { font-family:var(--dis); font-weight:700; font-size:14px; color:var(--t1); margin-bottom:2px; }
+.lf-sub   { font-size:11px; color:var(--t3); margin-bottom:16px; }
+.lf-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.lf-field label {
+  display:block; font-family:var(--mono); font-size:8.5px;
+  letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--t3); margin-bottom:5px;
+}
+.lf-field input {
+  width:100%; padding:8px 11px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:var(--r-s); color:var(--t1);
+  font-family:var(--mono); font-size:12px;
+  outline:none; transition:border-color 0.2s;
+}
+.lf-field input:focus { border-color:var(--gold); }
+.lf-field input::placeholder { color:var(--t4); }
+.lf-actions { display:flex; gap:8px; align-items:center; margin-top:13px; }
+.btn-add {
+  padding:8px 20px; background:var(--gold);
+  color:var(--ink); border:none; border-radius:var(--r-s);
+  font-family:var(--dis); font-weight:700;
+  font-size:12px; letter-spacing:0.07em;
+  cursor:pointer; transition:all 0.2s;
+}
+.btn-add:hover { background:var(--gold-2); color:#fff; }
+.btn-clr {
+  padding:8px 14px; background:transparent;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:var(--r-s); font-size:12px;
+  color:var(--t3); cursor:pointer; transition:all 0.2s;
+}
+.btn-clr:hover { border-color:rgba(255,255,255,0.25); color:var(--t2); }
+.autofill-tag {
+  font-family:var(--mono); font-size:10px;
+  color:var(--green); background:rgba(90,158,114,0.1);
+  border:1px solid rgba(90,158,114,0.22);
+  padding:2px 8px; border-radius:4px; letter-spacing:0.03em;
+}
+
+/* ════════════════════════  TOAST  */
+.toast {
+  position:fixed; bottom:20px; right:20px;
+  background:var(--ink); color:var(--t1);
+  padding:11px 16px; border-radius:var(--r);
+  border-left:3px solid var(--gold);
+  font-size:12px; z-index:999;
+  transform:translateY(60px); opacity:0;
+  transition:all 0.28s; max-width:280px;
+  box-shadow:0 8px 28px rgba(0,0,0,0.3);
+}
+.toast.show { transform:translateY(0); opacity:1; }
+.toast.ok   { border-left-color:var(--green); }
+.toast.err  { border-left-color:var(--red); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+.main::-webkit-scrollbar-thumb { background:rgba(28,27,24,0.15); }
+</style>
+</head>
+<body>
+
+<!-- ══════════  TOPBAR  -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon-wrap">
+      <img src="data:image/png;base64,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" alt="FoldifyCase Logo">
+    </div>
+    <span class="logo-wordmark">FOLDIFYCASE</span>
+  </div>
+</div>
+
+<!-- ══════════  LAYOUT  -->
+<div class="layout">
+
+  <!-- ══════════  SIDEBAR  -->
+  <aside class="sidebar">
+
+    <div class="sb-label">Stats</div>
+    <div class="sb-stats">
+      <div class="sb-stat">
+        <div class="sb-stat-val sv-green" id="sb-profit">$4,218</div>
+        <div class="sb-stat-label">Net Profit</div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-val sv-gold" id="sb-rev">$18.5k</div>
+        <div class="sb-stat-label">Revenue</div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-val sv-red" id="sb-spend">$6,210</div>
+        <div class="sb-stat-label">Ad Spend</div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-val sv-cream" id="sb-margin">22.7%</div>
+        <div class="sb-stat-label">Margin</div>
+      </div>
+    </div>
+
+    <!-- Auto-sync toggle -->
+    <div class="sb-toggle-row">
+      <div class="sb-toggle-label">
+        <span>↺</span> Auto-Sync Shopify
+      </div>
+      <label class="toggle">
+        <input type="checkbox" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+
+    <div class="sb-div"></div>
+    <div class="sb-label" style="padding-top:4px">View</div>
+
+    <div class="sb-nav-item active" onclick="setNav(this)">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span>Overview</div>
+      <span class="sb-nav-badge">7D</span>
+    </div>
+    <div class="sb-nav-item" onclick="setNav(this)">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📅</span>Daily P&amp;L Log</div>
+      <span class="sb-nav-badge" id="nb-entries">7</span>
+    </div>
+    <div class="sb-nav-item" onclick="setNav(this)">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span>Ad Platforms</div>
+      <span class="sb-nav-badge">3</span>
+    </div>
+
+    <div class="sb-div"></div>
+    <div class="sb-label" style="padding-top:4px">Platform ROAS</div>
+
+    <div class="sb-nav-item" onclick="void(0)">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">●</span>Google Ads</div>
+      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">4.2×</span>
+    </div>
+    <div class="sb-nav-item" onclick="void(0)">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">●</span>Meta Ads</div>
+      <span class="sb-nav-badge" style="background:var(--orange-dim);color:var(--orange)">2.6×</span>
+    </div>
+    <div class="sb-nav-item" onclick="void(0)">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">●</span>Microsoft Ads</div>
+      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">3.8×</span>
+    </div>
+
+    <!-- Shopify connect -->
+    <div class="sb-shopify">
+      <div class="sb-shopify-title"><span class="sdot"></span>Shopify Connected</div>
+      <input type="password" id="apiToken" placeholder="Admin API Token">
+      <button class="btn-conn" onclick="connectShopify()">CONNECT / UPDATE</button>
+      <div class="conn-live"><span class="sdot"></span>scnd9y-a1.myshopify.com</div>
+    </div>
+
+  </aside>
+
+  <!-- ══════════  MAIN  -->
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-hd">
+      <div>
+        <div class="page-title">PROFIT <span class="gold">TRACKING</span></div>
+        <div class="page-sub">Your complete profit picture — revenue, ad spend, COGS, shipping and net margin across all 3 markets. Click Refresh Data to pull latest Shopify orders.</div>
+      </div>
+      <div class="page-hd-btns">
+        <button class="btn-out" onclick="document.getElementById('logSection').scrollIntoView({behavior:'smooth'})">+ Add Entry</button>
+        <button class="btn-ink" id="syncBtn" onclick="doSync()">⟳ Refresh Data</button>
+      </div>
+    </div>
+
+    <!-- Controls bar — range + market + export -->
+    <div class="main-controls">
+      <button class="rp" onclick="setRange(this,'today')">Today</button>
+      <button class="rp active" onclick="setRange(this,'7d')">7D</button>
+      <button class="rp" onclick="setRange(this,'30d')">30D</button>
+      <button class="rp" onclick="setRange(this,'90d')">90D</button>
+      <button class="rp" onclick="setRange(this,'ytd')">YTD</button>
+      <div class="controls-divider"></div>
+      <button class="mkt active" onclick="setMkt(this)">ALL</button>
+      <button class="mkt" onclick="setMkt(this)">🇺🇸 US</button>
+      <button class="mkt" onclick="setMkt(this)">🇬🇧 UK</button>
+      <button class="mkt" onclick="setMkt(this)">🇦🇺 AU</button>
+      <div class="ctrl-right">
+        <button class="btn-out" onclick="exportCSV()">↓ Export CSV</button>
+      </div>
+    </div>
+
+    <!-- ── 1. KPI STRIP ── -->
+    <div class="pad">
+      <div class="sec">Key Performance Indicators</div>
+      <div class="kpi-strip">
+
+        <div class="kpi k-profit">
+          <div class="kpi-label"><span class="kpi-dot" style="background:var(--green)"></span>Net Profit</div>
+          <div class="kpi-val green" id="kpi-profit">$4,218</div>
+          <div class="kpi-change up" id="kpi-profit-chg">▲ 12.4% vs prev</div>
+        </div>
+
+        <div class="kpi k-revenue">
+          <div class="kpi-label"><span class="kpi-dot" style="background:var(--gold)"></span>Total Revenue</div>
+          <div class="kpi-val gold" id="kpi-rev">$18,540</div>
+          <div class="kpi-change up">▲ 8.1% vs prev</div>
+        </div>
+
+        <div class="kpi k-margin">
+          <div class="kpi-label"><span class="kpi-dot" style="background:var(--blue)"></span>Profit Margin</div>
+          <div class="kpi-val blue" id="kpi-margin">22.7%</div>
+          <div class="kpi-change up">▲ 2.1pp vs prev</div>
+        </div>
+
+        <div class="kpi k-aov">
+          <div class="kpi-label"><span class="kpi-dot" style="background:var(--purple)"></span>Avg Order Value</div>
+          <div class="kpi-val purple" id="kpi-aov">$76.90</div>
+          <div class="kpi-change up">▲ 5.3% vs prev</div>
+        </div>
+
+        <div class="kpi k-spend">
+          <div class="kpi-label"><span class="kpi-dot" style="background:var(--red)"></span>Total Ad Spend</div>
+          <div class="kpi-val red" id="kpi-spend">$6,210</div>
+          <div class="kpi-change neu">— vs prev period</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 2. REVENUE CHART + COST BREAKDOWN ── -->
+    <div class="pad" style="padding-top:0">
+      <div class="sec">Revenue vs Costs</div>
+      <div class="two-col">
+
+        <!-- Bar chart card -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Daily Revenue vs Total Costs</div>
+            <span class="badge gold">7 Days</span>
+          </div>
+          <div class="card-body">
+            <div id="barChart" style="display:flex;align-items:flex-end;gap:6px;height:130px;position:relative;margin-bottom:10px;">
+              <!-- rendered by JS -->
+            </div>
+            <!-- chart legend -->
+            <div style="display:flex;gap:14px;margin-top:4px">
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--c3)">
+                <div style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></div>Revenue
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--c3)">
+                <div style="width:10px;height:10px;border-radius:2px;background:var(--ink-4);opacity:.6"></div>Total Costs
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--c3);margin-left:auto">
+                <span style="color:var(--green);font-family:var(--mono);font-size:10px">● Profit zone</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost breakdown donut card -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Cost Breakdown</div>
+            <span class="badge gold">7D Total</span>
+          </div>
+          <div class="donut-grid" id="costBreakdown"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 3. AD PLATFORM CARDS ── -->
+    <div class="pad" style="padding-top:0">
+      <div class="sec">Ad Platform Performance</div>
+      <div class="three-col">
+
+        <div class="ad-card google">
+          <div class="ad-pname"><span class="ad-pip"></span>Google Ads</div>
+          <div class="ad-spend">$2,840</div>
+          <div class="ad-spend-sub">spend this period</div>
+          <div class="ad-mets">
+            <div>
+              <div class="am-l">ROAS</div>
+              <div class="am-v good">4.2×</div>
+              <div class="roas-bar-track"><div class="roas-bar-fill" style="width:84%;background:var(--green)"></div></div>
+            </div>
+            <div><div class="am-l">Revenue</div><div class="am-v">$11,928</div></div>
+            <div><div class="am-l">CPA</div><div class="am-v">$24.10</div></div>
+            <div><div class="am-l">Conversions</div><div class="am-v">118</div></div>
+          </div>
+        </div>
+
+        <div class="ad-card meta">
+          <div class="ad-pname"><span class="ad-pip"></span>Meta Ads</div>
+          <div class="ad-spend">$2,490</div>
+          <div class="ad-spend-sub">spend this period</div>
+          <div class="ad-mets">
+            <div>
+              <div class="am-l">ROAS</div>
+              <div class="am-v warn">2.6×</div>
+              <div class="roas-bar-track"><div class="roas-bar-fill" style="width:52%;background:var(--orange)"></div></div>
+            </div>
+            <div><div class="am-l">Revenue</div><div class="am-v">$6,474</div></div>
+            <div><div class="am-l">CPA</div><div class="am-v">$31.60</div></div>
+            <div><div class="am-l">Conversions</div><div class="am-v">78</div></div>
+          </div>
+        </div>
+
+        <div class="ad-card ms">
+          <div class="ad-pname"><span class="ad-pip"></span>Microsoft Ads</div>
+          <div class="ad-spend">$880</div>
+          <div class="ad-spend-sub">spend this period</div>
+          <div class="ad-mets">
+            <div>
+              <div class="am-l">ROAS</div>
+              <div class="am-v good">3.8×</div>
+              <div class="roas-bar-track"><div class="roas-bar-fill" style="width:76%;background:var(--green)"></div></div>
+            </div>
+            <div><div class="am-l">Revenue</div><div class="am-v">$3,344</div></div>
+            <div><div class="am-l">CPA</div><div class="am-v">$19.40</div></div>
+            <div><div class="am-l">Conversions</div><div class="am-v">45</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 4. DAILY P&L TABLE ── -->
+    <div class="pad" style="padding-top:0">
+      <div class="sec">Daily P&amp;L Log</div>
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">7-Day Profit &amp; Loss</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge green" id="tblCount">7 entries</span>
+            <span class="badge gold">AUD</span>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th class="r">Revenue</th>
+                <th class="r">Orders</th>
+                <th class="r">AOV</th>
+                <th class="r">COGS</th>
+                <th class="r">Ad Spend</th>
+                <th class="r">Shipping</th>
+                <th class="r">Net Profit</th>
+                <th class="r">Margin</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. ADD ENTRY FORM ── -->
+    <div class="pad" style="padding-top:0" id="logSection">
+      <div class="sec">Add Daily Entry</div>
+      <div class="log-form">
+        <div class="lf-title">Daily Cost Logger</div>
+        <div class="lf-sub">Revenue &amp; orders auto-pulled from Shopify on sync · Enter ad spend per platform manually each day</div>
+        <div class="lf-grid">
+          <div class="lf-field"><label>Date</label><input type="date" id="eDate" value="2026-04-15"></div>
+          <div class="lf-field"><label>Revenue ($)</label><input type="number" id="eRev" placeholder="Auto from Shopify" step="0.01"></div>
+          <div class="lf-field"><label>Orders</label><input type="number" id="eOrd" placeholder="Auto from Shopify"></div>
+          <div class="lf-field"><label>Unit Cost ($)</label><input type="number" id="eCOGS" placeholder="e.g. 12.50" step="0.01"></div>
+          <div class="lf-field"><label>Google Ads ($)</label><input type="number" id="eGoogle" placeholder="0.00" step="0.01"></div>
+          <div class="lf-field"><label>Meta Ads ($)</label><input type="number" id="eMeta" placeholder="0.00" step="0.01"></div>
+          <div class="lf-field"><label>Microsoft Ads ($)</label><input type="number" id="eMs" placeholder="0.00" step="0.01"></div>
+          <div class="lf-field"><label>Shipping Fees ($)</label><input type="number" id="eShip" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="lf-actions">
+          <button class="btn-add" onclick="addEntry()">+ ADD ENTRY</button>
+          <button class="btn-clr" onclick="clearForm()">CLEAR</button>
+          <span class="autofill-tag">⟳ Shopify auto-fills on sync</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ── DATA ── */
+let rows = [
+  {date:'Apr 09', orders:18, revenue:2140, cogs:816,  google:380, meta:310, ms:110, ship:96},
+  {date:'Apr 10', orders:27, revenue:3210, cogs:1224, google:540, meta:470, ms:150, ship:144},
+  {date:'Apr 11', orders:21, revenue:2480, cogs:946,  google:410, meta:380, ms:120, ship:111},
+  {date:'Apr 12', orders:24, revenue:2890, cogs:1102, google:480, meta:420, ms:130, ship:130},
+  {date:'Apr 13', orders:16, revenue:1980, cogs:755,  google:320, meta:280, ms:90,  ship:84},
+  {date:'Apr 14', orders:26, revenue:3140, cogs:1197, google:520, meta:450, ms:140, ship:134},
+  {date:'Apr 15', orders:22, revenue:2700, cogs:1030, google:390, meta:340, ms:120, ship:120},
+];
+
+/* ── CALC ── */
+const calc = r => {
+  const ad = r.google + r.meta + r.ms;
+  const total = r.cogs + ad + r.ship;
+  const profit = r.revenue - total;
+  const margin = ((profit / r.revenue) * 100).toFixed(1);
+  const aov = (r.revenue / r.orders).toFixed(2);
+  return { ad, total, profit, margin, aov };
+};
+
+const f$ = n => '$' + Math.abs(Math.round(n)).toLocaleString();
+const fPct = n => parseFloat(n).toFixed(1) + '%';
+
+/* ── TOTALS ── */
+function totals() {
+  return rows.reduce((a, r) => {
+    const c = calc(r);
+    a.rev     += r.revenue;
+    a.profit  += c.profit;
+    a.ad      += c.ad;
+    a.cogs    += r.cogs;
+    a.ship    += r.ship;
+    a.orders  += r.orders;
+    return a;
+  }, { rev:0, profit:0, ad:0, cogs:0, ship:0, orders:0 });
+}
+
+/* ── RENDER ALL ── */
+function renderAll() {
+  renderKPIs();
+  renderSidebar();
+  renderChart();
+  renderBreakdown();
+  renderTable();
+}
+
+/* ── KPIs ── */
+function renderKPIs() {
+  const t = totals();
+  const margin = ((t.profit / t.rev) * 100).toFixed(1);
+  const aov = (t.rev / t.orders).toFixed(2);
+
+  document.getElementById('kpi-profit').textContent = f$(t.profit);
+  document.getElementById('kpi-rev').textContent    = f$(t.rev);
+  document.getElementById('kpi-margin').textContent = fPct(margin);
+  document.getElementById('kpi-aov').textContent    = f$(aov);
+  document.getElementById('kpi-spend').textContent  = f$(t.ad);
+
+  // profit change colour
+  const el = document.getElementById('kpi-profit');
+  el.className = 'kpi-val ' + (t.profit >= 0 ? 'green' : 'red');
+}
+
+/* ── SIDEBAR ── */
+function renderSidebar() {
+  const t = totals();
+  const margin = ((t.profit / t.rev) * 100).toFixed(1);
+  document.getElementById('sb-profit').textContent = f$(t.profit);
+  document.getElementById('sb-rev').textContent    = '$' + (t.rev/1000).toFixed(1)+'k';
+  document.getElementById('sb-spend').textContent  = f$(t.ad);
+  document.getElementById('sb-margin').textContent = fPct(margin);
+  document.getElementById('nb-entries').textContent = rows.length;
+}
+
+/* ── BAR CHART ── */
+function renderChart() {
+  const container = document.getElementById('barChart');
+  container.innerHTML = '';
+  const maxRev = Math.max(...rows.map(r => r.revenue));
+  const H = 118;
+
+  // baseline
+  const baseline = document.createElement('div');
+  baseline.style.cssText = 'position:absolute;bottom:22px;left:0;right:0;height:1px;background:rgba(28,27,24,0.08);pointer-events:none';
+  container.appendChild(baseline);
+
+  rows.forEach(r => {
+    const c = calc(r);
+    const revH  = Math.round((r.revenue / maxRev) * H);
+    const costH = Math.round((c.total   / maxRev) * H);
+    const lbl   = r.date.split(' ')[1];
+    const isProfit = c.profit > 0;
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;height:100%;cursor:pointer';
+    wrap.title = `${r.date}  |  Revenue: ${f$(r.revenue)}  |  Costs: ${f$(c.total)}  |  Profit: ${f$(c.profit)}  |  Margin: ${c.margin}%`;
+
+    wrap.innerHTML = `
+      <div style="display:flex;gap:2px;align-items:flex-end;width:90%;height:${H}px">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="height:${revH}px;background:var(--gold);border-radius:3px 3px 0 0;opacity:0.9;transition:opacity .2s"></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="height:${costH}px;background:${isProfit?'var(--ink-4)':'var(--red)'};border-radius:3px 3px 0 0;opacity:0.55;transition:opacity .2s"></div>
+        </div>
+      </div>
+      <div style="font-size:9px;color:var(--c3);font-family:var(--mono);margin-top:6px">${lbl}</div>
+    `;
+
+    wrap.addEventListener('mouseenter', () => {
+      wrap.querySelectorAll('div > div').forEach(b => b.style.opacity = '1');
+    });
+    wrap.addEventListener('mouseleave', () => {
+      wrap.querySelectorAll('div > div:first-child div').forEach(b => b.style.opacity = '0.9');
+      wrap.querySelectorAll('div > div:last-child div').forEach(b => b.style.opacity = '0.55');
+    });
+
+    container.appendChild(wrap);
+  });
+}
+
+/* ── COST BREAKDOWN — DONUT CHARTS ── */
+function renderBreakdown() {
+  const t = totals();
+  const shopify = Math.round(t.rev * 0.005);
+  const profit  = t.rev - t.cogs - t.ad - t.ship - shopify;
+
+  const items = [
+    { name:'COGS',       amt:t.cogs,  pct:+(t.cogs/t.rev*100).toFixed(1),  color:'#7E6DB5', bg:'rgba(126,109,181,0.1)' },
+    { name:'Ad Spend',   amt:t.ad,    pct:+(t.ad/t.rev*100).toFixed(1),    color:'#D95454', bg:'rgba(217,84,84,0.1)' },
+    { name:'Shipping',   amt:t.ship,  pct:+(t.ship/t.rev*100).toFixed(1),  color:'#4A7FC1', bg:'rgba(74,127,193,0.1)' },
+    { name:'Shopify Fee',amt:shopify, pct:+(shopify/t.rev*100).toFixed(1), color:'#999',    bg:'rgba(0,0,0,0.05)' },
+    { name:'Net Profit', amt:profit,  pct:+(profit/t.rev*100).toFixed(1),  color:'#5A9E72', bg:'rgba(90,158,114,0.1)' },
+  ];
+
+  // SVG donut helper
+  function donut(pct, color, bg) {
+    const r = 34;
+    const circ = 2 * Math.PI * r;
+    const filled = (pct / 100) * circ;
+    const gap    = circ - filled;
+    return `
+      <circle cx="43" cy="43" r="${r}" fill="none" stroke="${bg}" stroke-width="9"/>
+      <circle cx="43" cy="43" r="${r}" fill="none" stroke="${color}" stroke-width="9"
+        stroke-dasharray="${filled.toFixed(2)} ${gap.toFixed(2)}"
+        stroke-linecap="round"/>
+    `;
+  }
+
+  document.getElementById('costBreakdown').innerHTML = items.map(i => `
+    <div class="donut-item">
+      <div class="donut-svg-wrap">
+        <svg viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg">
+          ${donut(i.pct, i.color, i.bg)}
+        </svg>
+        <div class="donut-center">
+          <div class="donut-pct" style="color:${i.color}">${i.pct}%</div>
+        </div>
+      </div>
+      <div class="donut-name">${i.name}</div>
+      <div class="donut-amt">${f$(i.amt)}</div>
+    </div>
+  `).join('');
+}
+
+/* ── TABLE ── */
+function renderTable() {
+  const tb = document.getElementById('tableBody');
+  tb.innerHTML = '';
+
+  rows.forEach(r => {
+    const c = calc(r);
+    const mgClass = parseFloat(c.margin) >= 20 ? 'mgn-g' : parseFloat(c.margin) >= 10 ? 'mgn-w' : 'mgn-r';
+    const chipCls = c.profit >= 0 ? 'chip-g' : 'chip-r';
+    const sign    = c.profit < 0 ? '−' : '';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="mono" style="color:var(--c2);font-size:12px">${r.date}</td>
+      <td class="r mono">${f$(r.revenue)}</td>
+      <td class="r mono" style="color:var(--c3)">${r.orders}</td>
+      <td class="r mono" style="color:var(--c2)">${f$(c.aov)}</td>
+      <td class="r mono" style="color:var(--purple)">${f$(r.cogs)}</td>
+      <td class="r mono" style="color:var(--red)">${f$(c.ad)}</td>
+      <td class="r mono" style="color:var(--blue)">${f$(r.ship)}</td>
+      <td class="r">
+        <span class="chip ${chipCls}">${sign}${f$(c.profit)}</span>
+      </td>
+      <td class="r">
+        <span class="mgn-badge ${mgClass}">${c.margin}%</span>
+      </td>
+    `;
+    tb.appendChild(tr);
+  });
+
+  document.getElementById('tblCount').textContent = rows.length + ' entries';
+}
+
+/* ── ADD ENTRY ── */
+function addEntry() {
+  const rev    = parseFloat(document.getElementById('eRev').value)    || 0;
+  const orders = parseInt(document.getElementById('eOrd').value)       || 0;
+  const unit   = parseFloat(document.getElementById('eCOGS').value)   || 0;
+  const google = parseFloat(document.getElementById('eGoogle').value) || 0;
+  const meta   = parseFloat(document.getElementById('eMeta').value)   || 0;
+  const ms     = parseFloat(document.getElementById('eMs').value)     || 0;
+  const ship   = parseFloat(document.getElementById('eShip').value)   || 0;
+
+  if (!rev) { toast('Please enter a revenue figure', 'err'); return; }
+
+  const d = new Date(document.getElementById('eDate').value);
+  const label = d.toLocaleDateString('en-AU', { month:'short', day:'2-digit' });
+
+  rows.unshift({ date:label, orders, revenue:rev, cogs:unit*orders, google, meta, ms, ship });
+  clearForm();
+  renderAll();
+  toast(`Entry for ${label} added`, 'ok');
+}
+
+function clearForm() {
+  ['eRev','eOrd','eCOGS','eGoogle','eMeta','eMs','eShip'].forEach(id => document.getElementById(id).value='');
+}
+
+/* ── CONTROLS ── */
+function setRange(btn) {
+  document.querySelectorAll('.rp').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setMkt(btn) {
+  document.querySelectorAll('.mkt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setNav(el) {
+  document.querySelectorAll('.sb-nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── SYNC ── */
+function doSync() {
+  const btn = document.getElementById('syncBtn');
+  btn.classList.add('syncing');
+  btn.innerHTML = '<span class="sdot"></span> Syncing...';
+  setTimeout(() => {
+    btn.classList.remove('syncing');
+    btn.innerHTML = '<span class="sdot"></span> Refresh Data';
+    toast('Data synced · ' + new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}), 'ok');
+  }, 1800);
+}
+
+function connectShopify() {
+  const t = document.getElementById('apiToken').value;
+  if (!t) { toast('Enter your Shopify Admin API token', 'err'); return; }
+  toast('✓ Connected to scnd9y-a1.myshopify.com', 'ok');
+}
+
+/* ── EXPORT ── */
+function exportCSV() {
+  let csv = 'Date,Orders,Revenue,AOV,COGS,Google Ads,Meta Ads,Microsoft Ads,Shipping,Total Ad Spend,Net Profit,Margin\n';
+  rows.forEach(r => {
+    const c = calc(r);
+    csv += `${r.date},${r.orders},${r.revenue},${c.aov},${r.cogs},${r.google},${r.meta},${r.ms},${r.ship},${c.ad},${c.profit},${c.margin}%\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = 'foldifycase-profit-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('CSV exported', 'ok');
+}
+
+/* ── TOAST ── */
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.className = 'toast', 3000);
+}
+
+/* ── INIT ── */
+renderAll();
+</script>
+</body>
+</html>
