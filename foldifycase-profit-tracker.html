@@ -680,7 +680,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
     <div class="sb-nav-item" onclick="void(0)">
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">●</span>Meta Ads</div>
-      <span class="sb-nav-badge" style="background:var(--orange-dim);color:var(--orange)">2.6×</span>
+      <span class="sb-nav-badge" id="meta-roas-badge" style="background:var(--orange-dim);color:var(--orange)">—</span>
     </div>
     <div class="sb-nav-item" onclick="void(0)">
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">●</span>Microsoft Ads</div>
@@ -704,7 +704,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <div class="page-hd">
       <div>
         <div class="page-title">PROFIT <span class="gold">TRACKING</span></div>
-        <div class="page-sub">Your complete profit picture — revenue, ad spend, COGS, shipping and net margin across all 3 markets. Click Refresh Data to pull latest Shopify orders.</div>
+        <div class="page-sub">Auto-syncs Shopify revenue + Meta Ads spend on load. Google Ads coming soon. <span id="liveBadge" style="font-family:var(--mono);font-size:10px;margin-left:6px">⚪ SAMPLE</span></div>
       </div>
       <div class="page-hd-btns">
         <button class="btn-out" onclick="document.getElementById('logSection').scrollIntoView({behavior:'smooth'})">+ Add Entry</button>
@@ -815,50 +815,56 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div class="three-col">
 
         <div class="ad-card google">
-          <div class="ad-pname"><span class="ad-pip"></span>Google Ads</div>
-          <div class="ad-spend">$2,840</div>
-          <div class="ad-spend-sub">spend this period</div>
+          <div class="ad-pname"><span class="ad-pip"></span>Google Ads
+            <span style="margin-left:auto;font-size:9px;color:var(--orange);background:rgba(212,135,74,0.1);border:1px solid rgba(212,135,74,0.3);padding:1px 6px;border-radius:4px">PENDING APPROVAL</span>
+          </div>
+          <div class="ad-spend" id="google-spend-val">—</div>
+          <div class="ad-spend-sub">awaiting Google Ads API approval</div>
           <div class="ad-mets">
             <div>
               <div class="am-l">ROAS</div>
-              <div class="am-v good">4.2×</div>
-              <div class="roas-bar-track"><div class="roas-bar-fill" style="width:84%;background:var(--green)"></div></div>
+              <div class="am-v" id="google-roas-val" style="color:var(--c3)">—</div>
+              <div class="roas-bar-track"><div class="roas-bar-fill" id="google-roas-bar" style="width:0%;background:var(--green)"></div></div>
             </div>
-            <div><div class="am-l">Revenue</div><div class="am-v">$11,928</div></div>
-            <div><div class="am-l">CPA</div><div class="am-v">$24.10</div></div>
-            <div><div class="am-l">Conversions</div><div class="am-v">118</div></div>
+            <div><div class="am-l">Revenue</div><div class="am-v" id="google-rev-val" style="color:var(--c3)">—</div></div>
+            <div><div class="am-l">CPA</div><div class="am-v" id="google-cpa-val" style="color:var(--c3)">—</div></div>
+            <div><div class="am-l">Conversions</div><div class="am-v" id="google-conv-val" style="color:var(--c3)">—</div></div>
           </div>
         </div>
 
         <div class="ad-card meta">
-          <div class="ad-pname"><span class="ad-pip"></span>Meta Ads</div>
-          <div class="ad-spend">$2,490</div>
+          <div class="ad-pname"><span class="ad-pip"></span>Meta Ads
+            <span style="margin-left:auto;font-size:9px;color:var(--green);background:rgba(90,158,114,0.1);border:1px solid rgba(90,158,114,0.3);padding:1px 6px;border-radius:4px">● LIVE</span>
+          </div>
+          <div class="ad-spend" id="meta-spend-val">—</div>
           <div class="ad-spend-sub">spend this period</div>
           <div class="ad-mets">
             <div>
               <div class="am-l">ROAS</div>
-              <div class="am-v warn">2.6×</div>
-              <div class="roas-bar-track"><div class="roas-bar-fill" style="width:52%;background:var(--orange)"></div></div>
+              <div class="am-v" id="meta-roas-val">—</div>
+              <div class="roas-bar-track"><div class="roas-bar-fill" id="meta-roas-bar" style="width:0%"></div></div>
             </div>
-            <div><div class="am-l">Revenue</div><div class="am-v">$6,474</div></div>
-            <div><div class="am-l">CPA</div><div class="am-v">$31.60</div></div>
-            <div><div class="am-l">Conversions</div><div class="am-v">78</div></div>
+            <div><div class="am-l">Revenue</div><div class="am-v" id="meta-rev-val">—</div></div>
+            <div><div class="am-l">CPA</div><div class="am-v" id="meta-cpa-val">—</div></div>
+            <div><div class="am-l">Conversions</div><div class="am-v" id="meta-conv-val">—</div></div>
           </div>
         </div>
 
         <div class="ad-card ms">
-          <div class="ad-pname"><span class="ad-pip"></span>Microsoft Ads</div>
-          <div class="ad-spend">$880</div>
-          <div class="ad-spend-sub">spend this period</div>
+          <div class="ad-pname"><span class="ad-pip"></span>Microsoft Ads
+            <span style="margin-left:auto;font-size:9px;color:var(--c3);background:rgba(0,0,0,0.05);border:1px solid var(--cream-3);padding:1px 6px;border-radius:4px">COMING SOON</span>
+          </div>
+          <div class="ad-spend" id="ms-spend-val" style="color:var(--c3)">—</div>
+          <div class="ad-spend-sub">not yet connected</div>
           <div class="ad-mets">
             <div>
               <div class="am-l">ROAS</div>
-              <div class="am-v good">3.8×</div>
-              <div class="roas-bar-track"><div class="roas-bar-fill" style="width:76%;background:var(--green)"></div></div>
+              <div class="am-v" id="ms-roas-val" style="color:var(--c3)">—</div>
+              <div class="roas-bar-track"><div class="roas-bar-fill" id="ms-roas-bar" style="width:0%"></div></div>
             </div>
-            <div><div class="am-l">Revenue</div><div class="am-v">$3,344</div></div>
-            <div><div class="am-l">CPA</div><div class="am-v">$19.40</div></div>
-            <div><div class="am-l">Conversions</div><div class="am-v">45</div></div>
+            <div><div class="am-l">Revenue</div><div class="am-v" id="ms-rev-val" style="color:var(--c3)">—</div></div>
+            <div><div class="am-l">CPA</div><div class="am-v" id="ms-cpa-val" style="color:var(--c3)">—</div></div>
+            <div><div class="am-l">Conversions</div><div class="am-v" id="ms-conv-val" style="color:var(--c3)">—</div></div>
           </div>
         </div>
 
@@ -930,9 +936,184 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
      JAVASCRIPT
 ══════════════════════════════════════════ -->
 <script>
-/* ── DATA ── */
-let rows = [
-  {date:'Apr 09', orders:18, revenue:2140, cogs:816,  google:380, meta:310, ms:110, ship:96},
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const PROXY      = 'https://foldify-case-operation-management-a.vercel.app/api/proxy';
+const UNIT_COST  = 12.50; // default cost per unit — update to match your products
+const SHIP_RATE  = 0.045; // shipping as % of revenue — update to match your rates
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let rows         = [];          // live data merged from Shopify + ad platforms
+let activeRange  = '7d';
+let activeMkt    = 'all';
+let isLiveData   = false;
+
+// Ad platform live totals (populated after sync)
+let livePlatforms = {
+  meta:   null,  // { spend, revenue, roas, cpa, conversions } — connected ✅
+  google: null,  // waiting for API approval ⏳
+  ms:     null,  // skipped for now ⏳
+};
+
+/* ══════════════════════════════════════════
+   DATE HELPERS
+══════════════════════════════════════════ */
+function getRange(key) {
+  const now   = new Date();
+  const today = now.toISOString().slice(0,10);
+  const map   = { today:0, '7d':6, '30d':29, '90d':89,
+    ytd: Math.floor((now - new Date(now.getFullYear(),0,1)) / 86400000) };
+  const days  = map[key] ?? 6;
+  const from  = new Date(now - days*86400000).toISOString().slice(0,10);
+  return { from, to: today };
+}
+
+/* ══════════════════════════════════════════
+   MAIN SYNC — fetch all live data
+══════════════════════════════════════════ */
+async function doSync() {
+  const btn = document.getElementById('syncBtn');
+  btn.textContent = '⟳ Syncing...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  const { from, to } = getRange(activeRange);
+  toast('Fetching live data from Shopify + Meta...', 'ok');
+
+  try {
+    // Fetch Shopify + Meta in parallel
+    // Google + Microsoft will be added once API keys are in Vercel
+    const [shopifyRes, metaRes] = await Promise.allSettled([
+      fetch(`${PROXY}?service=shopify&action=daily-sales&from=${from}&to=${to}`),
+      fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`),
+      // Google: uncomment when approved
+      // fetch(`${PROXY}?service=google-ads&from=${from}&to=${to}`),
+      // Microsoft: uncomment when ready
+      // fetch(`${PROXY}?service=ms-ads&from=${from}&to=${to}`),
+    ]);
+
+    // ── Parse Shopify ─────────────────────────────────────────
+    let shopifyDays = {};
+    if (shopifyRes.status === 'fulfilled' && shopifyRes.value.ok) {
+      const d = await shopifyRes.value.json();
+      (d.daily || []).forEach(day => { shopifyDays[day.date] = day; });
+      isLiveData = Object.keys(shopifyDays).length > 0;
+    }
+
+    // ── Parse Meta ────────────────────────────────────────────
+    let metaDays = {};
+    if (metaRes.status === 'fulfilled' && metaRes.value.ok) {
+      const d = await metaRes.value.json();
+      if (d.total) {
+        livePlatforms.meta = d.total;
+        updateAdCard('meta', d.total);
+        // Update sidebar ROAS badge
+        const roas = d.total.roas || 0;
+        document.getElementById('meta-roas-badge').textContent = roas.toFixed(1) + '×';
+        document.getElementById('meta-roas-badge').style.color =
+          roas >= 3 ? 'var(--green)' : roas >= 2 ? 'var(--orange)' : 'var(--red)';
+      }
+      (d.daily || []).forEach(day => { metaDays[day.date] = day.spend || 0; });
+    }
+
+    // ── Merge into rows ───────────────────────────────────────
+    if (isLiveData) {
+      // Total meta spend across period, spread proportionally by day revenue
+      const totalMetaSpend = livePlatforms.meta?.spend || 0;
+      const totalShopifyRev = Object.values(shopifyDays).reduce((s,d) => s+d.revenue, 0);
+
+      rows = Object.values(shopifyDays).map(day => {
+        const rev    = day.revenue || 0;
+        const orders = day.orders  || 0;
+        // Spread meta spend proportionally by revenue share
+        const dayShare = totalShopifyRev > 0 ? rev / totalShopifyRev : 0;
+        const meta   = metaDays[day.date] !== undefined
+          ? metaDays[day.date]
+          : +(totalMetaSpend * dayShare).toFixed(2);
+        const google = 0; // will be live once Google API approved
+        const ms     = 0; // will be live once Microsoft connected
+        const cogs   = +(orders * UNIT_COST).toFixed(2);
+        const ship   = +(rev * SHIP_RATE).toFixed(2);
+        return {
+          date:    day.date,
+          orders,
+          revenue: rev,
+          cogs,
+          google,
+          meta,
+          ms,
+          ship,
+        };
+      }).sort((a,b) => a.date.localeCompare(b.date));
+
+      // Format dates nicely for display
+      rows = rows.map(r => ({
+        ...r,
+        date: new Date(r.date).toLocaleDateString('en-AU', {month:'short', day:'2-digit'})
+      }));
+
+      toast('✓ Live data loaded — Shopify + Meta', 'ok');
+    } else {
+      toast('Using sample data — check proxy connection', 'err');
+      loadSampleData();
+    }
+
+  } catch (err) {
+    console.error('Sync error:', err);
+    toast('Sync failed — using sample data', 'err');
+    loadSampleData();
+  }
+
+  btn.textContent = '⟳ Refresh Data';
+  btn.style.opacity = '1';
+  btn.disabled = false;
+
+  renderAll();
+}
+
+/* ── Update an ad platform card with live data ── */
+function updateAdCard(platform, data) {
+  if (!data) return;
+  const pfx = platform === 'ms' ? 'ms' : platform;
+  const spendEl  = document.getElementById(`${pfx}-spend-val`);
+  const roasEl   = document.getElementById(`${pfx}-roas-val`);
+  const revEl    = document.getElementById(`${pfx}-rev-val`);
+  const cpaEl    = document.getElementById(`${pfx}-cpa-val`);
+  const convEl   = document.getElementById(`${pfx}-conv-val`);
+  const roasBar  = document.getElementById(`${pfx}-roas-bar`);
+
+  if (spendEl) spendEl.textContent = '$' + (data.spend||0).toLocaleString(undefined,{maximumFractionDigits:0});
+  if (revEl)   revEl.textContent   = '$' + (data.revenue||0).toLocaleString(undefined,{maximumFractionDigits:0});
+  if (cpaEl)   cpaEl.textContent   = '$' + (data.cpa||0).toFixed(2);
+  if (convEl)  convEl.textContent  = Math.round(data.conversions||0);
+  if (roasEl) {
+    const roas = data.roas || 0;
+    roasEl.textContent  = roas.toFixed(1) + '×';
+    roasEl.className    = 'am-v ' + (roas>=3?'good':roas>=2?'warn':'bad');
+  }
+  if (roasBar) {
+    const pct = Math.min(100, ((data.roas||0)/5)*100);
+    roasBar.style.width = pct + '%';
+    roasBar.style.background = (data.roas||0)>=3 ? 'var(--green)' : 'var(--orange)';
+  }
+}
+
+/* ── Sample data fallback ── */
+function loadSampleData() {
+  rows = [
+    {date:'Apr 09', orders:18, revenue:2140, cogs:816,  google:380, meta:310, ms:110, ship:96},
+    {date:'Apr 10', orders:27, revenue:3210, cogs:1224, google:540, meta:470, ms:150, ship:144},
+    {date:'Apr 11', orders:21, revenue:2480, cogs:946,  google:410, meta:380, ms:120, ship:111},
+    {date:'Apr 12', orders:24, revenue:2890, cogs:1102, google:480, meta:420, ms:130, ship:130},
+    {date:'Apr 13', orders:16, revenue:1980, cogs:755,  google:320, meta:280, ms:90,  ship:84},
+    {date:'Apr 14', orders:26, revenue:3140, cogs:1197, google:520, meta:450, ms:140, ship:134},
+    {date:'Apr 15', orders:22, revenue:2700, cogs:1030, google:390, meta:340, ms:120, ship:120},
+  ];
+  isLiveData = false;
+}
   {date:'Apr 10', orders:27, revenue:3210, cogs:1224, google:540, meta:470, ms:150, ship:144},
   {date:'Apr 11', orders:21, revenue:2480, cogs:946,  google:410, meta:380, ms:120, ship:111},
   {date:'Apr 12', orders:24, revenue:2890, cogs:1102, google:480, meta:420, ms:130, ship:130},
@@ -941,34 +1122,37 @@ let rows = [
   {date:'Apr 15', orders:22, revenue:2700, cogs:1030, google:390, meta:340, ms:120, ship:120},
 ];
 
-/* ── CALC ── */
+/* ══════════════════════════════════════════
+   CALC + FORMAT
+══════════════════════════════════════════ */
 const calc = r => {
-  const ad = r.google + r.meta + r.ms;
-  const total = r.cogs + ad + r.ship;
+  const ad     = r.google + r.meta + r.ms;
+  const total  = r.cogs + ad + r.ship;
   const profit = r.revenue - total;
-  const margin = ((profit / r.revenue) * 100).toFixed(1);
-  const aov = (r.revenue / r.orders).toFixed(2);
+  const margin = r.revenue > 0 ? ((profit/r.revenue)*100).toFixed(1) : '0.0';
+  const aov    = r.orders  > 0 ? (r.revenue/r.orders).toFixed(2)    : '0.00';
   return { ad, total, profit, margin, aov };
 };
 
-const f$ = n => '$' + Math.abs(Math.round(n)).toLocaleString();
-const fPct = n => parseFloat(n).toFixed(1) + '%';
+const f$   = n  => '$' + Math.abs(Math.round(n)).toLocaleString();
+const fPct = n  => parseFloat(n).toFixed(1) + '%';
 
-/* ── TOTALS ── */
 function totals() {
-  return rows.reduce((a, r) => {
+  return rows.reduce((a,r) => {
     const c = calc(r);
-    a.rev     += r.revenue;
-    a.profit  += c.profit;
-    a.ad      += c.ad;
-    a.cogs    += r.cogs;
-    a.ship    += r.ship;
-    a.orders  += r.orders;
+    a.rev    += r.revenue;
+    a.profit += c.profit;
+    a.ad     += c.ad;
+    a.cogs   += r.cogs;
+    a.ship   += r.ship;
+    a.orders += r.orders;
     return a;
-  }, { rev:0, profit:0, ad:0, cogs:0, ship:0, orders:0 });
+  }, {rev:0, profit:0, ad:0, cogs:0, ship:0, orders:0});
 }
 
-/* ── RENDER ALL ── */
+/* ══════════════════════════════════════════
+   RENDER ALL
+══════════════════════════════════════════ */
 function renderAll() {
   renderKPIs();
   renderSidebar();
@@ -977,138 +1161,105 @@ function renderAll() {
   renderTable();
 }
 
-/* ── KPIs ── */
 function renderKPIs() {
-  const t = totals();
-  const margin = ((t.profit / t.rev) * 100).toFixed(1);
-  const aov = (t.rev / t.orders).toFixed(2);
-
+  const t      = totals();
+  const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(1) : '0.0';
+  const aov    = t.orders > 0 ? (t.rev/t.orders).toFixed(2) : '0.00';
   document.getElementById('kpi-profit').textContent = f$(t.profit);
+  document.getElementById('kpi-profit').className   = 'kpi-val ' + (t.profit>=0?'green':'red');
   document.getElementById('kpi-rev').textContent    = f$(t.rev);
   document.getElementById('kpi-margin').textContent = fPct(margin);
   document.getElementById('kpi-aov').textContent    = f$(aov);
   document.getElementById('kpi-spend').textContent  = f$(t.ad);
-
-  // profit change colour
-  const el = document.getElementById('kpi-profit');
-  el.className = 'kpi-val ' + (t.profit >= 0 ? 'green' : 'red');
+  // Live indicator
+  const badge = document.getElementById('liveBadge');
+  if (badge) badge.textContent = isLiveData ? '🟢 LIVE' : '⚪ SAMPLE';
 }
 
-/* ── SIDEBAR ── */
 function renderSidebar() {
-  const t = totals();
-  const margin = ((t.profit / t.rev) * 100).toFixed(1);
-  document.getElementById('sb-profit').textContent = f$(t.profit);
-  document.getElementById('sb-rev').textContent    = '$' + (t.rev/1000).toFixed(1)+'k';
-  document.getElementById('sb-spend').textContent  = f$(t.ad);
-  document.getElementById('sb-margin').textContent = fPct(margin);
+  const t      = totals();
+  const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(1) : '0.0';
+  document.getElementById('sb-profit').textContent  = f$(t.profit);
+  document.getElementById('sb-rev').textContent     = '$'+(t.rev/1000).toFixed(1)+'k';
+  document.getElementById('sb-spend').textContent   = f$(t.ad);
+  document.getElementById('sb-margin').textContent  = fPct(margin);
   document.getElementById('nb-entries').textContent = rows.length;
 }
 
-/* ── BAR CHART ── */
 function renderChart() {
   const container = document.getElementById('barChart');
   container.innerHTML = '';
+  if (!rows.length) return;
   const maxRev = Math.max(...rows.map(r => r.revenue));
   const H = 118;
-
   // baseline
-  const baseline = document.createElement('div');
-  baseline.style.cssText = 'position:absolute;bottom:22px;left:0;right:0;height:1px;background:rgba(28,27,24,0.08);pointer-events:none';
-  container.appendChild(baseline);
-
+  const bl = document.createElement('div');
+  bl.style.cssText = 'position:absolute;bottom:22px;left:0;right:0;height:1px;background:rgba(28,27,24,0.08);pointer-events:none';
+  container.appendChild(bl);
   rows.forEach(r => {
-    const c = calc(r);
-    const revH  = Math.round((r.revenue / maxRev) * H);
-    const costH = Math.round((c.total   / maxRev) * H);
-    const lbl   = r.date.split(' ')[1];
-    const isProfit = c.profit > 0;
-
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;height:100%;cursor:pointer';
-    wrap.title = `${r.date}  |  Revenue: ${f$(r.revenue)}  |  Costs: ${f$(c.total)}  |  Profit: ${f$(c.profit)}  |  Margin: ${c.margin}%`;
-
-    wrap.innerHTML = `
+    const c    = calc(r);
+    const revH = Math.round((r.revenue/maxRev)*H);
+    const cstH = Math.round((c.total/maxRev)*H);
+    const lbl  = r.date.includes(' ') ? r.date.split(' ')[1] : r.date.slice(-2);
+    const div  = document.createElement('div');
+    div.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;height:100%;cursor:pointer';
+    div.title = `${r.date} | Revenue: ${f$(r.revenue)} | Costs: ${f$(c.total)} | Profit: ${f$(c.profit)} | Margin: ${c.margin}%`;
+    div.innerHTML = `
       <div style="display:flex;gap:2px;align-items:flex-end;width:90%;height:${H}px">
         <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
-          <div style="height:${revH}px;background:var(--gold);border-radius:3px 3px 0 0;opacity:0.9;transition:opacity .2s"></div>
+          <div style="height:${revH}px;background:var(--gold);border-radius:3px 3px 0 0;opacity:.9"></div>
         </div>
         <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
-          <div style="height:${costH}px;background:${isProfit?'var(--ink-4)':'var(--red)'};border-radius:3px 3px 0 0;opacity:0.55;transition:opacity .2s"></div>
+          <div style="height:${cstH}px;background:${c.profit>0?'var(--ink-4)':'var(--red)'};border-radius:3px 3px 0 0;opacity:.55"></div>
         </div>
       </div>
-      <div style="font-size:9px;color:var(--c3);font-family:var(--mono);margin-top:6px">${lbl}</div>
-    `;
-
-    wrap.addEventListener('mouseenter', () => {
-      wrap.querySelectorAll('div > div').forEach(b => b.style.opacity = '1');
-    });
-    wrap.addEventListener('mouseleave', () => {
-      wrap.querySelectorAll('div > div:first-child div').forEach(b => b.style.opacity = '0.9');
-      wrap.querySelectorAll('div > div:last-child div').forEach(b => b.style.opacity = '0.55');
-    });
-
-    container.appendChild(wrap);
+      <div style="font-size:9px;color:var(--c3);font-family:var(--mono);margin-top:6px">${lbl}</div>`;
+    container.appendChild(div);
   });
 }
 
-/* ── COST BREAKDOWN — DONUT CHARTS ── */
 function renderBreakdown() {
-  const t = totals();
+  const t       = totals();
   const shopify = Math.round(t.rev * 0.005);
   const profit  = t.rev - t.cogs - t.ad - t.ship - shopify;
-
-  const items = [
-    { name:'COGS',       amt:t.cogs,  pct:+(t.cogs/t.rev*100).toFixed(1),  color:'#7E6DB5', bg:'rgba(126,109,181,0.1)' },
-    { name:'Ad Spend',   amt:t.ad,    pct:+(t.ad/t.rev*100).toFixed(1),    color:'#D95454', bg:'rgba(217,84,84,0.1)' },
-    { name:'Shipping',   amt:t.ship,  pct:+(t.ship/t.rev*100).toFixed(1),  color:'#4A7FC1', bg:'rgba(74,127,193,0.1)' },
-    { name:'Shopify Fee',amt:shopify, pct:+(shopify/t.rev*100).toFixed(1), color:'#999',    bg:'rgba(0,0,0,0.05)' },
-    { name:'Net Profit', amt:profit,  pct:+(profit/t.rev*100).toFixed(1),  color:'#5A9E72', bg:'rgba(90,158,114,0.1)' },
+  const items   = [
+    {name:'COGS',       amt:t.cogs,  pct:+(t.cogs/t.rev*100).toFixed(1),   color:'#7E6DB5', bg:'rgba(126,109,181,0.1)'},
+    {name:'Ad Spend',   amt:t.ad,    pct:+(t.ad/t.rev*100).toFixed(1),     color:'#D95454', bg:'rgba(217,84,84,0.1)'},
+    {name:'Shipping',   amt:t.ship,  pct:+(t.ship/t.rev*100).toFixed(1),   color:'#4A7FC1', bg:'rgba(74,127,193,0.1)'},
+    {name:'Shopify Fee',amt:shopify, pct:+(shopify/t.rev*100).toFixed(1),  color:'#999',    bg:'rgba(0,0,0,0.05)'},
+    {name:'Net Profit', amt:profit,  pct:+(profit/t.rev*100).toFixed(1),   color:'#5A9E72', bg:'rgba(90,158,114,0.1)'},
   ];
-
-  // SVG donut helper
   function donut(pct, color, bg) {
-    const r = 34;
-    const circ = 2 * Math.PI * r;
-    const filled = (pct / 100) * circ;
-    const gap    = circ - filled;
+    const r = 34, circ = 2*Math.PI*r;
+    const filled = (Math.max(0,pct)/100)*circ;
     return `
       <circle cx="43" cy="43" r="${r}" fill="none" stroke="${bg}" stroke-width="9"/>
       <circle cx="43" cy="43" r="${r}" fill="none" stroke="${color}" stroke-width="9"
-        stroke-dasharray="${filled.toFixed(2)} ${gap.toFixed(2)}"
-        stroke-linecap="round"/>
-    `;
+        stroke-dasharray="${filled.toFixed(2)} ${(circ-filled).toFixed(2)}" stroke-linecap="round"/>`;
   }
-
   document.getElementById('costBreakdown').innerHTML = items.map(i => `
     <div class="donut-item">
       <div class="donut-svg-wrap">
-        <svg viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg">
-          ${donut(i.pct, i.color, i.bg)}
-        </svg>
+        <svg viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg">${donut(i.pct,i.color,i.bg)}</svg>
         <div class="donut-center">
           <div class="donut-pct" style="color:${i.color}">${i.pct}%</div>
         </div>
       </div>
       <div class="donut-name">${i.name}</div>
       <div class="donut-amt">${f$(i.amt)}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-/* ── TABLE ── */
 function renderTable() {
   const tb = document.getElementById('tableBody');
   tb.innerHTML = '';
-
   rows.forEach(r => {
-    const c = calc(r);
-    const mgClass = parseFloat(c.margin) >= 20 ? 'mgn-g' : parseFloat(c.margin) >= 10 ? 'mgn-w' : 'mgn-r';
-    const chipCls = c.profit >= 0 ? 'chip-g' : 'chip-r';
-    const sign    = c.profit < 0 ? '−' : '';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
+    const c       = calc(r);
+    const mgCls   = parseFloat(c.margin)>=20?'mgn-g':parseFloat(c.margin)>=10?'mgn-w':'mgn-r';
+    const chipCls = c.profit>=0?'chip-g':'chip-r';
+    const sign    = c.profit<0?'−':'';
+    const tr      = document.createElement('tr');
+    tr.innerHTML  = `
       <td class="mono" style="color:var(--c2);font-size:12px">${r.date}</td>
       <td class="r mono">${f$(r.revenue)}</td>
       <td class="r mono" style="color:var(--c3)">${r.orders}</td>
@@ -1116,100 +1267,91 @@ function renderTable() {
       <td class="r mono" style="color:var(--purple)">${f$(r.cogs)}</td>
       <td class="r mono" style="color:var(--red)">${f$(c.ad)}</td>
       <td class="r mono" style="color:var(--blue)">${f$(r.ship)}</td>
-      <td class="r">
-        <span class="chip ${chipCls}">${sign}${f$(c.profit)}</span>
-      </td>
-      <td class="r">
-        <span class="mgn-badge ${mgClass}">${c.margin}%</span>
-      </td>
-    `;
+      <td class="r"><span class="chip ${chipCls}">${sign}${f$(c.profit)}</span></td>
+      <td class="r"><span class="mgn-badge ${mgCls}">${c.margin}%</span></td>`;
     tb.appendChild(tr);
   });
-
-  document.getElementById('tblCount').textContent = rows.length + ' entries';
+  document.getElementById('tblCount').textContent = rows.length + (isLiveData?' live entries':' sample entries');
 }
 
-/* ── ADD ENTRY ── */
+/* ══════════════════════════════════════════
+   MANUAL ENTRY
+══════════════════════════════════════════ */
 function addEntry() {
-  const rev    = parseFloat(document.getElementById('eRev').value)    || 0;
-  const orders = parseInt(document.getElementById('eOrd').value)       || 0;
-  const unit   = parseFloat(document.getElementById('eCOGS').value)   || 0;
-  const google = parseFloat(document.getElementById('eGoogle').value) || 0;
-  const meta   = parseFloat(document.getElementById('eMeta').value)   || 0;
-  const ms     = parseFloat(document.getElementById('eMs').value)     || 0;
-  const ship   = parseFloat(document.getElementById('eShip').value)   || 0;
-
-  if (!rev) { toast('Please enter a revenue figure', 'err'); return; }
-
-  const d = new Date(document.getElementById('eDate').value);
-  const label = d.toLocaleDateString('en-AU', { month:'short', day:'2-digit' });
-
-  rows.unshift({ date:label, orders, revenue:rev, cogs:unit*orders, google, meta, ms, ship });
+  const rev    = parseFloat(document.getElementById('eRev').value)||0;
+  const orders = parseInt(document.getElementById('eOrd').value)||0;
+  const unit   = parseFloat(document.getElementById('eCOGS').value)||0;
+  const google = parseFloat(document.getElementById('eGoogle').value)||0;
+  const meta   = parseFloat(document.getElementById('eMeta').value)||0;
+  const ms     = parseFloat(document.getElementById('eMs').value)||0;
+  const ship   = parseFloat(document.getElementById('eShip').value)||0;
+  if (!rev) { toast('Please enter a revenue figure','err'); return; }
+  const d     = new Date(document.getElementById('eDate').value);
+  const label = d.toLocaleDateString('en-AU',{month:'short',day:'2-digit'});
+  rows.unshift({date:label, orders, revenue:rev, cogs:unit*orders, google, meta, ms, ship});
   clearForm();
   renderAll();
-  toast(`Entry for ${label} added`, 'ok');
+  toast(`Entry for ${label} added`,'ok');
 }
 
 function clearForm() {
   ['eRev','eOrd','eCOGS','eGoogle','eMeta','eMs','eShip'].forEach(id => document.getElementById(id).value='');
 }
 
-/* ── CONTROLS ── */
-function setRange(btn) {
+/* ══════════════════════════════════════════
+   CONTROLS
+══════════════════════════════════════════ */
+function setRange(btn, key) {
   document.querySelectorAll('.rp').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  activeRange = key;
+  doSync(); // auto-refresh when range changes
 }
+
 function setMkt(btn) {
   document.querySelectorAll('.mkt').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
+
 function setNav(el) {
   document.querySelectorAll('.sb-nav-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
 }
 
-/* ── SYNC ── */
-function doSync() {
-  const btn = document.getElementById('syncBtn');
-  btn.classList.add('syncing');
-  btn.innerHTML = '<span class="sdot"></span> Syncing...';
-  setTimeout(() => {
-    btn.classList.remove('syncing');
-    btn.innerHTML = '<span class="sdot"></span> Refresh Data';
-    toast('Data synced · ' + new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}), 'ok');
-  }, 1800);
-}
-
 function connectShopify() {
-  const t = document.getElementById('apiToken').value;
-  if (!t) { toast('Enter your Shopify Admin API token', 'err'); return; }
-  toast('✓ Connected to scnd9y-a1.myshopify.com', 'ok');
+  toast('Shopify is connected via your proxy — no token needed here','ok');
 }
 
-/* ── EXPORT ── */
 function exportCSV() {
-  let csv = 'Date,Orders,Revenue,AOV,COGS,Google Ads,Meta Ads,Microsoft Ads,Shipping,Total Ad Spend,Net Profit,Margin\n';
+  let csv = 'Date,Orders,Revenue,AOV,COGS,Google Ads,Meta Ads,Microsoft Ads,Shipping,Ad Spend,Net Profit,Margin\n';
   rows.forEach(r => {
     const c = calc(r);
     csv += `${r.date},${r.orders},${r.revenue},${c.aov},${r.cogs},${r.google},${r.meta},${r.ms},${r.ship},${c.ad},${c.profit},${c.margin}%\n`;
   });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-  a.download = 'foldifycase-profit-' + new Date().toISOString().slice(0,10) + '.csv';
+  const a   = document.createElement('a');
+  a.href    = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'foldifycase-profit-'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();
-  toast('CSV exported', 'ok');
+  toast('CSV exported','ok');
 }
 
-/* ── TOAST ── */
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
 function toast(msg, type='ok') {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = 'toast ' + type + ' show';
-  setTimeout(() => el.className = 'toast', 3000);
+  el.className   = 'toast '+type+' show';
+  setTimeout(() => el.className = 'toast', 3200);
 }
 
-/* ── INIT ── */
+/* ══════════════════════════════════════════
+   INIT — load sample data then sync live
+══════════════════════════════════════════ */
+loadSampleData();
 renderAll();
+// Auto-sync on load
+doSync();
 </script>
 </body>
 </html>
