@@ -211,24 +211,35 @@ async function handleShopify(req, res) {
 
       if (!byDate[localDate]) byDate[localDate] = {
         date: localDate, revenue: 0, orders: 0,
-        cogs: 0, shipping_charged: 0, shipping_cost: 0, has_cogs: false,
+        cogs: 0, shipping_charged: 0, shipping_cost: 0,
+        transaction_fees: 0, gateway_fees: 0,
+        has_cogs: false,
       };
       const d = byDate[localDate];
       d.revenue += parseFloat(o.total_price || 0);
       d.orders  += 1;
 
+      // COGS
       (o.line_items || []).forEach(li => {
         const cost = variantCostMap[li.variant_id] || 0;
         if (cost > 0) d.has_cogs = true;
         d.cogs += cost * (li.quantity || 1);
       });
 
+      // Shipping charged to customer
       d.shipping_charged += parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
+
+      // Shipping label cost (Shopify Shipping)
       (o.shipping_lines || []).forEach(sl => {
         if (sl.source === 'shopify-shipping' || sl.carrier_identifier) {
           d.shipping_cost += parseFloat(sl.price || 0);
         }
       });
+
+      // Transaction fees from Shopify payment gateway
+      const orderTotal = parseFloat(o.total_price || 0);
+      d.transaction_fees += +(orderTotal * 0.005).toFixed(2);  // ~0.5% Shopify fee
+      d.gateway_fees     += +(orderTotal * 0.0175).toFixed(2); // ~1.75% gateway fee
     });
 
     // ── Step 7: Build response ───────────────────────────────────────────────────
@@ -240,6 +251,8 @@ async function handleShopify(req, res) {
         cogs:             +d.cogs.toFixed(2),
         shipping_charged: +d.shipping_charged.toFixed(2),
         shipping_cost:    +d.shipping_cost.toFixed(2),
+        transaction_fees: +d.transaction_fees.toFixed(2),
+        gateway_fees:     +d.gateway_fees.toFixed(2),
         aov:              d.orders > 0 ? +(d.revenue / d.orders).toFixed(2) : 0,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
@@ -250,7 +263,9 @@ async function handleShopify(req, res) {
       cogs:             +(acc.cogs + d.cogs).toFixed(2),
       shipping_charged: +(acc.shipping_charged + d.shipping_charged).toFixed(2),
       shipping_cost:    +(acc.shipping_cost + d.shipping_cost).toFixed(2),
-    }), { revenue:0, orders:0, cogs:0, shipping_charged:0, shipping_cost:0 });
+      transaction_fees: +(acc.transaction_fees + d.transaction_fees).toFixed(2),
+      gateway_fees:     +(acc.gateway_fees + d.gateway_fees).toFixed(2),
+    }), { revenue:0, orders:0, cogs:0, shipping_charged:0, shipping_cost:0, transaction_fees:0, gateway_fees:0 });
 
     return res.status(200).json({
       daily,
