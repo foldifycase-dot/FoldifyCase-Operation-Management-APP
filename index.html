@@ -3258,7 +3258,7 @@ let livePlatforms = {
 let dpCustomFrom = null;
 let dpCustomTo   = null;
 
-const _fmtISO = d => d.toISOString().slice(0,10);
+const _fmtISO=function(d){const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+mo+'-'+dy;};
 
 function getRange(key) {
   // If custom range was set via calendar picker
@@ -4066,7 +4066,11 @@ function fmtDisplay(d) {
   return d.toLocaleDateString('en-AU', {day:'2-digit', month:'short', year:'numeric'});
 }
 function fmtISO(d) {
-  return d.toISOString().slice(0,10);
+  // Use local date parts to avoid UTC shift (fixes off-by-one in AU timezone)
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 function renderCals() {
@@ -4145,7 +4149,9 @@ function navMonth(dir) {
 }
 
 function dpClickDay(iso) {
-  const clicked = new Date(iso);
+  // Parse as local date: split ISO string to avoid UTC midnight shift
+  const [cy,cm,cd] = iso.split('-').map(Number);
+  const clicked = new Date(cy, cm-1, cd);
   clicked.setHours(0,0,0,0);
 
   if (!dpSelStart || (dpSelStart && dpSelEnd)) {
@@ -5359,7 +5365,7 @@ function clvExportCSV() {
       s.viewLeft=new Date(s.viewLeft.getFullYear(),s.viewLeft.getMonth()+dir,1); render(pid);
     };
     window[`${pid}ClickDay`]=function(iso){
-      init(pid); const s=STATE[pid]; const clicked=new Date(iso); clicked.setHours(0,0,0,0);
+      init(pid); const s=STATE[pid]; const [_cy,_cm,_cd]=iso.split('-').map(Number);const clicked=new Date(_cy,_cm-1,_cd);clicked.setHours(0,0,0,0);
       if(!s.selStart||(s.selStart&&s.selEnd)){s.selStart=clicked;s.selEnd=null;}
       else{if(clicked<s.selStart){s.selEnd=s.selStart;s.selStart=clicked;}else{s.selEnd=clicked;}}
       // Guard: render() destroys clicked element — prevent outside-click handler from closing
