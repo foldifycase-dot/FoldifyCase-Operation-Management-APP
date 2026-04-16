@@ -94,21 +94,63 @@ async function handleShopify(req, res) {
   // ── DAILY SALES — pulls real revenue, orders, COGS, shipping from Shopify ───
   // Returns: [ { date, revenue, orders, aov, cogs, shipping_charged, shipping_cost } ]
   if (action === "daily-sales") {
-    const { from, to } = req.query;
+    const { from, to, tz_offset } = req.query;
     if (!from || !to) return res.status(400).json({ error: "from and to dates required (YYYY-MM-DD)" });
 
-    // Fetch orders with full financial detail — line items include COGS if set
-    const url = `${base}/orders.json?status=any&financial_status=paid`
-      + `&created_at_min=${from}T00:00:00Z&created_at_max=${to}T23:59:59Z`
+    // ── TIMEZONE FIX ─────────────────────────────────────────────────────────────
+    // Shopify stores timestamps in UTC. Your store is in Australia (AEST = UTC+10,
+    // AEDT = UTC+11). We must shift the query window to capture the full local day.
+    // tz_offset passed from frontend (e.g. "-600" for AEST = +10h = -600 mins from UTC)
+    // Default to AEST +10h if not provided
+    const offsetMins = parseInt(tz_offset || '-600'); // negative = ahead of UTC
+    const offsetMs   = -offsetMins * 60 * 1000;       // convert to ms offset
+
+    const fromDate = new Date(from + 'T00:00:00.000Z');
+    const toDate   = new Date(to   + 'T23:59:59.999Z');
+
+    // Shift by timezone offset so we capture the full local calendar day
+    const fromUTC = new Date(fromDate.getTime() + offsetMs).toISOString();
+    const toUTC   = new Date(toDate.getTime()   + offsetMs).toISOString();
+
+    console.log(`[Shopify] Querying ${from} → ${to} | UTC window: ${fromUTC} → ${toUTC}`);
+
+    // ── PAGINATION — fetch ALL orders (not just first 250) ──────────────────────
+    // Use cursor-based pagination via page_info
+    const baseParams = `status=any&financial_status=any`
+      + `&created_at_min=${fromUTC}&created_at_max=${toUTC}`
       + `&limit=250`
       + `&fields=id,created_at,total_price,subtotal_price,total_shipping_price_set,`
-      + `shipping_lines,line_items,total_discounts`;
+      + `shipping_lines,line_items,total_discounts,financial_status,cancelled_at`;
 
-    const r = await fetch(url, { headers });
-    const { orders = [] } = await r.json();
+    let allOrders = [];
+    let nextUrl   = `${base}/orders.json?${baseParams}`;
+
+    while (nextUrl) {
+      const r    = await fetch(nextUrl, { headers });
+      const data = await r.json();
+      const batch = data.orders || [];
+      allOrders.push(...batch);
+
+      // Parse Link header for next page cursor
+      const linkHeader = r.headers.get('Link') || '';
+      const nextMatch  = linkHeader.match(/<([^>]+)>;\s*rel="next"/);
+      nextUrl = nextMatch ? nextMatch[1] : null;
+
+      console.log(`[Shopify] Fetched batch of ${batch.length}, total so far: ${allOrders.length}`);
+      if (batch.length < 250) break; // safety exit
+    }
+
+    // ── FILTER: exclude cancelled orders and refunded-only ───────────────────────
+    const orders = allOrders.filter(o => {
+      if (o.cancelled_at) return false; // exclude cancelled
+      if (o.financial_status === 'refunded') return false; // fully refunded
+      if (o.financial_status === 'voided') return false;   // voided
+      return true;
+    });
+
+    console.log(`[Shopify] ${allOrders.length} raw orders → ${orders.length} after filtering`);
 
     // ── Batch-fetch variant costs (COGS) from Inventory Items API ──────────────
-    // Collect all unique variant IDs across all orders
     const variantIds = new Set();
     orders.forEach(o => {
       (o.line_items || []).forEach(li => {
@@ -116,28 +158,20 @@ async function handleShopify(req, res) {
       });
     });
 
-    // Build variant_id → cost map using Inventory Items
     const variantCostMap = {};
     if (variantIds.size > 0) {
       try {
-        // Shopify allows up to 100 variant IDs per request
-        const chunks = [];
         const arr = [...variantIds];
-        for (let i = 0; i < arr.length; i += 50) chunks.push(arr.slice(i, i + 50));
-
-        for (const chunk of chunks) {
-          const vUrl = `${base}/variants.json?ids=${chunk.join(',')}&fields=id,inventory_item_id`;
-          const vRes = await fetch(vUrl, { headers });
+        for (let i = 0; i < arr.length; i += 50) {
+          const chunk = arr.slice(i, i + 50);
+          const vRes = await fetch(`${base}/variants.json?ids=${chunk.join(',')}&fields=id,inventory_item_id`, { headers });
           const { variants = [] } = await vRes.json();
 
-          // Fetch inventory items for cost data
           const invIds = variants.map(v => v.inventory_item_id).filter(Boolean);
           if (invIds.length) {
-            const iUrl = `${base}/inventory_items.json?ids=${invIds.join(',')}&fields=id,cost`;
-            const iRes = await fetch(iUrl, { headers });
+            const iRes = await fetch(`${base}/inventory_items.json?ids=${invIds.join(',')}&fields=id,cost`, { headers });
             const { inventory_items = [] } = await iRes.json();
 
-            // Map variant_id → cost
             const invCostMap = {};
             inventory_items.forEach(item => { invCostMap[item.id] = parseFloat(item.cost || 0); });
             variants.forEach(v => {
@@ -149,48 +183,43 @@ async function handleShopify(req, res) {
         }
         console.log(`[Shopify] COGS map built for ${Object.keys(variantCostMap).length} variants`);
       } catch (cogErr) {
-        console.warn('[Shopify] COGS fetch failed, will use 0:', cogErr.message);
+        console.warn('[Shopify] COGS fetch failed:', cogErr.message);
       }
     }
 
-    // ── Group orders by date ────────────────────────────────────────────────────
+    // ── Group by LOCAL date (adjust UTC timestamp back to local day) ─────────────
     const byDate = {};
     orders.forEach(o => {
-      const date = o.created_at.slice(0, 10);
-      if (!byDate[date]) byDate[date] = {
-        date,
+      // Convert UTC order timestamp to local date using timezone offset
+      const utcMs    = new Date(o.created_at).getTime();
+      const localMs  = utcMs - offsetMs;
+      const localDate = new Date(localMs).toISOString().slice(0, 10);
+
+      if (!byDate[localDate]) byDate[localDate] = {
+        date:             localDate,
         revenue:          0,
         orders:           0,
-        cogs:             0,   // real cost from Shopify inventory_items
-        shipping_charged: 0,   // what the customer paid for shipping
-        shipping_cost:    0,   // what you paid for shipping labels (Shopify Shipping)
+        cogs:             0,
+        shipping_charged: 0,
+        shipping_cost:    0,
         has_cogs:         false,
       };
 
-      const d = byDate[date];
+      const d = byDate[localDate];
       d.revenue += parseFloat(o.total_price || 0);
       d.orders  += 1;
 
-      // ── COGS: sum line_item quantity × variant cost ──────────────────────────
       (o.line_items || []).forEach(li => {
         const cost = variantCostMap[li.variant_id] || 0;
         if (cost > 0) d.has_cogs = true;
         d.cogs += cost * (li.quantity || 1);
       });
 
-      // ── Shipping charged to customer ─────────────────────────────────────────
       d.shipping_charged += parseFloat(
         o.total_shipping_price_set?.shop_money?.amount || 0
       );
 
-      // ── Shipping label cost (what you pay Shopify for labels) ────────────────
-      // shipping_lines[].price = shipping charged to customer
-      // shipping_lines[].discounted_price = after any free shipping discount
-      // For Shopify Shipping labels, the cost is in source: "shopify-shipping"
       (o.shipping_lines || []).forEach(sl => {
-        // If sourced from Shopify Shipping, price_set.shop_money is what customer paid
-        // The actual label cost isn't directly exposed but can be approximated
-        // Shopify exposes it in the 'price' field of shipping_lines for label cost
         if (sl.source === 'shopify-shipping' || sl.carrier_identifier) {
           d.shipping_cost += parseFloat(sl.price || 0);
         }
@@ -198,6 +227,7 @@ async function handleShopify(req, res) {
     });
 
     const daily = Object.values(byDate)
+      .filter(d => d.date >= from && d.date <= to) // only return days in requested range
       .map(d => ({
         ...d,
         revenue:          +d.revenue.toFixed(2),
@@ -219,8 +249,14 @@ async function handleShopify(req, res) {
     return res.status(200).json({
       daily,
       totals,
-      has_cogs: daily.some(d => d.has_cogs),
+      has_cogs:     daily.some(d => d.has_cogs),
       total_orders: orders.length,
+      debug: {
+        raw_orders:      allOrders.length,
+        filtered_orders: orders.length,
+        tz_offset:       offsetMins,
+        utc_window:      { from: fromUTC, to: toUTC },
+      }
     });
   }
 
