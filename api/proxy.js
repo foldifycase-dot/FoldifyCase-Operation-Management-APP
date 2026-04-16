@@ -83,7 +83,7 @@ module.exports = async function handler(req, res) {
         created_at_min:   fromUTC,
         created_at_max:   toUTC,
         limit:            "250",
-        fields:           "id,created_at,total_price,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at",
+        fields:           "id,created_at,total_price,subtotal_price,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at",
       });
 
       let allOrders = [];
@@ -121,23 +121,52 @@ module.exports = async function handler(req, res) {
       console.log(`[proxy] ${allOrders.length} raw → ${orders.length} after filter`);
 
       // ── COGS ────────────────────────────────────────────────────────────────
+      // Build unique variant ID list from all orders
       const variantIds = [...new Set(
-        orders.flatMap(o => (o.line_items||[]).map(li => li.variant_id).filter(Boolean))
+        orders.flatMap(o => (o.line_items||[])
+          .map(li => li.variant_id)
+          .filter(id => id && id !== null)
+        )
       )];
-      const costMap = {};
+      console.log(`[proxy] COGS: ${variantIds.length} unique variants to price`);
+
+      const costMap = {}; // variantId → cost
       for (let i = 0; i < variantIds.length; i += 50) {
+        const chunk = variantIds.slice(i, i + 50);
         try {
-          const chunk = variantIds.slice(i, i+50);
-          const vr    = await fetch(`${base}/variants.json?ids=${chunk.join(",")}&fields=id,inventory_item_id`, { headers });
+          // Step 1: variant_id → inventory_item_id
+          const vUrl = `${base}/variants.json?ids=${chunk.join(",")}&fields=id,inventory_item_id`;
+          const vr   = await fetch(vUrl, { headers });
+          if (!vr.ok) { console.warn(`[proxy] variants fetch HTTP ${vr.status}`); continue; }
           const { variants = [] } = await vr.json();
+          console.log(`[proxy] COGS chunk ${i}: got ${variants.length} variants`);
+
           const invIds = variants.map(v => v.inventory_item_id).filter(Boolean);
           if (!invIds.length) continue;
-          const ir   = await fetch(`${base}/inventory_items.json?ids=${invIds.join(",")}&fields=id,cost`, { headers });
+
+          // Step 2: inventory_item_id → cost
+          const iUrl = `${base}/inventory_items.json?ids=${invIds.join(",")}&fields=id,cost`;
+          const ir   = await fetch(iUrl, { headers });
+          if (!ir.ok) { console.warn(`[proxy] inventory_items fetch HTTP ${ir.status}`); continue; }
           const { inventory_items = [] } = await ir.json();
-          const invMap = Object.fromEntries(inventory_items.map(i => [i.id, parseFloat(i.cost||0)]));
-          variants.forEach(v => { costMap[v.id] = invMap[v.inventory_item_id] || 0; });
-        } catch(e) { console.warn("[proxy] COGS chunk error:", e.message); }
+          console.log(`[proxy] COGS chunk ${i}: got ${inventory_items.length} inventory items`);
+
+          // Build lookup: inventory_item_id → cost
+          const invMap = {};
+          inventory_items.forEach(item => {
+            invMap[item.id] = parseFloat(item.cost || 0);
+          });
+
+          // Map variant_id → cost
+          variants.forEach(v => {
+            const cost = invMap[v.inventory_item_id];
+            if (cost !== undefined) costMap[v.id] = cost;
+          });
+        } catch(e) {
+          console.warn(`[proxy] COGS chunk ${i} error:`, e.message);
+        }
       }
+      console.log(`[proxy] COGS: mapped ${Object.keys(costMap).length} of ${variantIds.length} variants`);
 
       // ── Group by store-local date ───────────────────────────────────────────
       const byDate = {};
@@ -155,18 +184,27 @@ module.exports = async function handler(req, res) {
           shipping_charged: 0, shipping_cost: 0, transaction_fees: 0, has_cogs: false,
         };
 
-        const d   = byDate[localDate];
-        const rev = parseFloat(o.total_price || 0);
-        d.revenue  += rev;
-        d.orders   += 1;
-        d.transaction_fees += rev * TX_RATE;
+        const d        = byDate[localDate];
+        const revTotal = parseFloat(o.total_price    || 0); // includes shipping
+        const subTotal = parseFloat(o.subtotal_price || 0); // product only, excl. shipping
 
+        d.revenue += revTotal;
+        d.orders  += 1;
+
+        // ── Transaction fee: apply rate to SUBTOTAL only (matches Shopify) ──
+        // Shopify/PayPal/Afterpay don't charge fees on the shipping amount
+        d.transaction_fees += subTotal * TX_RATE;
+
+        // ── COGS: sum cost × qty for each line item ──────────────────────────
         (o.line_items || []).forEach(li => {
-          const cost = costMap[li.variant_id] || 0;
-          if (cost > 0) d.has_cogs = true;
-          d.cogs += cost * (li.quantity || 1);
+          const cost = costMap[li.variant_id];
+          if (cost !== undefined && cost > 0) {
+            d.has_cogs = true;
+            d.cogs += cost * (li.quantity || 1);
+          }
         });
 
+        // ── Shipping ─────────────────────────────────────────────────────────
         d.shipping_charged += parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
         (o.shipping_lines || []).forEach(sl => {
           if (sl.source === "shopify-shipping" || sl.carrier_identifier) {
