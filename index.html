@@ -1564,32 +1564,20 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .ads-row-chg.warn { color:var(--orange); }
 .ads-row-chg.bad  { color:var(--red); }
 
-/* ── Google Ads Page ──────────────────────────────────────────── */
-.ga-kpi {
-  background:#fff; border-radius:10px;
-  border:1px solid rgba(28,27,24,0.08);
-  padding:14px 16px;
-  display:flex; flex-direction:column;
-}
-.ga-kpi-lbl {
-  font-family:'Inter',sans-serif; font-size:10px; font-weight:500;
-  text-transform:uppercase; letter-spacing:.06em;
-  color:rgba(28,27,24,0.45);
-  display:flex; align-items:flex-start; gap:5px; margin-bottom:6px; min-height:28px;
-}
+/* ── Google Ads Page ─────────────────────────────── */
+.ga-kpi { background:#fff;border-radius:10px;border:1px solid rgba(28,27,24,0.08);padding:14px 16px;display:flex;flex-direction:column; }
+.ga-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);display:flex;align-items:flex-start;gap:5px;margin-bottom:6px;min-height:28px; }
 .ga-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
-.ga-kpi-val { font-family:'Inter',sans-serif; font-size:22px; font-weight:700; color:var(--ink); line-height:1; letter-spacing:-0.01em; }
-.ga-kpi-sub { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); margin-top:4px; }
-.ga-is-row { display:flex;align-items:center;gap:8px;margin-bottom:10px;font-family:'Inter',sans-serif; }
+.ga-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
+.ga-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.ga-is-row { display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif; }
 .ga-is-label { font-size:10px;color:var(--c3);width:80px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em; }
 .ga-is-bar-wrap { flex:1;height:6px;background:rgba(28,27,24,0.08);border-radius:3px;overflow:hidden; }
 .ga-is-bar { height:100%;border-radius:3px;transition:width .4s ease; }
 .ga-is-pct { font-size:11px;font-weight:600;color:var(--ink);width:36px;text-align:right; }
 .ga-score-row { display:flex;align-items:center;justify-content:space-between;gap:8px; }
 .ga-score-label { font-family:'Inter',sans-serif;font-size:11px;color:var(--c2); }
-.ga-score-badge { font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap; }
-.ga-type-row { display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(28,27,24,0.05);font-family:'Inter',sans-serif; }
-.ga-type-row:last-child { border-bottom:none; }
+.ga-score-badge { font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(28,27,24,0.06);color:var(--c3); }
 .ga-step { display:flex;align-items:flex-start;gap:10px;font-family:'Inter',sans-serif;font-size:11px;color:var(--c2);line-height:1.5; }
 .ga-step-num { width:20px;height:20px;border-radius:50%;background:#4285F4;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
 .ga-step-text code { background:rgba(28,27,24,0.06);padding:1px 4px;border-radius:3px;font-size:10px;color:var(--ink); }
@@ -1666,7 +1654,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <div class="sb-div"></div>
     <div class="sb-label" style="padding-top:4px">Platform ROAS</div>
 
-    <div class="sb-nav-item" id="navGoogleAds2" onclick="openPage('googleAds')" style="cursor:pointer">
+    <div class="sb-nav-item" onclick="openGoogleAdsPage()" style="cursor:pointer">
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">G</span>Google Ads</div>
       <span class="sb-nav-badge" id="ga-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
     </div>
@@ -1699,8 +1687,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
     <div class="sb-nav-item" id="navCLV" onclick="openPage('clv')" style="cursor:pointer;">
-      <div class="sb-nav-left"><span class="sb-nav-icon">👥</span><span>Customer Lifetime Value</span></div></div>
-
+      <div class="sb-nav-left"><span class="sb-nav-icon">👥</span><span>Customer Lifetime Value</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
 
@@ -3245,12 +3232,17 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
   </main><!-- /pageCLV -->
 
+
+</div>
+
+<div class="toast" id="toast"></div>
+
   <!-- ══ GOOGLE ADS PAGE ══════════════════════════════════════════════════ -->
   <main class="main report-main" id="pageGoogleAds" style="display:none">
 
     <div class="page-hd">
       <div style="display:flex;align-items:center;gap:16px">
-        <button onclick="closePage()" class="page-back-btn">←</button>
+        <button onclick="closeGoogleAdsPage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">GOOGLE</span> <span class="gold">ADS</span></div>
       </div>
     </div>
@@ -3259,9 +3251,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:6px;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.2)">
         <span style="font-size:11px;color:#4285F4;font-weight:600">⚠ Google Ads API</span>
         <span style="font-size:10px;color:var(--c3)">Connect your account to load live data</span>
-      </div>
-      <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="gaRender()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
       </div>
     </div>
 
@@ -3275,7 +3264,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div class="ga-kpi" style="border-top:3px solid var(--green)">
         <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--green)"></span>Conv. Value</div>
         <div class="ga-kpi-val" id="ga-conv-value" style="color:var(--green)">—</div>
-        <div class="ga-kpi-sub" id="ga-conv-value-sub">attributed revenue</div>
+        <div class="ga-kpi-sub">attributed revenue</div>
       </div>
       <div class="ga-kpi" style="border-top:3px solid var(--gold)">
         <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--gold)"></span>ROAS</div>
@@ -3299,19 +3288,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <!-- ── 2-column layout: Campaign table + Efficiency panel ── -->
+    <!-- ── 2-col: Campaign Table + Right Panel ── -->
     <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
 
-      <!-- Campaign Performance Table -->
+      <!-- Campaign Table -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
-            <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA by campaign</div>
-          </div>
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA · CTR by campaign</div>
         </div>
-        <!-- Table header -->
-        <div style="display:grid;grid-template-columns:1fr 80px 70px 80px 80px 70px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+        <div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
           <div>Campaign</div>
           <div style="text-align:right">Spend</div>
           <div style="text-align:right">ROAS</div>
@@ -3319,18 +3305,18 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="text-align:right">CPA</div>
           <div style="text-align:right">CTR</div>
         </div>
-        <div id="ga-campaign-table" style="max-height:340px;overflow-y:auto">
+        <div id="ga-campaign-table" style="max-height:320px;overflow-y:auto">
           <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Connect Google Ads API to view campaign data</div>
         </div>
       </div>
 
-      <!-- Efficiency & Quality Panel -->
+      <!-- Right Panel -->
       <div style="display:flex;flex-direction:column;gap:16px">
 
-        <!-- Search Impression Share -->
+        <!-- Impression Share -->
         <div class="card" style="padding:16px">
           <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Impression Share</div>
-          <div id="ga-is-panel">
+          <div style="display:flex;flex-direction:column;gap:10px">
             <div class="ga-is-row">
               <div class="ga-is-label">Search IS</div>
               <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-search" style="width:0%;background:#4285F4"></div></div>
@@ -3352,38 +3338,25 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
               <div class="ga-is-pct" id="ga-is-top-pct">—</div>
             </div>
           </div>
-          <div style="font-size:10px;color:var(--c3);margin-top:10px;font-family:'Inter',sans-serif">IS = impressions ÷ eligible impressions</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:8px;font-family:'Inter',sans-serif">IS = impressions ÷ eligible impressions</div>
         </div>
 
-        <!-- Benchmark Scorecard -->
+        <!-- Performance Scorecard -->
         <div class="card" style="padding:16px">
           <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Performance Score</div>
-          <div id="ga-scorecard" style="display:flex;flex-direction:column;gap:8px">
-            <div class="ga-score-row">
-              <span class="ga-score-label">ROAS vs Target (4×)</span>
-              <span class="ga-score-badge" id="ga-roas-score" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
-            </div>
-            <div class="ga-score-row">
-              <span class="ga-score-label">CTR Benchmark (&gt;3%)</span>
-              <span class="ga-score-badge" id="ga-ctr-score" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
-            </div>
-            <div class="ga-score-row">
-              <span class="ga-score-label">Conv. Rate (&gt;4%)</span>
-              <span class="ga-score-badge" id="ga-cvr-score" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
-            </div>
-            <div class="ga-score-row">
-              <span class="ga-score-label">CPA vs AOV</span>
-              <span class="ga-score-badge" id="ga-cpa-score" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
-            </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="ga-score-row"><span class="ga-score-label">ROAS vs Target (4×)</span><span class="ga-score-badge" id="ga-roas-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CTR Benchmark (&gt;3%)</span><span class="ga-score-badge" id="ga-ctr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate (&gt;4%)</span><span class="ga-score-badge" id="ga-cvr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPA vs AOV</span><span class="ga-score-badge" id="ga-cpa-score">—</span></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ── Bottom row: Ad Type breakdown + Daily trend + Setup guide ── -->
+    <!-- ── Bottom row: Type breakdown + Device + Setup ── -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
 
-      <!-- Campaign Type Breakdown -->
       <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
           <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">By Campaign Type</div>
@@ -3394,7 +3367,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
 
-      <!-- Device Breakdown -->
       <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
           <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">By Device</div>
@@ -3405,33 +3377,18 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
 
-      <!-- Setup Guide -->
       <div class="card" style="padding:16px;background:linear-gradient(135deg,rgba(66,133,244,0.04),rgba(66,133,244,0.01))">
         <div style="font-size:12px;font-weight:700;color:#4285F4;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">🔌 Connect Google Ads</div>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <div class="ga-step">
-            <div class="ga-step-num">1</div>
-            <div class="ga-step-text">Apply for Google Ads API access at <strong>ads.google.com/nav/selectaccount</strong></div>
-          </div>
-          <div class="ga-step">
-            <div class="ga-step-num">2</div>
-            <div class="ga-step-text">Add <code>GOOGLE_ADS_DEVELOPER_TOKEN</code>, <code>GOOGLE_ADS_CUSTOMER_ID</code> and OAuth credentials to Vercel env vars</div>
-          </div>
-          <div class="ga-step">
-            <div class="ga-step-num">3</div>
-            <div class="ga-step-text">Uncomment the Google Ads fetch in <code>proxy.js</code> — metrics will auto-populate</div>
-          </div>
-          <div class="ga-step">
-            <div class="ga-step-num">4</div>
-            <div class="ga-step-text">Key metrics: Spend · ROAS · CPA · CTR · Conv. Rate · Impression Share · Quality Score</div>
-          </div>
+          <div class="ga-step"><div class="ga-step-num">1</div><div class="ga-step-text">Apply for Google Ads API access at <strong>ads.google.com</strong></div></div>
+          <div class="ga-step"><div class="ga-step-num">2</div><div class="ga-step-text">Add <code>GOOGLE_ADS_DEVELOPER_TOKEN</code> and <code>GOOGLE_ADS_CUSTOMER_ID</code> to Vercel env vars</div></div>
+          <div class="ga-step"><div class="ga-step-num">3</div><div class="ga-step-text">Uncomment the Google Ads fetch in <code>proxy.js</code> — data auto-populates</div></div>
+          <div class="ga-step"><div class="ga-step-num">4</div><div class="ga-step-text">Track: Spend · ROAS · CPA · CTR · Conv. Rate · Impression Share</div></div>
         </div>
       </div>
     </div>
 
   </main><!-- /pageGoogleAds -->
-
-<div class="toast" id="toast"></div>
 
 <!-- ══════════════════════════════════════════
      JAVASCRIPT
@@ -4526,6 +4483,104 @@ FEE_KEYS.forEach(k => {
     if (el) el.addEventListener('input', updateFeeExamples);
   });
 });
+
+// ── Google Ads Page ─────────────────────────────────────────────────────
+function openGoogleAdsPage() {
+  // Hide main dashboard
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
+  // Hide all other report pages
+  document.querySelectorAll('.report-main').forEach(el => el.style.display = 'none');
+  // Show Google Ads page
+  const gaPage = document.getElementById('pageGoogleAds');
+  if (gaPage) gaPage.style.display = 'block';
+  // Render content
+  gaRenderPage();
+}
+
+function closeGoogleAdsPage() {
+  const gaPage = document.getElementById('pageGoogleAds');
+  if (gaPage) gaPage.style.display = 'none';
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
+}
+
+function gaRenderPage() {
+  const d = window.livePlatforms && window.livePlatforms.google;
+  const spend   = d && d.spend       ? d.spend       : 0;
+  const convVal = d && d.revenue     ? d.revenue     : 0;
+  const conv    = d && d.conversions ? d.conversions : 0;
+  const clicks  = d && d.clicks      ? d.clicks      : 0;
+  const impr    = d && d.impressions ? d.impressions : 0;
+  const roas    = spend > 0 ? convVal / spend : 0;
+  const cpa     = conv  > 0 ? spend   / conv  : 0;
+  const cpc     = clicks> 0 ? spend   / clicks: 0;
+  const ctr     = impr  > 0 ? clicks  / impr * 100 : 0;
+  const cvr     = clicks> 0 ? conv    / clicks* 100 : 0;
+
+  function gFmt(n) {
+    if (!n) return '—';
+    var abs = Math.abs(parseFloat(n)||0);
+    return '$' + abs.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function gPct(n) { return n > 0 ? n.toFixed(1)+'%' : '—'; }
+  function gX(n)   { return n > 0 ? n.toFixed(2)+'×' : '—'; }
+  function gEl(id, val) { var e=document.getElementById(id); if(e) e.textContent=val; }
+
+  gEl('ga-spend',       gFmt(spend));
+  gEl('ga-spend-sub',   spend > 0 ? 'total ad spend' : 'awaiting API');
+  gEl('ga-conv-value',  gFmt(convVal));
+  gEl('ga-roas',        gX(roas));
+  gEl('ga-cpa',         gFmt(cpa));
+  gEl('ga-conv',        conv > 0 ? conv.toLocaleString() : '—');
+  gEl('ga-conv-sub',    conv > 0 ? 'purchases' : 'awaiting API');
+  gEl('ga-cpc',         gFmt(cpc));
+  gEl('ga-ctr-sub',     'CTR: ' + gPct(ctr));
+
+  // Update sidebar badge
+  var badge = document.getElementById('ga-roas-badge');
+  if (badge) { badge.textContent = roas > 0 ? gX(roas) : '—'; }
+
+  // Impression share bars
+  function gBar(barId, pctId, val) {
+    var bar=document.getElementById(barId); if(bar) bar.style.width=Math.min(val*100,100)+'%';
+    var pct=document.getElementById(pctId); if(pct) pct.textContent=gPct(val*100);
+  }
+  gBar('ga-is-search', 'ga-is-search-pct', d&&d.impressionShare ||0);
+  gBar('ga-is-budget', 'ga-is-budget-pct', d&&d.lostISBudget    ||0);
+  gBar('ga-is-rank',   'ga-is-rank-pct',   d&&d.lostISRank      ||0);
+  gBar('ga-is-top',    'ga-is-top-pct',    d&&d.absTopIS        ||0);
+
+  // Scorecard
+  function gScore(id, good, warn, label) {
+    var e=document.getElementById(id); if(!e) return;
+    e.textContent=label;
+    if(good) { e.style.background='rgba(90,158,114,0.15)'; e.style.color='var(--green)'; }
+    else if(warn) { e.style.background='rgba(212,135,74,0.15)'; e.style.color='var(--orange)'; }
+    else { e.style.background='rgba(28,27,24,0.06)'; e.style.color='var(--c3)'; }
+  }
+  gScore('ga-roas-score', roas>=4, roas>=2, roas>0?(roas>=4?'✅ '+gX(roas):'⚠ '+gX(roas)):'—');
+  gScore('ga-ctr-score',  ctr>=3,  ctr>=1.5, ctr>0?(ctr>=3?'✅ '+gPct(ctr):'⚠ '+gPct(ctr)):'—');
+  gScore('ga-cvr-score',  cvr>=4,  cvr>=2,  cvr>0?(cvr>=4?'✅ '+gPct(cvr):'⚠ '+gPct(cvr)):'—');
+  gScore('ga-cpa-score',  cpa>0&&cpa<48, cpa>0&&cpa<120, cpa>0?(cpa<48?'✅ '+gFmt(cpa):'⚠ '+gFmt(cpa)):'—');
+
+  // Campaign table
+  var tbl = document.getElementById('ga-campaign-table');
+  if (tbl && d && d.campaigns && d.campaigns.length) {
+    tbl.innerHTML = d.campaigns.map(function(c) {
+      var cr = c.spend>0 ? (c.convValue/c.spend).toFixed(1)+'x' : '—';
+      var cc = c.conv>0  ? gFmt(c.spend/c.conv) : '—';
+      var ct = c.impr>0  ? gPct(c.clicks/c.impr*100) : '—';
+      return '<div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
+        '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500" title="'+c.name+'">'+c.name+'</div>' +
+        '<div style="text-align:right;color:#4285F4;font-weight:600">'+gFmt(c.spend)+'</div>' +
+        '<div style="text-align:right;color:var(--gold);font-weight:600">'+cr+'</div>' +
+        '<div style="text-align:right">'+( c.conv||'—')+'</div>' +
+        '<div style="text-align:right;color:var(--c2)">'+cc+'</div>' +
+        '<div style="text-align:right;color:var(--c3)">'+ct+'</div>' +
+        '</div>';
+    }).join('');
+  }
+}
+
 doSync();
 </script>
 <!-- ══════════  SETTINGS MODAL  -->
@@ -5272,136 +5327,6 @@ function orExportCSV() {
   a.click();
   toast(`Exported ${orders.length} orders`, 'ok');
 }
-// ── Google Ads Page ─────────────────────────────────────────────────────
-let gaData = null;
-
-function gaRender() {
-  // If live Google Ads data comes in from livePlatforms, use it
-  // Otherwise show a realistic mock layout with "—" placeholders
-  const d = livePlatforms.google;
-
-  // KPI strip
-  const spend    = d?.spend       || 0;
-  const convVal  = d?.revenue     || 0;
-  const conv     = d?.conversions || 0;
-  const clicks   = d?.clicks      || 0;
-  const impr     = d?.impressions || 0;
-  const roas     = spend > 0 ? convVal / spend : 0;
-  const cpa      = conv  > 0 ? spend   / conv  : 0;
-  const cpc      = clicks > 0 ? spend  / clicks : 0;
-  const ctr      = impr  > 0 ? (clicks / impr * 100) : 0;
-  const cvr      = clicks > 0 ? (conv  / clicks * 100) : 0;
-
-  const fmt = n => n > 0 ? '$' + Math.abs(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
-  const fmtX = n => n > 0 ? n.toFixed(2) + '×' : '—';
-  const fmtPct = n => n > 0 ? n.toFixed(1) + '%' : '—';
-
-  _gaSetText('ga-spend',        fmt(spend));
-  _gaSetText('ga-spend-sub',    spend > 0 ? 'total ad spend' : 'awaiting API');
-  _gaSetText('ga-conv-value',   fmt(convVal));
-  _gaSetText('ga-conv-value-sub', convVal > 0 ? 'attributed revenue' : 'awaiting API');
-  _gaSetText('ga-roas',         fmtX(roas));
-  _gaSetText('ga-cpa',          fmt(cpa));
-  _gaSetText('ga-conv',         conv > 0 ? conv.toLocaleString() : '—');
-  _gaSetText('ga-conv-sub',     conv > 0 ? 'purchases' : 'awaiting API');
-  _gaSetText('ga-cpc',          fmt(cpc));
-  _gaSetText('ga-ctr-sub',      ctr > 0 ? 'CTR: ' + fmtPct(ctr) : 'CTR: —');
-
-  // Impression Share bars (from live data or mock)
-  const is       = d?.impressionShare     || 0;
-  const isTop    = d?.absTopIS            || 0;
-  const isBudget = d?.lostISBudget        || 0;
-  const isRank   = d?.lostISRank          || 0;
-  _gaSetBar('ga-is-search', is,       'ga-is-search-pct',  fmtPct(is * 100));
-  _gaSetBar('ga-is-budget', isBudget, 'ga-is-budget-pct',  fmtPct(isBudget * 100));
-  _gaSetBar('ga-is-rank',   isRank,   'ga-is-rank-pct',    fmtPct(isRank * 100));
-  _gaSetBar('ga-is-top',    isTop,    'ga-is-top-pct',     fmtPct(isTop * 100));
-
-  // Performance scorecard
-  _gaScore('ga-roas-score', roas, roas >= 4 ? 'good' : roas >= 2 ? 'warn' : 'bad',
-    roas > 0 ? (roas >= 4 ? '✅ ' + fmtX(roas) : '⚠ ' + fmtX(roas)) : '—');
-  _gaScore('ga-ctr-score',  ctr,  ctr  >= 3 ? 'good' : ctr  >= 1.5 ? 'warn' : 'bad',
-    ctr > 0 ? (ctr >= 3 ? '✅ ' + fmtPct(ctr) : '⚠ ' + fmtPct(ctr)) : '—');
-  _gaScore('ga-cvr-score',  cvr,  cvr  >= 4 ? 'good' : cvr  >= 2 ? 'warn' : 'bad',
-    cvr > 0 ? (cvr >= 4 ? '✅ ' + fmtPct(cvr) : '⚠ ' + fmtPct(cvr)) : '—');
-  const aov = 120; // approximate AOV in AUD
-  _gaScore('ga-cpa-score',  cpa,  cpa  > 0 && cpa < aov*0.4 ? 'good' : cpa < aov ? 'warn' : 'bad',
-    cpa > 0 ? (cpa < aov*0.4 ? '✅ ' + fmt(cpa) : '⚠ ' + fmt(cpa)) : '—');
-
-  // Campaign table
-  const tbl = document.getElementById('ga-campaign-table');
-  if (tbl) {
-    if (d?.campaigns?.length) {
-      tbl.innerHTML = d.campaigns.map(c => {
-        const cRoas = c.spend > 0 ? c.convValue / c.spend : 0;
-        const cCpa  = c.conv  > 0 ? c.spend / c.conv : 0;
-        const cCtr  = c.impr  > 0 ? c.clicks / c.impr * 100 : 0;
-        return '<div style="display:grid;grid-template-columns:1fr 80px 70px 80px 80px 70px;padding:8px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
-          '<div style="color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + c.name + '">' + c.name + '</div>' +
-          '<div style="text-align:right;color:#4285F4;font-weight:600">' + fmt(c.spend) + '</div>' +
-          '<div style="text-align:right;color:' + (cRoas>=4?'var(--green)':cRoas>=2?'var(--gold)':'var(--red)') + ';font-weight:600">' + (cRoas>0?cRoas.toFixed(1)+'×':'—') + '</div>' +
-          '<div style="text-align:right;color:var(--ink)">' + (c.conv>0?c.conv:'—') + '</div>' +
-          '<div style="text-align:right;color:var(--c2)">' + fmt(cCpa) + '</div>' +
-          '<div style="text-align:right;color:var(--c3)">' + (cCtr>0?cCtr.toFixed(1)+'%':'—') + '</div>' +
-          '</div>';
-      }).join('');
-    } else {
-      tbl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:Inter,sans-serif;font-size:12px">Connect Google Ads API to view campaign data.<br><span style="font-size:10px;margin-top:4px;display:block">See setup guide below →</span></div>';
-    }
-  }
-
-  // Campaign type breakdown (mock until API connected)
-  const typeTbl = document.getElementById('ga-type-breakdown');
-  if (typeTbl) {
-    const types = d?.byType || [
-      {name:'Search',    spend:0, roas:0, conv:0},
-      {name:'Shopping',  spend:0, roas:0, conv:0},
-      {name:'Perf. Max', spend:0, roas:0, conv:0},
-      {name:'Display',   spend:0, roas:0, conv:0},
-    ];
-    typeTbl.innerHTML = types.map(t => {
-      const r = t.roas > 0 ? t.roas.toFixed(1)+'×' : '—';
-      return '<div class="ga-type-row">' +
-        '<span style="font-size:11px;color:var(--ink);font-weight:500">' + t.name + '</span>' +
-        '<span style="font-size:11px;color:#4285F4">' + (t.spend>0?fmt(t.spend):'—') + '</span>' +
-        '<span style="font-size:11px;color:var(--gold);font-weight:600">' + r + '</span>' +
-        '<span style="font-size:11px;color:var(--c3)">' + (t.conv>0?t.conv+' conv':'—') + '</span>' +
-        '</div>';
-    }).join('');
-  }
-
-  // Device breakdown
-  const devTbl = document.getElementById('ga-device-breakdown');
-  if (devTbl) {
-    const devs = d?.byDevice || [
-      {name:'Mobile',  pct:0, spend:0},
-      {name:'Desktop', pct:0, spend:0},
-      {name:'Tablet',  pct:0, spend:0},
-    ];
-    const colors = ['#4285F4','var(--gold)','var(--green)'];
-    devTbl.innerHTML = devs.map((dv,i) => '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
-      '<span style="width:8px;height:8px;border-radius:50%;background:' + colors[i] + ';flex-shrink:0"></span>' +
-      '<span style="flex:1;font-size:11px;color:var(--ink);font-family:Inter,sans-serif">' + dv.name + '</span>' +
-      '<span style="font-size:11px;color:#4285F4;font-family:Inter,sans-serif">' + (dv.spend>0?fmt(dv.spend):'—') + '</span>' +
-      '<span style="font-size:10px;color:var(--c3);font-family:Inter,sans-serif;width:30px;text-align:right">' + (dv.pct>0?dv.pct.toFixed(0)+'%':'—') + '</span>' +
-      '</div>').join('');
-  }
-}
-
-function _gaSetText(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
-function _gaSetBar(barId, val, pctId, pctLabel) {
-  const bar=document.getElementById(barId); if(bar) bar.style.width=(Math.min(val*100,100))+'%';
-  const pct=document.getElementById(pctId); if(pct) pct.textContent=pctLabel;
-}
-function _gaScore(id, val, cls, label) {
-  const el=document.getElementById(id); if(!el) return;
-  el.textContent=label;
-  const colors={good:'rgba(90,158,114,0.15)',warn:'rgba(212,135,74,0.15)',bad:'rgba(217,84,84,0.15)'};
-  const txtColors={good:'var(--green)',warn:'var(--orange)',bad:'var(--red)'};
-  el.style.background=colors[cls]||'rgba(28,27,24,0.06)';
-  el.style.color=txtColors[cls]||'var(--c3)';
-}
-
 let clvData = null;
 
 async function clvSync() { clvSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
