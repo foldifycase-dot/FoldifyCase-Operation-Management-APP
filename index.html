@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FoldifyCase — Operation Management</title>
+<title>FoldifyCase — Operation Management v12c8c13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -4942,6 +4942,7 @@ function orRenderTotalsRow() {
 
 function orRenderTable() {
   const el = document.getElementById('or-table-body');
+  console.log('[OR] orRenderTable called. el:', !!el, 'orFiltered.length:', orFiltered.length);
   if (!el) return;
   if (!orFiltered.length) {
     el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-size:12px">No orders match the current filters</div>';
@@ -5425,6 +5426,7 @@ async function orSyncWithRange(from,to){
     if(!r.ok){const e=await r.json().catch(()=>({}));orSetStatus(`✗ Error: ${e.error||r.status}`,true);return;}
     const data=await r.json();
     orAllOrders=data.orders||[];
+    console.log('[OR] Orders loaded:', orAllOrders.length, 'first:', orAllOrders[0]?.name);
     const gws=[...new Set(orAllOrders.map(o=>o.gateway).filter(Boolean))];
     const gwSel=document.getElementById('or-gateway-filter');
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
