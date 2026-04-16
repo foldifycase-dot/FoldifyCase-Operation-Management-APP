@@ -1,11 +1,7 @@
 {
-  "name": "foldifycase-profit-tracker",
+  "name": "foldifycase-operation-management",
   "version": "1.0.0",
-  "description": "FoldifyCase Profit Intelligence Dashboard",
   "engines": {
     "node": "20.x"
-  },
-  "dependencies": {
-    "@vercel/blob": "^0.19.0"
   }
 }
