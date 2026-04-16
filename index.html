@@ -2125,24 +2125,33 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   <!-- Product Analytics — Full Dashboard -->
   <main class="main report-main" id="pageProductAnalytics" style="display:none">
 
-    <!-- Header -->
+    <!-- Header — title on own line, matching main dashboard style -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">PRODUCT</span> <span class="gold">ANALYTICS</span></div>
       </div>
-      <!-- Date range + sync -->
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <select id="pa-range" onchange="paSync()" style="
-          padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);
-          background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);
-          cursor:pointer;
-        ">
-          <option value="7">Last 7 Days</option>
-          <option value="30" selected>Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
-          <option value="365">Last 12 Months</option>
-        </select>
+    </div>
+
+    <!-- Controls bar — below the title, matching main dashboard pattern -->
+    <div class="main-controls" style="margin-top:0">
+      <!-- Date picker — styled like main dashboard trigger -->
+      <div style="position:relative">
+        <div class="dp-trigger" id="paDpTrigger" onclick="paDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="paDpText">Last 30 Days</span>
+          <span class="dp-trigger-arrow" id="paDpArrow">▼</span>
+        </div>
+        <!-- Dropdown presets -->
+        <div id="paDpPanel" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:var(--ink);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.2)">
+          <button class="dp-preset" onclick="paApplyPreset(7,'Last 7 Days')">Last 7 days</button>
+          <button class="dp-preset dp-preset-pa-active" onclick="paApplyPreset(30,'Last 30 Days')">Last 30 days</button>
+          <button class="dp-preset" onclick="paApplyPreset(90,'Last 90 Days')">Last 90 days</button>
+          <button class="dp-preset" onclick="paApplyPreset(365,'Last 12 Months')">Last 12 months</button>
+        </div>
+      </div>
+      <!-- Actions -->
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="paSync()" id="paSyncBtn" style="
           padding:7px 16px;border-radius:7px;background:var(--gold);
           color:var(--ink);border:none;font-size:12px;font-weight:700;
@@ -3885,6 +3894,16 @@ document.addEventListener('click', e => {
   const trigger = document.getElementById('dpTrigger');
   if (dpOpen && !panel.contains(e.target) && !trigger.contains(e.target)) {
     closeDatePicker();
+  }
+  // Close PA date dropdown when clicking outside
+  const paPanel   = document.getElementById('paDpPanel');
+  const paTrigger = document.getElementById('paDpTrigger');
+  if (paPanel && paPanel.style.display === 'block' &&
+      !paPanel.contains(e.target) && paTrigger && !paTrigger.contains(e.target)) {
+    paPanel.style.display = 'none';
+    if (paTrigger) paTrigger.classList.remove('open');
+    const arrow = document.getElementById('paDpArrow');
+    if (arrow) arrow.textContent = '▼';
   }
 });
 
@@ -5786,11 +5805,40 @@ let paData       = null; // full API response
 let paSortKey    = 'revenue';
 let paSortDir    = -1; // -1 = desc
 let paViewMode   = 'revenue'; // revenue | units | margin
+let paDays       = 30; // controlled by the custom dropdown
+
+function paDpToggle() {
+  const panel = document.getElementById('paDpPanel');
+  const trigger = document.getElementById('paDpTrigger');
+  const arrow   = document.getElementById('paDpArrow');
+  if (!panel) return;
+  const open = panel.style.display === 'block';
+  panel.style.display = open ? 'none' : 'block';
+  if (trigger) trigger.classList.toggle('open', !open);
+  if (arrow)   arrow.textContent = open ? '▼' : '▲';
+}
+
+function paApplyPreset(days, label) {
+  paDays = days;
+  const textEl = document.getElementById('paDpText');
+  if (textEl) textEl.textContent = label;
+  // Update active state
+  document.querySelectorAll('.dp-preset-pa-active').forEach(el => el.classList.remove('dp-preset-pa-active'));
+  event?.target?.classList.add('dp-preset-pa-active');
+  // Close dropdown
+  const panel = document.getElementById('paDpPanel');
+  const trigger = document.getElementById('paDpTrigger');
+  const arrow   = document.getElementById('paDpArrow');
+  if (panel)   panel.style.display = 'none';
+  if (trigger) trigger.classList.remove('open');
+  if (arrow)   arrow.textContent = '▼';
+  paSync();
+}
 
 async function paSync() {
   const btn    = document.getElementById('paSyncBtn');
   const status = document.getElementById('pa-status');
-  const days   = parseInt(document.getElementById('pa-range')?.value || 30);
+  const days   = paDays || 30;
   const to     = new Date().toISOString().slice(0,10);
   const from   = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
 
