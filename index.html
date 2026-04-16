@@ -2489,18 +2489,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">P&amp;L</span> <span class="gold">REPORT</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <!-- Granularity toggle -->
-        <div style="display:flex;gap:4px;background:rgba(28,27,24,0.06);padding:3px;border-radius:8px">
-          <button onclick="plSetGranularity('daily')"   id="pl-g-daily"   class="pl-gran-btn pl-gran-active">Daily</button>
-          <button onclick="plSetGranularity('weekly')"  id="pl-g-weekly"  class="pl-gran-btn">Weekly</button>
-          <button onclick="plSetGranularity('monthly')" id="pl-g-monthly" class="pl-gran-btn">Monthly</button>
-        </div>
-        <div style="position:relative">
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
           <div class="dp-trigger" id="plDpTrigger" onclick="plDpToggle()">
             <span class="dp-trigger-icon">📅</span>
             <span class="dp-trigger-text" id="plDpText">Last 30 Days</span>
@@ -2537,13 +2532,19 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
+      <!-- Granularity toggle -->
+      <div style="display:flex;gap:4px;background:rgba(28,27,24,0.06);padding:3px;border-radius:8px;margin-left:12px">
+        <button onclick="plSetGranularity('daily')"   id="pl-g-daily"   class="pl-gran-btn pl-gran-active">Daily</button>
+        <button onclick="plSetGranularity('weekly')"  id="pl-g-weekly"  class="pl-gran-btn">Weekly</button>
+        <button onclick="plSetGranularity('monthly')" id="pl-g-monthly" class="pl-gran-btn">Monthly</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="plSync()" id="plSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+        <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
-    <!-- Status -->
-    <div id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2686,12 +2687,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">MARKETING</span> <span class="gold">ATTRIBUTION</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <div style="position:relative">
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
           <div class="dp-trigger" id="maDpTrigger" onclick="maDpToggle()">
             <span class="dp-trigger-icon">📅</span>
             <span class="dp-trigger-text" id="maDpText">Last 30 Days</span>
@@ -2728,13 +2730,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="maSync()" id="maSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+        <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
-    <!-- Status -->
-    <div id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2966,12 +2968,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">CUSTOMER</span> <span class="gold">LIFETIME VALUE</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <div style="position:relative">
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
           <div class="dp-trigger" id="clvDpTrigger" onclick="clvDpToggle()">
             <span class="dp-trigger-icon">📅</span>
             <span class="dp-trigger-text" id="clvDpText">Last 12 Months</span>
@@ -3008,13 +3011,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="clvSync()" id="clvSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+        <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
-    <!-- Status -->
-    <div id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
