@@ -401,6 +401,48 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 .sb-div { height:1px; background:rgba(255,255,255,0.06); margin:4px 0 12px; }
 
+/* ── Config section ── */
+.sb-config-section { margin:0 14px 8px; }
+.sb-config-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 10px; border-radius:6px; cursor:pointer;
+  background:rgba(255,255,255,0.04);
+  transition:background .15s;
+}
+.sb-config-header:hover { background:rgba(255,255,255,0.08); }
+.sb-config-body {
+  padding:10px 4px 4px;
+  display:block;
+}
+.sb-config-body.collapsed { display:none; }
+
+/* Fee rows */
+.tx-fee-row {
+  display:flex; flex-direction:column; gap:4px;
+  padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.tx-fee-row:last-of-type { border-bottom:none; }
+.tx-fee-label {
+  display:flex; align-items:center; gap:6px;
+  font-size:11px; color:var(--t2); font-weight:500;
+}
+.tx-fee-dot {
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+}
+.tx-fee-inputs {
+  display:flex; align-items:center; gap:4px; padding-left:14px;
+}
+.tx-fee-input {
+  width:46px; padding:3px 5px; border-radius:4px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  color:var(--t1); font-size:11px; font-family:var(--mono);
+  text-align:right;
+}
+.tx-fee-input:focus { outline:none; border-color:var(--gold); }
+.tx-fee-unit, .tx-fee-plus, .tx-fee-dollar {
+  font-size:10px; color:var(--c3); font-family:var(--mono);
+}
+
 /* Nav items */
 .sb-nav-item {
   display:flex; align-items:center; justify-content:space-between;
@@ -1081,6 +1123,97 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">—</span>
     </div>
 
+    <!-- ── CONFIGURATION ── -->
+    <div class="sb-div"></div>
+    <div class="sb-label" style="padding-top:4px">Configuration</div>
+
+    <!-- Transaction Fees accordion -->
+    <div class="sb-config-section" id="txFeePanel">
+      <div class="sb-config-header" onclick="toggleTxFeePanel()">
+        <span style="font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.06em">💳 TRANSACTION FEES</span>
+        <span id="txFeePanelArrow" style="font-size:10px;color:var(--c3)">▼</span>
+      </div>
+      <div class="sb-config-body" id="txFeeBody">
+        <div style="font-size:10px;color:var(--c3);margin-bottom:8px;line-height:1.4">
+          Set rate (%) + flat fee per transaction for each payment provider.
+        </div>
+
+        <!-- Fee rows -->
+        <div class="tx-fee-row">
+          <div class="tx-fee-label">
+            <span class="tx-fee-dot" style="background:#5C6AC4"></span>Shopify Payments
+          </div>
+          <div class="tx-fee-inputs">
+            <input class="tx-fee-input" id="fee_shopify_pct"  type="number" step="0.01" min="0" value="1.75" title="Rate %"><span class="tx-fee-unit">%</span>
+            <span class="tx-fee-plus">+</span>
+            <span class="tx-fee-dollar">$</span><input class="tx-fee-input" id="fee_shopify_flat" type="number" step="0.01" min="0" value="0.30" title="Flat fee">
+          </div>
+        </div>
+
+        <div class="tx-fee-row">
+          <div class="tx-fee-label">
+            <span class="tx-fee-dot" style="background:#2590FF"></span>Stripe
+          </div>
+          <div class="tx-fee-inputs">
+            <input class="tx-fee-input" id="fee_stripe_pct"  type="number" step="0.01" min="0" value="2.90" title="Rate %"><span class="tx-fee-unit">%</span>
+            <span class="tx-fee-plus">+</span>
+            <span class="tx-fee-dollar">$</span><input class="tx-fee-input" id="fee_stripe_flat" type="number" step="0.01" min="0" value="0.30" title="Flat fee">
+          </div>
+        </div>
+
+        <div class="tx-fee-row">
+          <div class="tx-fee-label">
+            <span class="tx-fee-dot" style="background:#003087"></span>PayPal
+          </div>
+          <div class="tx-fee-inputs">
+            <input class="tx-fee-input" id="fee_paypal_pct"  type="number" step="0.01" min="0" value="4.40" title="Rate %"><span class="tx-fee-unit">%</span>
+            <span class="tx-fee-plus">+</span>
+            <span class="tx-fee-dollar">$</span><input class="tx-fee-input" id="fee_paypal_flat" type="number" step="0.01" min="0" value="0.30" title="Flat fee">
+          </div>
+        </div>
+
+        <div class="tx-fee-row">
+          <div class="tx-fee-label">
+            <span class="tx-fee-dot" style="background:#FFB3C7"></span>Klarna
+          </div>
+          <div class="tx-fee-inputs">
+            <input class="tx-fee-input" id="fee_klarna_pct"  type="number" step="0.01" min="0" value="2.90" title="Rate %"><span class="tx-fee-unit">%</span>
+            <span class="tx-fee-plus">+</span>
+            <span class="tx-fee-dollar">$</span><input class="tx-fee-input" id="fee_klarna_flat" type="number" step="0.01" min="0" value="0.30" title="Flat fee">
+          </div>
+        </div>
+
+        <div class="tx-fee-row">
+          <div class="tx-fee-label">
+            <span class="tx-fee-dot" style="background:#B2FCE4"></span>Afterpay
+          </div>
+          <div class="tx-fee-inputs">
+            <input class="tx-fee-input" id="fee_afterpay_pct"  type="number" step="0.01" min="0" value="0.00" title="Rate %"><span class="tx-fee-unit">%</span>
+            <span class="tx-fee-plus">+</span>
+            <span class="tx-fee-dollar">$</span><input class="tx-fee-input" id="fee_afterpay_flat" type="number" step="0.01" min="0" value="0.00" title="Flat fee">
+          </div>
+        </div>
+
+        <div class="tx-fee-row">
+          <div class="tx-fee-label">
+            <span class="tx-fee-dot" style="background:var(--c3)"></span>Other
+          </div>
+          <div class="tx-fee-inputs">
+            <input class="tx-fee-input" id="fee_other_pct"  type="number" step="0.01" min="0" value="2.90" title="Rate %"><span class="tx-fee-unit">%</span>
+            <span class="tx-fee-plus">+</span>
+            <span class="tx-fee-dollar">$</span><input class="tx-fee-input" id="fee_other_flat" type="number" step="0.01" min="0" value="0.30" title="Flat fee">
+          </div>
+        </div>
+
+        <button onclick="saveFeeRates()" style="
+          width:100%;margin-top:10px;padding:7px;
+          background:var(--gold);color:#1C1B18;
+          border:none;border-radius:6px;font-size:11px;
+          font-weight:700;cursor:pointer;letter-spacing:.04em;
+        ">SAVE &amp; REFRESH DATA</button>
+      </div>
+    </div>
+
   </aside>
 
   <!-- ══════════  MAIN  -->
@@ -1414,6 +1547,7 @@ async function doSync() {
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
   const { from, to } = getRange(activeRange);
+  const feeParams = getFeeParams(); // configured gateway rates
 
   const setStatus = (msg, isError=false) => {
     if (!statusBar) return;
@@ -1428,7 +1562,7 @@ async function doSync() {
 
   try {
     const [shopifyRes, metaRes] = await Promise.allSettled([
-      fetch(`${PROXY}?service=shopify&action=daily-sales&from=${from}&to=${to}`),
+      fetch(`${PROXY}?service=shopify&action=daily-sales&from=${from}&to=${to}&${feeParams}`),
       fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`),
       // Google Ads — uncomment once API approved & env vars added to Vercel:
       // fetch(`${PROXY}?service=google-ads&from=${from}&to=${to}`),
@@ -2003,6 +2137,55 @@ function renderBreakdown() {
 }
 
 /* ══════════════════════════════════════════
+   TRANSACTION FEE CONFIG
+══════════════════════════════════════════ */
+const FEE_KEYS = ['shopify','stripe','paypal','klarna','afterpay','other'];
+
+function toggleTxFeePanel() {
+  const body  = document.getElementById('txFeeBody');
+  const arrow = document.getElementById('txFeePanelArrow');
+  const collapsed = body.classList.toggle('collapsed');
+  arrow.textContent = collapsed ? '▶' : '▼';
+}
+
+function loadFeeRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('fc_fee_rates') || '{}');
+    FEE_KEYS.forEach(k => {
+      const pctEl  = document.getElementById(`fee_${k}_pct`);
+      const flatEl = document.getElementById(`fee_${k}_flat`);
+      if (pctEl  && saved[`fee_${k}_pct`]  !== undefined) pctEl.value  = saved[`fee_${k}_pct`];
+      if (flatEl && saved[`fee_${k}_flat`] !== undefined) flatEl.value = saved[`fee_${k}_flat`];
+    });
+  } catch(e) {}
+}
+
+function saveFeeRates() {
+  const rates = {};
+  FEE_KEYS.forEach(k => {
+    const pctEl  = document.getElementById(`fee_${k}_pct`);
+    const flatEl = document.getElementById(`fee_${k}_flat`);
+    if (pctEl)  rates[`fee_${k}_pct`]  = parseFloat(pctEl.value  || 0);
+    if (flatEl) rates[`fee_${k}_flat`] = parseFloat(flatEl.value || 0);
+  });
+  localStorage.setItem('fc_fee_rates', JSON.stringify(rates));
+  toast('✓ Fee rates saved — refreshing data', 'ok');
+  doSync(); // re-sync with new rates
+}
+
+function getFeeParams() {
+  // Build query string params to send to proxy
+  const params = [];
+  FEE_KEYS.forEach(k => {
+    const pctEl  = document.getElementById(`fee_${k}_pct`);
+    const flatEl = document.getElementById(`fee_${k}_flat`);
+    if (pctEl)  params.push(`fee_${k}_pct=${encodeURIComponent(pctEl.value  || 0)}`);
+    if (flatEl) params.push(`fee_${k}_flat=${encodeURIComponent(flatEl.value || 0)}`);
+  });
+  return params.join('&');
+}
+
+/* ══════════════════════════════════════════
    CONTROLS
 ══════════════════════════════════════════ */
 /* ══════════════════════════════════════════
@@ -2253,7 +2436,7 @@ function toast(msg, type='ok') {
 ══════════════════════════════════════════ */
 loadSampleData();
 renderAll();
-// Auto-sync on load
+loadFeeRates(); // load saved fee config from localStorage
 doSync();
 </script>
 <!-- ══════════  SETTINGS MODAL  -->
