@@ -1099,7 +1099,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="dpTrigger" onclick="toggleDatePicker()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="dpTriggerText">Today</span>
+          <span class="dp-trigger-text" id="dpTriggerText">Last 7 Days</span>
           <span class="dp-trigger-arrow" id="dpArrow">▼</span>
         </div>
 
@@ -1107,9 +1107,9 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <div class="dp-panel" id="dpPanel">
           <!-- Left: presets -->
           <div class="dp-presets">
-            <button class="dp-preset active" onclick="applyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="applyPreset('today')">Today</button>
             <button class="dp-preset" onclick="applyPreset('yesterday')">Yesterday</button>
-            <button class="dp-preset" onclick="applyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="applyPreset('7d')">Last 7 days</button>
             <button class="dp-preset" onclick="applyPreset('30d')">Last 30 days</button>
             <button class="dp-preset" onclick="applyPreset('thismonth')">This month</button>
             <button class="dp-preset" onclick="applyPreset('lastmonth')">Last month</button>
@@ -1337,7 +1337,7 @@ const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy'
    STATE
 ══════════════════════════════════════════ */
 let rows         = [];          // live data merged from Shopify + ad platforms
-let activeRange  = 'today';
+let activeRange  = '7d';
 let activeMkt    = 'all';
 let isLiveData   = false;
 
@@ -1823,9 +1823,18 @@ function renderSidebar() {
 
 function renderChart() {
   const container = document.getElementById('barChart');
+  if (!container) return;
   container.innerHTML = '';
-  if (!rows.length) return;
-  const maxRev = Math.max(...rows.map(r => r.revenue));
+
+  if (!rows.length || rows.every(r => !r.revenue)) {
+    container.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px">
+      <div style="font-size:22px;opacity:0.2">📊</div>
+      <div style="font-size:11px;color:var(--c3);font-family:var(--mono)">No data for this period</div>
+    </div>`;
+    return;
+  }
+
+  const maxRev = Math.max(...rows.map(r => r.revenue), 1);
   const H = 88;
   // baseline
   const bl = document.createElement('div');
@@ -1855,16 +1864,28 @@ function renderChart() {
 }
 
 function renderBreakdown() {
-  const t      = totals();
+  const el = document.getElementById('costBreakdown');
+  if (!el) return;
 
-  // Use real fees from Shopify data if available, else estimate
-  const txFee  = t.txFee > 0 ? t.txFee  : +(t.rev * 0.005).toFixed(2);
-  const gwFee  = t.gwFee > 0 ? t.gwFee  : +(t.rev * 0.0175).toFixed(2);
-  const ship   = t.ship  > 0 ? t.ship   : 0;
-  const cogs   = t.cogs  > 0 ? t.cogs   : 0;
-  const ad     = t.ad    > 0 ? t.ad     : 0;
+  const t = totals();
 
-  const totalCosts = cogs + ad + ship + txFee + gwFee;
+  // Show placeholder if no data at all
+  if (!rows.length && t.rev === 0) {
+    el.innerHTML = `<div style="padding:40px;text-align:center">
+      <div style="font-size:36px;opacity:0.15">🍩</div>
+      <div style="font-size:12px;color:var(--c3);margin-top:8px;font-family:var(--mono)">No data for this period</div>
+    </div>`;
+    return;
+  }
+
+  // Use real data from Shopify if available, else estimates based on revenue
+  const txFee = t.txFee > 0 ? t.txFee : +(t.rev * 0.005).toFixed(2);
+  const gwFee = t.gwFee > 0 ? t.gwFee : +(t.rev * 0.0175).toFixed(2);
+  const ship  = t.ship  > 0 ? t.ship  : +(t.rev * 0.045).toFixed(2);
+  const cogs  = t.cogs  > 0 ? t.cogs  : 0;
+  const ad    = t.ad    > 0 ? t.ad    : 0;
+
+  const totalCosts = +(cogs + ad + ship + txFee + gwFee).toFixed(2);
   const profit     = +(t.rev - totalCosts).toFixed(2);
 
   // Cost segments for donut
@@ -2016,9 +2037,10 @@ let dpViewLeft  = new Date();
 // Initialise: left = current month, right = next month
 dpViewLeft = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-// Default selection = today
+// Default selection = last 7 days
 const _today = new Date(); _today.setHours(0,0,0,0);
-dpSelStart = _today;
+const _7dAgo = new Date(_today); _7dAgo.setDate(_today.getDate()-6);
+dpSelStart = _7dAgo;
 dpSelEnd   = _today;
 
 function toggleDatePicker() {
