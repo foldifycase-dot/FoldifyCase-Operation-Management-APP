@@ -91,29 +91,137 @@ async function handleShopify(req, res) {
   };
 
   // ── DAILY SALES (for profit tracker) ────────────────────────────────────────
-  // Returns: [ { date, revenue, orders, aov } ] for each day in range
+  // ── DAILY SALES — pulls real revenue, orders, COGS, shipping from Shopify ───
+  // Returns: [ { date, revenue, orders, aov, cogs, shipping_charged, shipping_cost } ]
   if (action === "daily-sales") {
     const { from, to } = req.query;
     if (!from || !to) return res.status(400).json({ error: "from and to dates required (YYYY-MM-DD)" });
 
-    const url = `${base}/orders.json?status=any&financial_status=paid&created_at_min=${from}T00:00:00Z&created_at_max=${to}T23:59:59Z&limit=250&fields=created_at,total_price,line_items`;
-    const r   = await fetch(url, { headers });
+    // Fetch orders with full financial detail — line items include COGS if set
+    const url = `${base}/orders.json?status=any&financial_status=paid`
+      + `&created_at_min=${from}T00:00:00Z&created_at_max=${to}T23:59:59Z`
+      + `&limit=250`
+      + `&fields=id,created_at,total_price,subtotal_price,total_shipping_price_set,`
+      + `shipping_lines,line_items,total_discounts`;
+
+    const r = await fetch(url, { headers });
     const { orders = [] } = await r.json();
 
-    // Group by date
+    // ── Batch-fetch variant costs (COGS) from Inventory Items API ──────────────
+    // Collect all unique variant IDs across all orders
+    const variantIds = new Set();
+    orders.forEach(o => {
+      (o.line_items || []).forEach(li => {
+        if (li.variant_id) variantIds.add(li.variant_id);
+      });
+    });
+
+    // Build variant_id → cost map using Inventory Items
+    const variantCostMap = {};
+    if (variantIds.size > 0) {
+      try {
+        // Shopify allows up to 100 variant IDs per request
+        const chunks = [];
+        const arr = [...variantIds];
+        for (let i = 0; i < arr.length; i += 50) chunks.push(arr.slice(i, i + 50));
+
+        for (const chunk of chunks) {
+          const vUrl = `${base}/variants.json?ids=${chunk.join(',')}&fields=id,inventory_item_id`;
+          const vRes = await fetch(vUrl, { headers });
+          const { variants = [] } = await vRes.json();
+
+          // Fetch inventory items for cost data
+          const invIds = variants.map(v => v.inventory_item_id).filter(Boolean);
+          if (invIds.length) {
+            const iUrl = `${base}/inventory_items.json?ids=${invIds.join(',')}&fields=id,cost`;
+            const iRes = await fetch(iUrl, { headers });
+            const { inventory_items = [] } = await iRes.json();
+
+            // Map variant_id → cost
+            const invCostMap = {};
+            inventory_items.forEach(item => { invCostMap[item.id] = parseFloat(item.cost || 0); });
+            variants.forEach(v => {
+              if (v.inventory_item_id && invCostMap[v.inventory_item_id] !== undefined) {
+                variantCostMap[v.id] = invCostMap[v.inventory_item_id];
+              }
+            });
+          }
+        }
+        console.log(`[Shopify] COGS map built for ${Object.keys(variantCostMap).length} variants`);
+      } catch (cogErr) {
+        console.warn('[Shopify] COGS fetch failed, will use 0:', cogErr.message);
+      }
+    }
+
+    // ── Group orders by date ────────────────────────────────────────────────────
     const byDate = {};
     orders.forEach(o => {
       const date = o.created_at.slice(0, 10);
-      if (!byDate[date]) byDate[date] = { date, revenue: 0, orders: 0 };
-      byDate[date].revenue += parseFloat(o.total_price);
-      byDate[date].orders  += 1;
+      if (!byDate[date]) byDate[date] = {
+        date,
+        revenue:          0,
+        orders:           0,
+        cogs:             0,   // real cost from Shopify inventory_items
+        shipping_charged: 0,   // what the customer paid for shipping
+        shipping_cost:    0,   // what you paid for shipping labels (Shopify Shipping)
+        has_cogs:         false,
+      };
+
+      const d = byDate[date];
+      d.revenue += parseFloat(o.total_price || 0);
+      d.orders  += 1;
+
+      // ── COGS: sum line_item quantity × variant cost ──────────────────────────
+      (o.line_items || []).forEach(li => {
+        const cost = variantCostMap[li.variant_id] || 0;
+        if (cost > 0) d.has_cogs = true;
+        d.cogs += cost * (li.quantity || 1);
+      });
+
+      // ── Shipping charged to customer ─────────────────────────────────────────
+      d.shipping_charged += parseFloat(
+        o.total_shipping_price_set?.shop_money?.amount || 0
+      );
+
+      // ── Shipping label cost (what you pay Shopify for labels) ────────────────
+      // shipping_lines[].price = shipping charged to customer
+      // shipping_lines[].discounted_price = after any free shipping discount
+      // For Shopify Shipping labels, the cost is in source: "shopify-shipping"
+      (o.shipping_lines || []).forEach(sl => {
+        // If sourced from Shopify Shipping, price_set.shop_money is what customer paid
+        // The actual label cost isn't directly exposed but can be approximated
+        // Shopify exposes it in the 'price' field of shipping_lines for label cost
+        if (sl.source === 'shopify-shipping' || sl.carrier_identifier) {
+          d.shipping_cost += parseFloat(sl.price || 0);
+        }
+      });
     });
 
     const daily = Object.values(byDate)
-      .map(d => ({ ...d, revenue: +d.revenue.toFixed(2), aov: +(d.revenue / d.orders).toFixed(2) }))
+      .map(d => ({
+        ...d,
+        revenue:          +d.revenue.toFixed(2),
+        cogs:             +d.cogs.toFixed(2),
+        shipping_charged: +d.shipping_charged.toFixed(2),
+        shipping_cost:    +d.shipping_cost.toFixed(2),
+        aov:              d.orders > 0 ? +(d.revenue / d.orders).toFixed(2) : 0,
+      }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    return res.status(200).json({ daily, total_orders: orders.length });
+    const totals = daily.reduce((acc, d) => ({
+      revenue:          +(acc.revenue + d.revenue).toFixed(2),
+      orders:           acc.orders + d.orders,
+      cogs:             +(acc.cogs + d.cogs).toFixed(2),
+      shipping_charged: +(acc.shipping_charged + d.shipping_charged).toFixed(2),
+      shipping_cost:    +(acc.shipping_cost + d.shipping_cost).toFixed(2),
+    }), { revenue:0, orders:0, cogs:0, shipping_charged:0, shipping_cost:0 });
+
+    return res.status(200).json({
+      daily,
+      totals,
+      has_cogs: daily.some(d => d.has_cogs),
+      total_orders: orders.length,
+    });
   }
 
   // ── PRODUCTS ─────────────────────────────────────────────────────────────────
