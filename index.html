@@ -1043,7 +1043,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .sec::after { content:''; flex:1; height:1px; background:rgba(28,27,24,0.1); }
 
 /* Padding wrapper */
-.pad { padding:20px 28px; }
+.pad { padding:0 28px 20px; }
 .pad-t { padding-top:22px; }
 
 /* ════════════════════════  KPI STRIP  */
@@ -1691,7 +1691,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Controls bar — date picker + export -->
-    <div class="main-controls">
+    <div class="main-controls" style="margin-top:0">
       <!-- Date picker trigger -->
       <div style="position:relative">
         <div class="dp-trigger" id="dpTrigger" onclick="toggleDatePicker()">
