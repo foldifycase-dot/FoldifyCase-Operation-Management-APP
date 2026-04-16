@@ -50,9 +50,10 @@ const ENV = {
 };
 
 // ─── MAIN ROUTER ──────────────────────────────────────────────────────────────
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") {
-    return res.status(200).set(CORS).end();
+    Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+    return res.status(200).end();
   }
   Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
 
@@ -67,9 +68,15 @@ export default async function handler(req, res) {
       case "meta-ads":   return await handleMetaAds(req, res);
       case "ms-ads":     return await handleMsAds(req, res);
       default:
-        return res.status(400).json({
-          error: "Unknown service",
-          valid: ["shopify","blob","alert","google-ads","meta-ads","ms-ads"]
+        return res.status(200).json({
+          status: 'FoldifyCase Proxy OK',
+          env_check: {
+            SHOPIFY_STORE:  ENV.shopifyStore  ? '✓ set' : '✗ MISSING',
+            SHOPIFY_TOKEN:  ENV.shopifyToken  ? '✓ set' : '✗ MISSING',
+            META_TOKEN:     ENV.metaToken     ? '✓ set' : '✗ MISSING',
+            META_AD_ACCOUNT:ENV.metaAdAccount ? '✓ set' : '✗ MISSING',
+          },
+          valid_services: ["shopify","blob","alert","google-ads","meta-ads","ms-ads"]
         });
     }
   } catch (err) {
@@ -84,6 +91,23 @@ export default async function handler(req, res) {
 // ═══════════════════════════════════════════════════════════════════════════════
 async function handleShopify(req, res) {
   const action = req.query.action || req.body?.action;
+
+  // ── Validate env vars immediately ────────────────────────────────────────────
+  if (!ENV.shopifyStore || !ENV.shopifyToken) {
+    console.error('[Shopify] Missing env vars:', {
+      SHOPIFY_STORE: ENV.shopifyStore ? '✓' : '✗ MISSING',
+      SHOPIFY_TOKEN: ENV.shopifyToken ? '✓' : '✗ MISSING',
+    });
+    return res.status(500).json({
+      error: 'Shopify not configured',
+      missing: [
+        !ENV.shopifyStore ? 'SHOPIFY_STORE' : null,
+        !ENV.shopifyToken ? 'SHOPIFY_TOKEN' : null,
+      ].filter(Boolean),
+      fix: 'Add SHOPIFY_STORE and SHOPIFY_TOKEN to Vercel Environment Variables for THIS project, then redeploy'
+    });
+  }
+
   const base   = `https://${ENV.shopifyStore}/admin/api/2026-01`;
   const headers = {
     "X-Shopify-Access-Token": ENV.shopifyToken,
