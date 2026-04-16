@@ -2142,12 +2142,30 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <span class="dp-trigger-text" id="paDpText">Last 30 Days</span>
           <span class="dp-trigger-arrow" id="paDpArrow">▼</span>
         </div>
-        <!-- Dropdown presets -->
-        <div id="paDpPanel" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:var(--ink);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.2)">
-          <button class="dp-preset" onclick="paApplyPreset(7,'Last 7 Days')">Last 7 days</button>
-          <button class="dp-preset dp-preset-pa-active" onclick="paApplyPreset(30,'Last 30 Days')">Last 30 days</button>
-          <button class="dp-preset" onclick="paApplyPreset(90,'Last 90 Days')">Last 90 days</button>
-          <button class="dp-preset" onclick="paApplyPreset(365,'Last 12 Months')">Last 12 months</button>
+        <div class="dp-panel" id="paDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="paApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="paApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="paApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="paApplyPreset('365d')">Last 12 months</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="paDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="paDpTo"   type="text" placeholder="End date"   readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="paCalL"></div>
+                <div class="dp-month" id="paCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="paDpClose()">Cancel</button>
+              <button class="dp-done"   onclick="paDpDone()">Done</button>
+            </div>
+          </div>
         </div>
       </div>
       <!-- Actions -->
@@ -2307,16 +2325,44 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">ORDER</span> <span class="gold">REPORT</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <select id="or-range" onchange="orSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
-          <option value="7">Last 7 Days</option>
-          <option value="30" selected>Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
-        </select>
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
+        <div class="dp-trigger" id="orDpTrigger" onclick="orDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="orDpText">Last 30 Days</span>
+          <span class="dp-trigger-arrow" id="orDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="orDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="orApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="orApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="orApplyPreset('90d')">Last 90 days</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="orDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="orDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="orCalL"></div>
+                <div class="dp-month" id="orCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="orDpClose()">Cancel</button>
+              <button class="dp-done" onclick="orDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="orSync()" id="orSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
         <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export</button>
       </div>
@@ -2443,12 +2489,41 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <button onclick="plSetGranularity('weekly')"  id="pl-g-weekly"  class="pl-gran-btn">Weekly</button>
           <button onclick="plSetGranularity('monthly')" id="pl-g-monthly" class="pl-gran-btn">Monthly</button>
         </div>
-        <select id="pl-range" onchange="plSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
-          <option value="7">Last 7 Days</option>
-          <option value="30" selected>Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
-          <option value="365">Last 12 Months</option>
-        </select>
+        <div style="position:relative">
+          <div class="dp-trigger" id="plDpTrigger" onclick="plDpToggle()">
+            <span class="dp-trigger-icon">📅</span>
+            <span class="dp-trigger-text" id="plDpText">Last 30 Days</span>
+            <span class="dp-trigger-arrow" id="plDpArrow">▼</span>
+          </div>
+          <div class="dp-panel" id="plDpPanel">
+            <div class="dp-presets">
+              <button class="dp-preset" onclick="plApplyPreset('7d')">Last 7 days</button>
+              <button class="dp-preset active" onclick="plApplyPreset('30d')">Last 30 days</button>
+              <button class="dp-preset" onclick="plApplyPreset('thismonth')">This month</button>
+              <button class="dp-preset" onclick="plApplyPreset('lastmonth')">Last month</button>
+              <button class="dp-preset" onclick="plApplyPreset('90d')">Last 90 days</button>
+              <button class="dp-preset" onclick="plApplyPreset('ytd')">This year</button>
+              <button class="dp-preset" onclick="plApplyPreset('lastyear')">Last year</button>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div class="dp-cal-area">
+                <div class="dp-inputs">
+                  <input class="dp-date-input" id="plDpFrom" type="text" placeholder="Start date" readonly>
+                  <span class="dp-arrow-sep">→</span>
+                  <input class="dp-date-input" id="plDpTo"   type="text" placeholder="End date"   readonly>
+                </div>
+                <div class="dp-months">
+                  <div class="dp-month" id="plCalL"></div>
+                  <div class="dp-month" id="plCalR"></div>
+                </div>
+              </div>
+              <div class="dp-footer">
+                <button class="dp-cancel" onclick="plDpClose()">Cancel</button>
+                <button class="dp-done"   onclick="plDpDone()">Done</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <button onclick="plSync()" id="plSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
         <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
       </div>
@@ -2603,12 +2678,41 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <div class="page-title"><span style="color:var(--c1)">MARKETING</span> <span class="gold">ATTRIBUTION</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <select id="ma-range" onchange="maSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
-          <option value="7">Last 7 Days</option>
-          <option value="30" selected>Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
-          <option value="365">Last 12 Months</option>
-        </select>
+        <div style="position:relative">
+          <div class="dp-trigger" id="maDpTrigger" onclick="maDpToggle()">
+            <span class="dp-trigger-icon">📅</span>
+            <span class="dp-trigger-text" id="maDpText">Last 30 Days</span>
+            <span class="dp-trigger-arrow" id="maDpArrow">▼</span>
+          </div>
+          <div class="dp-panel" id="maDpPanel">
+            <div class="dp-presets">
+              <button class="dp-preset" onclick="maApplyPreset('7d')">Last 7 days</button>
+              <button class="dp-preset active" onclick="maApplyPreset('30d')">Last 30 days</button>
+              <button class="dp-preset" onclick="maApplyPreset('thismonth')">This month</button>
+              <button class="dp-preset" onclick="maApplyPreset('lastmonth')">Last month</button>
+              <button class="dp-preset" onclick="maApplyPreset('90d')">Last 90 days</button>
+              <button class="dp-preset" onclick="maApplyPreset('ytd')">This year</button>
+              <button class="dp-preset" onclick="maApplyPreset('lastyear')">Last year</button>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div class="dp-cal-area">
+                <div class="dp-inputs">
+                  <input class="dp-date-input" id="maDpFrom" type="text" placeholder="Start date" readonly>
+                  <span class="dp-arrow-sep">→</span>
+                  <input class="dp-date-input" id="maDpTo"   type="text" placeholder="End date"   readonly>
+                </div>
+                <div class="dp-months">
+                  <div class="dp-month" id="maCalL"></div>
+                  <div class="dp-month" id="maCalR"></div>
+                </div>
+              </div>
+              <div class="dp-footer">
+                <button class="dp-cancel" onclick="maDpClose()">Cancel</button>
+                <button class="dp-done"   onclick="maDpDone()">Done</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <button onclick="maSync()" id="maSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
         <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
       </div>
@@ -2852,11 +2956,39 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <div class="page-title"><span style="color:var(--c1)">CUSTOMER</span> <span class="gold">LIFETIME VALUE</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <select id="clv-range" onchange="clvSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
-          <option value="90">Last 90 Days</option>
-          <option value="180">Last 6 Months</option>
-          <option value="365" selected>Last 12 Months</option>
-        </select>
+        <div style="position:relative">
+          <div class="dp-trigger" id="clvDpTrigger" onclick="clvDpToggle()">
+            <span class="dp-trigger-icon">📅</span>
+            <span class="dp-trigger-text" id="clvDpText">Last 12 Months</span>
+            <span class="dp-trigger-arrow" id="clvDpArrow">▼</span>
+          </div>
+          <div class="dp-panel" id="clvDpPanel">
+            <div class="dp-presets">
+              <button class="dp-preset" onclick="clvApplyPreset('90d')">Last 90 days</button>
+              <button class="dp-preset" onclick="clvApplyPreset('thismonth')">This month</button>
+              <button class="dp-preset" onclick="clvApplyPreset('lastmonth')">Last month</button>
+              <button class="dp-preset active" onclick="clvApplyPreset('ytd')">This year</button>
+              <button class="dp-preset" onclick="clvApplyPreset('lastyear')">Last year</button>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div class="dp-cal-area">
+                <div class="dp-inputs">
+                  <input class="dp-date-input" id="clvDpFrom" type="text" placeholder="Start date" readonly>
+                  <span class="dp-arrow-sep">→</span>
+                  <input class="dp-date-input" id="clvDpTo"   type="text" placeholder="End date"   readonly>
+                </div>
+                <div class="dp-months">
+                  <div class="dp-month" id="clvCalL"></div>
+                  <div class="dp-month" id="clvCalR"></div>
+                </div>
+              </div>
+              <div class="dp-footer">
+                <button class="dp-cancel" onclick="clvDpClose()">Cancel</button>
+                <button class="dp-done"   onclick="clvDpDone()">Done</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <button onclick="clvSync()" id="clvSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
         <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
       </div>
@@ -4639,38 +4771,7 @@ let orSortKey     = 'date';
 let orSortDir     = -1;
 let orSelectedIds = new Set();
 
-async function orSync() {
-  const btn  = document.getElementById('orSyncBtn');
-  const days = parseInt(document.getElementById('or-range')?.value || 30);
-  const to   = new Date().toISOString().slice(0,10);
-  const from = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
-
-  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
-  orSetStatus(`⟳ Fetching orders for last ${days} days...`);
-
-  try {
-    const feeParams = getFeeParams();
-    const r = await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
-    if (!r.ok) { const e = await r.json().catch(()=>({})); orSetStatus(`✗ Error: ${e.error||r.status}`, true); return; }
-    const data = await r.json();
-    orAllOrders = data.orders || [];
-
-    // Populate gateway filter
-    const gateways = [...new Set(orAllOrders.map(o => o.gateway).filter(Boolean))];
-    const gwSel = document.getElementById('or-gateway-filter');
-    if (gwSel) {
-      gwSel.innerHTML = '<option value="all">All Gateways</option>' +
-        gateways.map(g => `<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
-    }
-
-    orFilterAndRender();
-    orSetStatus(`✓ ${orAllOrders.length} orders loaded · ${data.debug?.variants_with_cost || 0} variants with COGS data · ${from} → ${to}`);
-  } catch(e) {
-    orSetStatus(`✗ ${e.message}`, true);
-  } finally {
-    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
-  }
-}
+async function orSync() { const r=window.orDpGetRange?.(); orSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
 
 function orSetStatus(msg, isErr=false) {
   const el = document.getElementById('or-status');
@@ -4895,27 +4996,7 @@ function orExportCSV() {
 }
 let clvData = null;
 
-async function clvSync() {
-  const btn  = document.getElementById('clvSyncBtn');
-  const days = parseInt(document.getElementById('clv-range')?.value || 365);
-  const to   = new Date().toISOString().slice(0,10);
-  const from = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
-
-  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
-  clvSetStatus(`⟳ Fetching customer data for last ${days} days...`);
-
-  try {
-    const r = await fetch(`${PROXY}?service=shopify&action=clv&from=${from}&to=${to}`);
-    if (!r.ok) { const e = await r.json().catch(()=>({})); clvSetStatus(`✗ Error: ${e.error||r.status}`, true); return; }
-    clvData = await r.json();
-    clvRender();
-    clvSetStatus(`✓ ${clvData.totals.totalCustomers} customers · ${clvData.totals.totalOrders} orders · ${clvData.topCustomers.length} top customers analysed`);
-  } catch(e) {
-    clvSetStatus(`✗ ${e.message}`, true);
-  } finally {
-    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
-  }
-}
+async function clvSync() { const r=window.clvDpGetRange?.(); clvSyncWithRange(r?.from||new Date(Date.now()-364*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
 
 function clvSetStatus(msg, isErr=false) {
   const el = document.getElementById('clv-status');
@@ -5143,42 +5224,208 @@ function clvExportCSV() {
   a.click();
   toast('Customer data exported', 'ok');
 }
-let maData     = null; // { meta:{daily,total,campaigns}, storeRevByDate:{} }
+
+/* ══════════════════════════════════════════
+   REPORT DATE PICKER — shared engine
+   Powers: or, pl, ma, clv, pa
+══════════════════════════════════════════ */
+(function() {
+  const STATE = {};
+  const _fmtISO  = d => d.toISOString().slice(0,10);
+  const _fmtDisp = d => d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+  const _now  = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+  const _ago  = n => { const d=_now(); d.setDate(d.getDate()-n); return d; };
+  const _som  = d => new Date(d.getFullYear(),d.getMonth(),1);
+  const _eom  = d => new Date(d.getFullYear(),d.getMonth()+1,0);
+  const _solm = () => { const n=_now(); return new Date(n.getFullYear(),n.getMonth()-1,1); };
+  const PRESETS = {
+    '7d':        ()=>({from:_ago(6),                          to:_now(), label:'Last 7 Days'}),
+    '30d':       ()=>({from:_ago(29),                         to:_now(), label:'Last 30 Days'}),
+    '90d':       ()=>({from:_ago(89),                         to:_now(), label:'Last 90 Days'}),
+    '365d':      ()=>({from:_ago(364),                        to:_now(), label:'Last 12 Months'}),
+    'thismonth': ()=>({from:_som(_now()),                     to:_now(), label:'This Month'}),
+    'lastmonth': ()=>({from:_solm(),                          to:_eom(_solm()), label:'Last Month'}),
+    'ytd':       ()=>({from:new Date(_now().getFullYear(),0,1),to:_now(), label:'This Year'}),
+    'lastyear':  ()=>{ const y=_now().getFullYear()-1; return {from:new Date(y,0,1),to:new Date(y,11,31),label:'Last Year'}; },
+  };
+
+  function init(pid) {
+    if (STATE[pid]) return;
+    const from=_ago(29), to=_now();
+    STATE[pid]={ open:false, selStart:from, selEnd:to, viewLeft:new Date(to.getFullYear(),to.getMonth()-1,1), fromISO:_fmtISO(from), toISO:_fmtISO(to) };
+  }
+
+  function render(pid) {
+    const s=STATE[pid]; if(!s) return;
+    const rl=new Date(s.viewLeft.getFullYear(),s.viewLeft.getMonth()+1,1);
+    _renderMon(pid,`${pid}CalL`,s.viewLeft,true);
+    _renderMon(pid,`${pid}CalR`,rl,false);
+    const fe=document.getElementById(`${pid}DpFrom`), te=document.getElementById(`${pid}DpTo`);
+    if(fe) fe.value=s.selStart?_fmtDisp(s.selStart):'';
+    if(te) te.value=s.selEnd  ?_fmtDisp(s.selEnd)  :'';
+  }
+
+  function _renderMon(pid,cid,md,showPrev) {
+    const el=document.getElementById(cid); if(!el) return;
+    const s=STATE[pid], yr=md.getFullYear(), mo=md.getMonth(), today=_now();
+    const mn=md.toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+    const pb=showPrev?`<button class="dp-nav" onclick="window['${pid}NavMon'](-1)">←</button>`:`<div style="width:28px"></div>`;
+    const nb=!showPrev?`<button class="dp-nav" onclick="window['${pid}NavMon'](1)">→</button>`:`<div style="width:28px"></div>`;
+    let h=`<div class="dp-month-hd">${pb}<div class="dp-month-name">${mn}</div>${nb}</div><div class="dp-grid">`;
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>h+=`<div class="dp-day-name">${d}</div>`);
+    const fd=new Date(yr,mo,1).getDay(), dim=new Date(yr,mo+1,0).getDate();
+    for(let i=0;i<fd;i++) h+=`<div class="dp-day empty"></div>`;
+    for(let d=1;d<=dim;d++){
+      const dt=new Date(yr,mo,d); dt.setHours(0,0,0,0);
+      const iso=_fmtISO(dt); let cls='dp-day';
+      if(dt.getTime()===today.getTime()) cls+=' today';
+      if(s.selStart&&s.selEnd){const st=s.selStart.getTime(),en=s.selEnd.getTime(),t=dt.getTime();
+        if(t===st) cls+=' range-start'; else if(t===en) cls+=' range-end'; else if(t>st&&t<en) cls+=' in-range';
+      } else if(s.selStart&&dt.getTime()===s.selStart.getTime()) cls+=' selected';
+      h+=`<div class="${cls}" onclick="window['${pid}ClickDay']('${iso}')">${d}</div>`;
+    }
+    h+='</div>'; el.innerHTML=h;
+  }
+
+  function register(pid, syncFn) {
+    init(pid);
+    window[`${pid}DpToggle`]=function(){
+      init(pid); const s=STATE[pid]; s.open=!s.open;
+      const p=document.getElementById(`${pid}DpPanel`),t=document.getElementById(`${pid}DpTrigger`),a=document.getElementById(`${pid}DpArrow`);
+      if(p) p.classList.toggle('show',s.open);
+      if(t) t.classList.toggle('open',s.open);
+      if(a) a.textContent=s.open?'▲':'▼';
+      if(s.open) render(pid);
+    };
+    window[`${pid}DpClose`]=function(){
+      init(pid); STATE[pid].open=false;
+      const p=document.getElementById(`${pid}DpPanel`),t=document.getElementById(`${pid}DpTrigger`),a=document.getElementById(`${pid}DpArrow`);
+      if(p) p.classList.remove('show'); if(t) t.classList.remove('open'); if(a) a.textContent='▼';
+    };
+    window[`${pid}NavMon`]=function(dir){
+      init(pid); const s=STATE[pid];
+      s.viewLeft=new Date(s.viewLeft.getFullYear(),s.viewLeft.getMonth()+dir,1); render(pid);
+    };
+    window[`${pid}ClickDay`]=function(iso){
+      init(pid); const s=STATE[pid]; const clicked=new Date(iso); clicked.setHours(0,0,0,0);
+      if(!s.selStart||(s.selStart&&s.selEnd)){s.selStart=clicked;s.selEnd=null;}
+      else{if(clicked<s.selStart){s.selEnd=s.selStart;s.selStart=clicked;}else{s.selEnd=clicked;}}
+      render(pid);
+    };
+    window[`${pid}ApplyPreset`]=function(key){
+      init(pid); const pr=PRESETS[key]; if(!pr) return;
+      const res=pr(); const s=STATE[pid];
+      s.selStart=res.from; s.selEnd=res.to;
+      s.fromISO=_fmtISO(res.from); s.toISO=_fmtISO(res.to);
+      s.viewLeft=new Date(res.from.getFullYear(),res.from.getMonth(),1);
+      document.querySelectorAll(`#${pid}DpPanel .dp-preset`).forEach(b=>b.classList.remove('active'));
+      if(event?.target) event.target.classList.add('active');
+      const tx=document.getElementById(`${pid}DpText`); if(tx) tx.textContent=res.label;
+      render(pid); window[`${pid}DpClose`](); syncFn(s.fromISO,s.toISO);
+    };
+    window[`${pid}DpDone`]=function(){
+      init(pid); const s=STATE[pid];
+      if(!s.selStart){window[`${pid}DpClose`]();return;}
+      const end=s.selEnd||s.selStart;
+      s.fromISO=_fmtISO(s.selStart); s.toISO=_fmtISO(end);
+      const same=end.getTime()===s.selStart.getTime();
+      const tx=document.getElementById(`${pid}DpText`);
+      if(tx) tx.textContent=same?_fmtDisp(s.selStart):_fmtDisp(s.selStart)+' – '+_fmtDisp(end);
+      window[`${pid}DpClose`](); syncFn(s.fromISO,s.toISO);
+    };
+    window[`${pid}DpGetRange`]=function(){ init(pid); return {from:STATE[pid].fromISO,to:STATE[pid].toISO}; };
+  }
+
+  register('or',  (f,t)=>orSyncWithRange(f,t));
+  register('pl',  (f,t)=>plSyncWithRange(f,t));
+  register('ma',  (f,t)=>maSyncWithRange(f,t));
+  register('clv', (f,t)=>clvSyncWithRange(f,t));
+  register('pa',  (f,t)=>paSyncWithRange(f,t));
+
+  document.addEventListener('click',e=>{
+    ['or','pl','ma','clv','pa'].forEach(pid=>{
+      if(!STATE[pid]?.open) return;
+      const p=document.getElementById(`${pid}DpPanel`),t=document.getElementById(`${pid}DpTrigger`);
+      if(p&&t&&!p.contains(e.target)&&!t.contains(e.target)) window[`${pid}DpClose`]();
+    });
+    // Also close the old PA simple dropdown if somehow still open
+    const pp=document.getElementById('paDpPanel');
+    if(pp&&pp.style.display==='block'){const pt=document.getElementById('paDpTrigger');if(pt&&!pt.contains(e.target)&&!pp.contains(e.target)){pp.style.display='none';pp.classList.remove('show');}}
+  });
+})();
+
+// ── Sync wrappers accepting explicit date range ───────────────────────────
+async function orSyncWithRange(from,to){
+  const btn=document.getElementById('orSyncBtn');
+  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  orSetStatus(`⟳ Fetching orders ${from} → ${to}...`);
+  try{
+    const feeParams=getFeeParams();
+    const r=await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
+    if(!r.ok){const e=await r.json().catch(()=>({}));orSetStatus(`✗ Error: ${e.error||r.status}`,true);return;}
+    const data=await r.json();
+    orAllOrders=data.orders||[];
+    const gws=[...new Set(orAllOrders.map(o=>o.gateway).filter(Boolean))];
+    const gwSel=document.getElementById('or-gateway-filter');
+    if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
+    orFilterAndRender();
+    orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+  }catch(e){orSetStatus(`✗ ${e.message}`,true);}
+  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+}
+async function plSyncWithRange(from,to){
+  const btn=document.getElementById('plSyncBtn');
+  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  plSetStatus(`⟳ Fetching P&L ${from} → ${to}...`);
+  try{
+    const r=await fetch(`${PROXY}?service=shopify&action=pnl&from=${from}&to=${to}&${getFeeParams()}`);
+    if(!r.ok){const e=await r.json().catch(()=>({}));plSetStatus(`✗ ${e.error||r.status}`,true);return;}
+    plData=await r.json();
+    if(rows.length&&isLiveData){const mb={};rows.forEach(r=>{mb[r.date]=r.meta||0;});plData.daily.forEach(d=>{d.adSpend=mb[d.date]||0;});plData.totals.adSpend=plData.daily.reduce((s,d)=>s+d.adSpend,0);plData.totals.contribMargin=plData.daily.reduce((s,d)=>s+(d.grossProfit-d.txFee-d.adSpend),0);plData.totals.netProfit=plData.totals.contribMargin;const nr=plData.totals.netRevenue||1;plData.totals.contribPct=Math.round(plData.totals.contribMargin/nr*10000)/100;plData.totals.netMargin=Math.round(plData.totals.netProfit/nr*10000)/100;plData.totals.totalCosts=Math.round((plData.totals.cogs+plData.totals.txFee+plData.totals.adSpend)*100)/100;plData.totals.costPct=Math.round(plData.totals.totalCosts/nr*10000)/100;}
+    plRender(); plSetStatus(`✓ ${plData.total_orders} orders · ${from} → ${to}`);
+  }catch(e){plSetStatus(`✗ ${e.message}`,true);}
+  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+}
+async function maSyncWithRange(from,to){
+  const btn=document.getElementById('maSyncBtn');
+  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  maSetStatus(`⟳ Fetching marketing data ${from} → ${to}...`);
+  try{
+    const metaRes=await fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`);
+    let mj={platform:'meta',daily:[],total:{spend:0,revenue:0,roas:0,cpa:0,conversions:0,clicks:0,impressions:0,ctr:0},campaigns:[]};
+    if(metaRes.ok){const d=await metaRes.json();if(!d.error) mj=d;}
+    const srv={};rows.forEach(r=>{srv[r.date]=(srv[r.date]||0)+r.revenue;});
+    maData={meta:mj,storeRevByDate:srv,totalStoreRev:rows.reduce((s,r)=>s+r.revenue,0),from,to};
+    maRender(); maSetStatus(`✓ Meta: ${mj.campaigns.length} campaigns · ${from} → ${to}`);
+  }catch(e){maSetStatus(`✗ ${e.message}`,true);}
+  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+}
+async function clvSyncWithRange(from,to){
+  const btn=document.getElementById('clvSyncBtn');
+  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  clvSetStatus(`⟳ Fetching customer data ${from} → ${to}...`);
+  try{
+    const r=await fetch(`${PROXY}?service=shopify&action=clv&from=${from}&to=${to}`);
+    if(!r.ok){const e=await r.json().catch(()=>({}));clvSetStatus(`✗ ${e.error||r.status}`,true);return;}
+    clvData=await r.json(); clvRender(); clvSetStatus(`✓ ${clvData.totals.totalCustomers} customers · ${from} → ${to}`);
+  }catch(e){clvSetStatus(`✗ ${e.message}`,true);}
+  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+}
+async function paSyncWithRange(from,to){
+  const btn=document.getElementById('paSyncBtn');
+  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  paSetStatus(`⟳ Fetching product data ${from} → ${to}...`);
+  try{
+    const r=await fetch(`${PROXY}?service=shopify&action=product-analytics&from=${from}&to=${to}&${getFeeParams()}`);
+    if(!r.ok){const e=await r.json().catch(()=>({}));paSetStatus(`✗ ${e.error||r.status}`,true);return;}
+    paData=await r.json(); paRender(); paSetStatus(`✓ ${paData.total_products} products · ${from} → ${to}`);
+  }catch(e){paSetStatus(`✗ ${e.message}`,true);}
+  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+}
 let maSortKey  = 'spend';
 let maSortDir  = -1;
 
-async function maSync() {
-  const btn  = document.getElementById('maSyncBtn');
-  const days = parseInt(document.getElementById('ma-range')?.value || 30);
-  const to   = new Date().toISOString().slice(0,10);
-  const from = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
-
-  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
-  maSetStatus(`⟳ Fetching marketing data for last ${days} days...`);
-
-  try {
-    // Fetch Meta Ads data (includes daily + campaigns)
-    const metaRes = await fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`);
-    let metaJson  = { platform:'meta', daily:[], total:{spend:0,revenue:0,roas:0,cpa:0,conversions:0,clicks:0,impressions:0,ctr:0}, campaigns:[] };
-    if (metaRes.ok) {
-      const d = await metaRes.json();
-      if (!d.error) metaJson = d;
-    }
-
-    // Build store revenue by date from main dashboard rows
-    const storeRevByDate = {};
-    rows.forEach(r => { storeRevByDate[r.date] = (storeRevByDate[r.date] || 0) + r.revenue; });
-    const totalStoreRev = rows.reduce((s,r) => s + r.revenue, 0);
-
-    maData = { meta: metaJson, storeRevByDate, totalStoreRev, from, to, days };
-    maRender();
-    maSetStatus(`✓ Meta: ${metaJson.campaigns.length} campaigns · ${metaJson.daily.length} days · ${from} → ${to}`);
-  } catch(e) {
-    maSetStatus(`✗ ${e.message}`, true);
-  } finally {
-    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
-  }
-}
+async function maSync() { const r=window.maDpGetRange?.(); maSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
 
 function maSetStatus(msg, isErr=false) {
   const el = document.getElementById('ma-status');
@@ -5416,45 +5663,7 @@ function maExportCSV() {
 let plData        = null;
 let plGranularity = 'daily'; // daily | weekly | monthly
 
-async function plSync() {
-  const btn    = document.getElementById('plSyncBtn');
-  const days   = parseInt(document.getElementById('pl-range')?.value || 30);
-  const to     = new Date().toISOString().slice(0,10);
-  const from   = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
-
-  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
-  plSetStatus(`⟳ Fetching P&L data for last ${days} days...`);
-
-  try {
-    const feeParams = getFeeParams();
-    const r = await fetch(`${PROXY}?service=shopify&action=pnl&from=${from}&to=${to}&${feeParams}`);
-    if (!r.ok) { const e = await r.json().catch(()=>({})); plSetStatus(`✗ Error: ${e.error || r.status}`, true); return; }
-    plData = await r.json();
-
-    // Inject meta ad spend into daily from main dashboard rows if available
-    if (rows.length && isLiveData) {
-      const metaByDate = {};
-      rows.forEach(r => { metaByDate[r.date] = r.meta || 0; });
-      plData.daily.forEach(d => { d.adSpend = metaByDate[d.date] || 0; });
-      // Recalculate totals with ad spend
-      plData.totals.adSpend       = plData.daily.reduce((s,d) => s + d.adSpend, 0);
-      plData.totals.contribMargin = plData.daily.reduce((s,d) => s + (d.grossProfit - d.txFee - d.adSpend), 0);
-      plData.totals.netProfit     = plData.totals.contribMargin;
-      const nr = plData.totals.netRevenue || 1;
-      plData.totals.contribPct  = Math.round(plData.totals.contribMargin / nr * 10000) / 100;
-      plData.totals.netMargin   = Math.round(plData.totals.netProfit / nr * 10000) / 100;
-      plData.totals.totalCosts  = Math.round((plData.totals.cogs + plData.totals.txFee + plData.totals.adSpend) * 100) / 100;
-      plData.totals.costPct     = Math.round(plData.totals.totalCosts / nr * 10000) / 100;
-    }
-
-    plRender();
-    plSetStatus(`✓ ${plData.total_orders} orders · ${from} → ${to}`);
-  } catch(e) {
-    plSetStatus(`✗ ${e.message}`, true);
-  } finally {
-    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
-  }
-}
+async function plSync() { const r=window.plDpGetRange?.(); plSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
 
 function plSetStatus(msg, isErr=false) {
   const el = document.getElementById('pl-status');
@@ -5807,61 +6016,11 @@ let paSortDir    = -1; // -1 = desc
 let paViewMode   = 'revenue'; // revenue | units | margin
 let paDays       = 30; // controlled by the custom dropdown
 
-function paDpToggle() {
-  const panel = document.getElementById('paDpPanel');
-  const trigger = document.getElementById('paDpTrigger');
-  const arrow   = document.getElementById('paDpArrow');
-  if (!panel) return;
-  const open = panel.style.display === 'block';
-  panel.style.display = open ? 'none' : 'block';
-  if (trigger) trigger.classList.toggle('open', !open);
-  if (arrow)   arrow.textContent = open ? '▼' : '▲';
-}
+function paDpToggle() { window.paDpToggle?.(); }
 
-function paApplyPreset(days, label) {
-  paDays = days;
-  const textEl = document.getElementById('paDpText');
-  if (textEl) textEl.textContent = label;
-  // Update active state
-  document.querySelectorAll('.dp-preset-pa-active').forEach(el => el.classList.remove('dp-preset-pa-active'));
-  event?.target?.classList.add('dp-preset-pa-active');
-  // Close dropdown
-  const panel = document.getElementById('paDpPanel');
-  const trigger = document.getElementById('paDpTrigger');
-  const arrow   = document.getElementById('paDpArrow');
-  if (panel)   panel.style.display = 'none';
-  if (trigger) trigger.classList.remove('open');
-  if (arrow)   arrow.textContent = '▼';
-  paSync();
-}
+function paApplyPreset(key) { window.paApplyPreset?.(key); }
 
-async function paSync() {
-  const btn    = document.getElementById('paSyncBtn');
-  const status = document.getElementById('pa-status');
-  const days   = paDays || 30;
-  const to     = new Date().toISOString().slice(0,10);
-  const from   = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
-
-  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
-  paSetStatus(`⟳ Fetching product data for last ${days} days...`);
-
-  try {
-    const feeParams = getFeeParams();
-    const r  = await fetch(`${PROXY}?service=shopify&action=product-analytics&from=${from}&to=${to}&${feeParams}`);
-    if (!r.ok) {
-      const e = await r.json().catch(()=>({}));
-      paSetStatus(`✗ Error: ${e.error || r.status}`, true);
-      return;
-    }
-    paData = await r.json();
-    paRender();
-    paSetStatus(`✓ ${paData.total_products} products · ${paData.total_variants} variants · ${paData.totals.orders} orders · ${from} → ${to}`);
-  } catch(e) {
-    paSetStatus(`✗ ${e.message}`, true);
-  } finally {
-    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
-  }
-}
+async function paSync() { const r=window.paDpGetRange?.(); paSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
 
 function paSetStatus(msg, isErr=false) {
   const el = document.getElementById('pa-status');
