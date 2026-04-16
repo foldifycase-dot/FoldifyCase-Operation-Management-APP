@@ -415,7 +415,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 /* Table header */
 .or-tbl-head {
-  display:grid;grid-template-columns:28px 85px 88px 125px 48px 88px 80px 78px 88px 50px 72px 88px 76px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
   align-items:center;
   padding:10px 16px;
   background:rgba(28,27,24,0.03);
@@ -424,7 +424,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   font-size:10px;font-weight:600;text-transform:uppercase;
   letter-spacing:.06em;color:var(--c3);
   position:sticky;top:0;z-index:3;gap:0;
-  min-width:994px;
+  min-width:996px;
 }
 .or-th { flex-shrink:0;white-space:nowrap;padding:0 4px;font-family:'Inter',sans-serif; }
 .or-th:first-child { padding-left:0; }
@@ -435,28 +435,29 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 /* Totals row */
 .or-totals-row {
-  display:grid;grid-template-columns:28px 85px 88px 125px 48px 88px 80px 78px 88px 50px 72px 88px 76px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
   align-items:center;
   padding:10px 16px;
-  background:rgba(200,169,110,0.06);
-  border-bottom:2px solid rgba(200,169,110,0.2);
-  border-top:1px solid rgba(200,169,110,0.15);
-  gap:0;min-width:994px;
+  border-bottom:2px solid rgba(28,27,24,0.1);
+  border-top:1px solid rgba(28,27,24,0.08);
+  background:rgba(28,27,24,0.02);
+  font-family:'Inter',sans-serif;
+  min-width:996px; gap:0;
 }
 
 /* Body rows */
 .or-row {
-  display:grid;grid-template-columns:28px 85px 88px 125px 48px 88px 80px 78px 88px 50px 72px 88px 76px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
   align-items:center;
   padding:8px 16px;
   border-bottom:1px solid rgba(28,27,24,0.04);
   transition:background .1s;gap:0;
-  cursor:default;min-width:994px;
+  cursor:default;min-width:996px;
   font-family:'Inter',sans-serif;
 }
 .or-row:hover { background:rgba(200,169,110,0.04); }
 .or-row:last-child { border-bottom:none; }
-.or-cell { flex-shrink:0;padding:0 6px;font-size:12px; }
+.or-cell { padding:0 4px;font-size:12px;min-width:0; }
 .or-cell-num { text-align:right;font-family:'Inter',sans-serif;font-size:12px;padding:0 4px;color:var(--c2); }
 
 /* Status badges */
@@ -2461,7 +2462,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div onclick="orSort('profit')" class="or-th or-sortable or-num">Net Profit</div>
           <div class="or-th" style="text-align:center">Status</div>
         </div>
-        <!-- Totals row <div class="or-totals-row" id="or-totals-row" style="display:none" class="or-totals-row">
+        <!-- Totals row <div class="or-totals-row" id="or-totals-row" style="display:none" class="or-totals-row or-row" data-totals="1">
           <div></div>
           <div style="font-weight:700;font-size:12px;color:var(--ink)" id="or-totals-label">Total</div>
           <div></div>
@@ -4910,7 +4911,7 @@ function orRenderKPIs() {
 function orRenderTotalsRow() {
   const orders    = orFiltered;
   if (!orders.length) { document.getElementById('or-totals-row').style.display = 'none'; return; }
-  document.getElementById('or-totals-row').style.display = 'flex';
+  document.getElementById('or-totals-row').style.display = 'grid';
   const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
   const discounts = orders.reduce((s,o)=>s+o.discounts,0);
   const shipping  = orders.reduce((s,o)=>s+o.shipping,0);
