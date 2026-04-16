@@ -763,8 +763,8 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .pa-kpi-card {
   background:#fff; border-radius:10px;
   border:1px solid rgba(28,27,24,0.08);
-  padding:14px 16px; display:flex;
-  flex-direction:column; gap:4px;
+  padding:14px 16px;
+  border-top:3px solid rgba(28,27,24,0.08);
 }
 .pa-kpi-label {
   font-family:'Inter',sans-serif; font-size:10px; font-weight:500; 
@@ -774,11 +774,11 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .pa-kpi-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .pa-kpi-val {
-  font-family:'Inter',sans-serif; color:var(--ink); line-height:1;
+  font-family:'Inter',sans-serif; font-size:22px; font-weight:700; color:var(--ink); line-height:1;
   margin-top:2px;
   letter-spacing:-0.01em;
 }
-.pa-kpi-sub { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); }
+.pa-kpi-sub { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); margin-top:4px; }
 
 /* Table shared styles */
 .pa-tbl-head {
@@ -2192,32 +2192,32 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div id="pa-kpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
-      <div class="pa-kpi-card" id="pa-k-revenue">
+      <div class="pa-kpi-card" style="border-top:3px solid var(--gold)" id="pa-k-revenue">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--gold)"></span>Total Revenue</div>
         <div class="pa-kpi-val" id="pa-revenue">—</div>
         <div class="pa-kpi-sub" id="pa-revenue-sub">—</div>
       </div>
-      <div class="pa-kpi-card" id="pa-k-units">
+      <div class="pa-kpi-card" style="border-top:3px solid #4A7FC1" id="pa-k-units">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#4A7FC1"></span>Units Sold</div>
         <div class="pa-kpi-val" id="pa-units">—</div>
         <div class="pa-kpi-sub" id="pa-units-sub">— orders</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid #7E6DB5">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#7E6DB5"></span>Avg Order Value</div>
         <div class="pa-kpi-val" id="pa-aov">—</div>
         <div class="pa-kpi-sub" id="pa-aov-sub">per order</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid var(--green)">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--green)"></span>Gross Profit</div>
         <div class="pa-kpi-val" id="pa-profit">—</div>
         <div class="pa-kpi-sub" id="pa-margin-sub">—% margin</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid var(--red)">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--red)"></span>Total COGS</div>
         <div class="pa-kpi-val" id="pa-cogs">—</div>
         <div class="pa-kpi-sub" id="pa-cogs-sub">cost of goods</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid #C8A96E">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#C8A96E"></span>Unique Products</div>
         <div class="pa-kpi-val" id="pa-products">—</div>
         <div class="pa-kpi-sub" id="pa-products-sub">— variants</div>
