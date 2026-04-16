@@ -1066,22 +1066,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <div class="sb-div"></div>
-    <div class="sb-label" style="padding-top:4px">View</div>
-
-    <div class="sb-nav-item active" onclick="setNav(this)">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span>Overview</div>
-      <span class="sb-nav-badge">7D</span>
-    </div>
-    <div class="sb-nav-item" onclick="setNav(this)">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span>Ad Spend</div>
-      <span class="sb-nav-badge" id="nb-entries">7</span>
-    </div>
-    <div class="sb-nav-item" onclick="setNav(this)">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span>Ad Platforms</div>
-      <span class="sb-nav-badge">3</span>
-    </div>
-
-    <div class="sb-div"></div>
     <div class="sb-label" style="padding-top:4px">Platform ROAS</div>
 
     <div class="sb-nav-item" onclick="void(0)">
@@ -1094,9 +1078,8 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
     <div class="sb-nav-item" onclick="void(0)">
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">●</span>Microsoft Ads</div>
-      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">3.8×</span>
+      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">—</span>
     </div>
-
 
   </aside>
 
@@ -1405,12 +1388,16 @@ async function doSync() {
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
   const { from, to } = getRange(activeRange);
+
+  // Get browser timezone offset in minutes (negative = ahead of UTC e.g. AEST = -600)
+  const tzOffset = new Date().getTimezoneOffset(); // e.g. -600 for AEST UTC+10
+  const tzParam  = `&tz_offset=${tzOffset}`;
+
   toast('Fetching live data...', 'ok');
 
   try {
-    // ── Fetch Shopify + Meta in parallel ──────────────────────
     const [shopifyRes, metaRes] = await Promise.allSettled([
-      fetch(`${PROXY}?service=shopify&action=daily-sales&from=${from}&to=${to}`),
+      fetch(`${PROXY}?service=shopify&action=daily-sales&from=${from}&to=${to}${tzParam}`),
       fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`),
       // Google Ads — uncomment once API approved & env vars added to Vercel:
       // fetch(`${PROXY}?service=google-ads&from=${from}&to=${to}`),
@@ -1428,6 +1415,7 @@ async function doSync() {
       if (resp.ok) {
         const d = await resp.json();
         console.log('[Shopify] raw response:', d);
+        console.log('[Shopify] debug info:', d.debug);
         shopifyHasCogs = d.has_cogs || false;
         (d.daily || []).forEach(day => {
           shopifyDays[day.date] = day;
