@@ -1147,6 +1147,15 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
+    <!-- Sync status bar -->
+    <div id="syncStatus" style="
+      display:none; margin:8px 28px 0;
+      padding:8px 14px; border-radius:6px;
+      font-family:var(--mono); font-size:11px;
+      border:1px solid rgba(28,27,24,0.1);
+      background:rgba(28,27,24,0.04);
+    "></div>
+
     <!-- ── 1. KPI STRIP ── -->
     <div class="pad">
       <div class="sec">Key Performance Indicators</div>
@@ -1401,10 +1410,21 @@ function getRange(key) {
 ══════════════════════════════════════════ */
 async function doSync() {
   const btn = document.getElementById('syncBtn');
+  const statusBar = document.getElementById('syncStatus');
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
   const { from, to } = getRange(activeRange);
-  toast('Fetching live data...', 'ok');
+
+  const setStatus = (msg, isError=false) => {
+    if (!statusBar) return;
+    statusBar.style.display = 'block';
+    statusBar.style.color   = isError ? 'var(--red)' : 'var(--green)';
+    statusBar.style.borderColor = isError ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
+    statusBar.style.background  = isError ? 'rgba(217,84,84,0.05)' : 'rgba(90,158,114,0.05)';
+    statusBar.textContent = msg;
+  };
+
+  setStatus(`⟳ Fetching ${from} → ${to}...`);
 
   try {
     const [shopifyRes, metaRes] = await Promise.allSettled([
@@ -1438,15 +1458,21 @@ async function doSync() {
         });
         isLiveData = Object.keys(shopifyDays).length > 0;
         if (isLiveData) {
-          console.log(`[Shopify] ✓ ${Object.keys(shopifyDays).length} days | rev=$${shopifyTotal.revenue.toFixed(2)} | cogs=$${shopifyTotal.cogs.toFixed(2)} | ship=$${shopifyTotal.shipping_cost.toFixed(2)}`);
-          if (!shopifyHasCogs) console.warn('[Shopify] ⚠ No COGS found — add cost per item in Shopify Admin → Products → Variants → Cost per item');
+          console.log(`[Shopify] ✓ ${Object.keys(shopifyDays).length} days | rev=$${shopifyTotal.revenue.toFixed(2)}`);
+          setStatus(`✓ Shopify: ${Object.keys(shopifyDays).length} days fetched | Revenue: $${shopifyTotal.revenue.toFixed(2)} | Orders: ${shopifyTotal.orders}`);
+        } else {
+          console.warn('[Shopify] Response OK but 0 orders for this date range');
+          setStatus(`⚠ Shopify connected but 0 orders found for ${from} → ${to}. Try a wider date range.`, true);
         }
       } else {
         const err = await resp.json().catch(()=>({}));
+        const errMsg = err.error || JSON.stringify(err);
         console.error('[Shopify] HTTP error:', resp.status, err);
+        setStatus(`✗ Shopify HTTP ${resp.status}: ${errMsg} — check SHOPIFY_STORE and SHOPIFY_TOKEN env vars in Vercel`, true);
       }
     } else {
       console.error('[Shopify] Fetch failed:', shopifyRes.reason);
+      setStatus(`✗ Proxy unreachable: ${shopifyRes.reason?.message || 'network error'} — is ${PROXY} deployed?`, true);
     }
 
     // ── Parse Meta Ads ─────────────────────────────────────────
@@ -1533,17 +1559,20 @@ async function doSync() {
       // Build toast message
       const sources = ['Shopify'];
       if (livePlatforms.meta) sources.push('Meta Ads');
-      const cogsNote = shopifyHasCogs ? '' : ' ⚠ Add cost/item in Shopify';
-      toast(`✓ Live — ${sources.join(' + ')}${cogsNote}`, 'ok');
+      const cogsNote = shopifyHasCogs ? '' : ' | ⚠ No COGS — add cost/item in Shopify';
+      setStatus(`✓ LIVE — ${sources.join(' + ')} | ${rows.length} days | Rev: $${shopifyTotal.revenue.toFixed(2)}${cogsNote}`);
+      toast(`✓ Live data loaded`, 'ok');
 
     } else {
       console.warn('[Sync] No Shopify data — falling back to sample');
-      toast('No data for this period — showing sample', 'err');
+      setStatus(`⚠ No live data — check env vars SHOPIFY_STORE + SHOPIFY_TOKEN in Vercel Settings`, true);
+      toast('Showing sample data — Shopify not connected', 'err');
       loadSampleData();
     }
 
   } catch (err) {
     console.error('[Sync] Unexpected error:', err);
+    setStatus(`✗ Error: ${err.message}`, true);
     toast('Sync error — using sample data', 'err');
     loadSampleData();
   }
