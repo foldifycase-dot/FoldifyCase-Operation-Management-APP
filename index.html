@@ -2477,7 +2477,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div class="or-num" style="font-weight:700;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-profit">—</div>
           <div></div>
         </div>
-        </div>
         <!-- Body -->
         <div id="or-table-body" style="max-height:520px;overflow-y:auto">
           <div style="padding:50px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load order data</div>
@@ -4271,10 +4270,12 @@ loadFeeRates();
 
 function broadcastToReports(from,to,label,sourcePid){
   window.GLOBAL_FROM=from;window.GLOBAL_TO=to;window.GLOBAL_LABEL=label||window.GLOBAL_LABEL;
+  // Update main dashboard picker label + re-fetch main dashboard
   var mt=document.getElementById('dpTriggerText');if(mt)mt.textContent=label;
   dpCustomFrom=from;dpCustomTo=to;activeRange='custom';
   document.querySelectorAll('#dpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
   doSync();
+  // Update all OTHER report picker labels and STATE
   ['or','pl','ma','clv','pa'].forEach(function(pid){
     if(pid===sourcePid)return;
     var el=document.getElementById(pid+'DpText');if(el)el.textContent=label;
@@ -4283,7 +4284,10 @@ function broadcastToReports(from,to,label,sourcePid){
     });
     if(window._setDpState)window._setDpState(pid,from,to);
   });
-  syncOpenReport(from,to);
+  // Only re-fetch the open report if a REPORT picker triggered the change.
+  // If sourcePid===null it means the main dashboard date picker changed,
+  // and the onOpen handler already fired the report fetch — don't double-fetch.
+  if(sourcePid!==null) syncOpenReport(from,to);
 }
 function syncOpenReport(from,to){
   var f=from||window.GLOBAL_FROM,t=to||window.GLOBAL_TO;
