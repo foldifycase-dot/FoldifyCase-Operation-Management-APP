@@ -401,7 +401,512 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 .sb-div { height:1px; background:rgba(255,255,255,0.06); margin:4px 0 12px; }
 
-/* ── Transaction Fees Page ── */
+/* ── Order Report Page ── */
+.or-kpi {
+  background:#fff;border-radius:10px;
+  border:1px solid rgba(28,27,24,0.08);
+  padding:14px 16px;
+  border-top:3px solid rgba(28,27,24,0.08);
+}
+.or-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
+.or-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
+.or-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+
+/* Table header */
+.or-tbl-head {
+  display:flex;align-items:center;
+  padding:10px 16px;
+  background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.08);
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--c3);
+  position:sticky;top:0;z-index:3;
+  gap:0;
+}
+.or-th { flex-shrink:0;white-space:nowrap;padding:0 6px; }
+.or-th:first-child { padding-left:0; }
+.or-num { width:100px;text-align:right;padding:0 6px; }
+.or-sortable { cursor:pointer; }
+.or-sortable:hover { color:var(--gold); }
+.or-sort-active { color:var(--gold) !important; }
+
+/* Totals row */
+.or-totals-row {
+  display:flex;align-items:center;
+  padding:10px 16px;
+  background:rgba(200,169,110,0.06);
+  border-bottom:2px solid rgba(200,169,110,0.2);
+  border-top:1px solid rgba(200,169,110,0.15);
+  gap:0;
+}
+
+/* Body rows */
+.or-row {
+  display:flex;align-items:center;
+  padding:10px 16px;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  transition:background .1s;gap:0;
+  cursor:default;
+}
+.or-row:hover { background:rgba(200,169,110,0.04); }
+.or-row:last-child { border-bottom:none; }
+.or-cell { flex-shrink:0;padding:0 6px;font-size:12px; }
+.or-cell-num { width:100px;text-align:right;font-family:var(--mono);font-size:12px;padding:0 6px;color:var(--c2); }
+
+/* Status badges */
+.or-badge {
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;letter-spacing:.04em;
+  white-space:nowrap;
+}
+.or-badge-paid    { background:rgba(90,158,114,0.12);color:#2d7a50; }
+.or-badge-pending { background:rgba(229,168,41,0.12);color:#8a6200; }
+.or-badge-refunded{ background:rgba(217,84,84,0.12);color:var(--red); }
+.or-badge-partial { background:rgba(126,109,181,0.12);color:#4a3a80; }
+.or-badge-other   { background:rgba(28,27,24,0.07);color:var(--c3); }
+
+/* Cost breakdown bars */
+.or-cb-row { display:flex;align-items:center;gap:8px;margin-bottom:7px; }
+.or-cb-label { font-size:10px;color:var(--c2);width:90px;flex-shrink:0; }
+.or-cb-bar-wrap { flex:1;background:rgba(28,27,24,0.06);border-radius:3px;height:7px;overflow:hidden; }
+.or-cb-bar { height:100%;border-radius:3px;transition:width .4s ease; }
+.or-cb-val { font-size:10px;font-family:var(--mono);color:var(--c3);width:42px;text-align:right;flex-shrink:0; }
+
+/* Pagination */
+.or-page-btn {
+  padding:5px 12px;border-radius:6px;border:1.5px solid rgba(28,27,24,0.12);
+  background:transparent;font-size:11px;font-weight:600;color:var(--c2);
+  cursor:pointer;transition:all .12s;
+}
+.or-page-btn:hover:not(:disabled) { border-color:var(--gold);color:var(--gold); }
+.or-page-btn:disabled { opacity:.35;cursor:default; }
+.clv-kpi {
+  background:#fff;border-radius:10px;
+  border:1px solid rgba(28,27,24,0.08);
+  padding:14px 16px;
+  border-top:3px solid rgba(28,27,24,0.08);
+}
+.clv-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
+.clv-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
+.clv-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+
+/* Cohort heatmap */
+.clv-cohort-grid { display:grid;border-collapse:collapse; }
+.clv-cohort-cell {
+  width:52px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-family:var(--mono);font-weight:600;
+  border-radius:4px;
+  transition:transform .1s;cursor:default;
+}
+.clv-cohort-cell:hover { transform:scale(1.1);z-index:2;position:relative; }
+.clv-cohort-label {
+  font-size:10px;color:var(--c3);font-family:var(--mono);
+  white-space:nowrap;padding-right:8px;
+  display:flex;align-items:center;
+}
+.clv-cohort-header-cell {
+  font-size:9px;color:var(--c3);font-family:var(--mono);
+  text-align:center;width:52px;padding-bottom:4px;
+}
+
+/* RFM table */
+.clv-rfm-head {
+  display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr 90px;
+  padding:9px 16px;background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);
+}
+.clv-rfm-row {
+  display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr 90px;
+  padding:11px 16px;border-bottom:1px solid rgba(28,27,24,0.04);
+  align-items:center;
+}
+.clv-rfm-row:last-child { border-bottom:none; }
+.clv-rfm-row:hover { background:rgba(200,169,110,0.04); }
+.clv-rfm-num { text-align:right;font-family:var(--mono);font-size:12px;color:var(--c2); }
+.clv-rfm-badge {
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:5px;
+  font-size:11px;font-weight:700;
+}
+
+/* Top customers */
+.clv-top-head {
+  display:flex;padding:9px 16px;
+  background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);
+  position:sticky;top:0;z-index:2;
+}
+.clv-top-row {
+  display:flex;padding:11px 16px;align-items:center;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  transition:background .12s;
+}
+.clv-top-row:hover { background:rgba(200,169,110,0.04); }
+.clv-top-row:last-child { border-bottom:none; }
+.clv-top-num { text-align:right;font-family:var(--mono);font-size:12px;color:var(--c2);flex-shrink:0;width:90px; }
+
+/* Benchmarks */
+.clv-bench-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid rgba(28,27,24,0.05);
+  font-size:11px;color:var(--c3);
+}
+.clv-bench-row:last-child { border-bottom:none; }
+.ma-kpi {
+  background:#fff;border-radius:10px;
+  border:1px solid rgba(28,27,24,0.08);
+  padding:14px 16px;
+  border-top:3px solid rgba(28,27,24,0.08);
+}
+.ma-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
+.ma-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
+.ma-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+
+/* Channel cards */
+.ma-ch-card { padding:0; }
+.ma-ch-header { display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(28,27,24,0.05); }
+.ma-ch-name { font-size:13px;font-weight:700; }
+.ma-ch-badge { font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.06em; }
+.ma-ch-metrics { padding:4px 0; }
+.ma-ch-metric {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;border-bottom:1px solid rgba(28,27,24,0.04);
+  font-size:12px;color:var(--c3);
+}
+.ma-ch-metric:last-child { border-bottom:none; }
+.ma-ch-val { font-family:var(--mono);font-size:12px;color:var(--c1);font-weight:500; }
+.ma-ch-val.green { color:var(--green); }
+.ma-ch-val.blue  { color:#4A7FC1; }
+.ma-ch-val.red   { color:var(--red); }
+
+/* Campaign table */
+.ma-camp-head {
+  display:flex;padding:9px 16px;
+  background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--c3);
+  position:sticky;top:0;z-index:2;
+}
+.ma-camp-row {
+  display:flex;padding:11px 16px;align-items:center;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  transition:background .12s;
+}
+.ma-camp-row:hover { background:rgba(200,169,110,0.04); }
+.ma-camp-row:last-child { border-bottom:none; }
+.ma-camp-num { text-align:right;font-family:var(--mono);font-size:12px;color:var(--c2);flex-shrink:0;width:80px; }
+.ma-camp-name { font-size:12px;font-weight:500;color:var(--ink);flex:3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px; }
+
+/* Allocation bars */
+.ma-alloc-row { margin-bottom:10px; }
+.ma-alloc-label { display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px; }
+.ma-alloc-name { color:var(--c2);font-weight:500; }
+.ma-alloc-pct { color:var(--c3);font-family:var(--mono); }
+.ma-alloc-bar-wrap { background:rgba(28,27,24,0.06);border-radius:3px;height:8px;overflow:hidden; }
+.ma-alloc-bar { height:100%;border-radius:3px;transition:width .4s ease; }
+
+/* Daily table */
+.ma-daily-head {
+  display:grid;grid-template-columns:100px 1fr 1fr 1fr 80px;
+  padding:8px 16px;background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--c3);
+  position:sticky;top:0;z-index:2;
+}
+.ma-daily-row {
+  display:grid;grid-template-columns:100px 1fr 1fr 1fr 80px;
+  padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.04);
+  font-size:11px;font-family:var(--mono);
+}
+.ma-daily-row:last-child { border-bottom:none; }
+.ma-daily-row:hover { background:rgba(200,169,110,0.04); }
+
+/* Benchmarks */
+.ma-bench-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid rgba(28,27,24,0.05);
+  font-size:11px;color:var(--c3);
+}
+.ma-bench-row:last-child { border-bottom:none; }
+.pl-kpi {
+  background:#fff; border-radius:10px;
+  border:1px solid rgba(28,27,24,0.08);
+  padding:14px 16px;
+  border-top:3px solid rgba(28,27,24,0.08);
+}
+.pl-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
+.pl-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
+.pl-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+
+/* Granularity toggle */
+.pl-gran-btn {
+  padding:5px 12px;border-radius:6px;border:none;
+  background:transparent;font-size:11px;font-weight:600;
+  color:var(--c3);cursor:pointer;transition:all .12s;
+}
+.pl-gran-btn:hover { color:var(--ink); }
+.pl-gran-active { background:#fff !important;color:var(--ink) !important;box-shadow:0 1px 3px rgba(0,0,0,.08); }
+
+/* Waterfall bars */
+.pl-wf-row {
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:8px;
+}
+.pl-wf-label { font-size:12px;color:var(--c2);width:140px;flex-shrink:0;font-weight:500; }
+.pl-wf-bar-wrap { flex:1;position:relative;height:26px;display:flex;align-items:center; }
+.pl-wf-bar {
+  height:22px;border-radius:4px;
+  display:flex;align-items:center;
+  padding:0 8px;font-size:11px;font-weight:700;
+  font-family:var(--mono);color:#fff;
+  white-space:nowrap;min-width:4px;
+  transition:width .4s ease;
+}
+.pl-wf-val { font-size:11px;font-family:var(--mono);color:var(--c2);width:80px;text-align:right;flex-shrink:0; }
+.pl-wf-pct { font-size:10px;font-family:var(--mono);color:var(--c3);width:44px;text-align:right;flex-shrink:0; }
+.pl-wf-subtotal { border-top:1px dashed rgba(28,27,24,0.1);margin:4px 0 10px; }
+.pl-wf-subtotal-label { font-size:11px;font-weight:700;color:var(--ink);width:140px;flex-shrink:0; }
+
+/* Period comparison table */
+.pl-comp-header {
+  display:grid;grid-template-columns:1.8fr 1fr 1fr 80px 80px;
+  padding:9px 20px;background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--c3);
+}
+.pl-comp-row {
+  display:grid;grid-template-columns:1.8fr 1fr 1fr 80px 80px;
+  padding:9px 20px;border-bottom:1px solid rgba(28,27,24,0.04);
+  font-size:12px;align-items:center;
+}
+.pl-comp-row:last-child { border-bottom:none; }
+.pl-comp-section {
+  padding:7px 20px 3px;
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--c3);
+  background:rgba(28,27,24,0.02);
+  border-bottom:1px solid rgba(28,27,24,0.04);
+}
+.pl-comp-num { text-align:right;font-family:var(--mono); }
+.pl-comp-subtotal {
+  background:rgba(28,27,24,0.03);font-weight:700;
+  border-top:1px solid rgba(28,27,24,0.08);
+  border-bottom:1px solid rgba(28,27,24,0.08);
+}
+
+/* Income statement */
+.pl-is-section {
+  padding:8px 20px 4px;
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--c3);
+  background:rgba(28,27,24,0.02);
+  border-bottom:1px solid rgba(28,27,24,0.04);
+}
+.pl-is-row {
+  display:grid;grid-template-columns:1.6fr 1fr 80px;
+  padding:9px 20px;border-bottom:1px solid rgba(28,27,24,0.04);
+  font-size:12px;align-items:center;
+}
+.pl-is-row:last-child { border-bottom:none; }
+.pl-is-row.subtotal {
+  font-weight:700;font-size:13px;
+  background:rgba(28,27,24,0.03);
+  border-top:1px solid rgba(28,27,24,0.08);
+  border-bottom:1px solid rgba(28,27,24,0.08) !important;
+}
+.pl-is-row.total {
+  font-weight:800;font-size:14px;
+  font-family:'Syne',sans-serif;
+  background:var(--gold-bg);
+  border-top:2px solid var(--gold);
+  border-bottom:none !important;
+}
+.pl-is-num { text-align:right;font-family:var(--mono); }
+.pl-is-pct { text-align:right;font-family:var(--mono);font-size:11px;color:var(--c3); }
+
+/* Cost breakdown bars */
+.pl-cb-row { margin-bottom:12px; }
+.pl-cb-label { display:flex;justify-content:space-between;margin-bottom:4px; }
+.pl-cb-name { font-size:12px;color:var(--c2);font-weight:500; }
+.pl-cb-pct { font-size:11px;font-family:var(--mono);color:var(--c3); }
+.pl-cb-bar-wrap { background:rgba(28,27,24,0.06);border-radius:4px;height:8px;overflow:hidden; }
+.pl-cb-bar { height:100%;border-radius:4px;transition:width .4s ease; }
+
+/* Benchmark rows */
+.pl-bench-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid rgba(28,27,24,0.05);
+  font-size:11px;color:var(--c3);
+}
+.pl-bench-row:last-child { border-bottom:none; }
+
+/* Period table */
+.pl-pt-wrap { min-width:900px; }
+.pl-pt-head {
+  display:grid;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--c3);
+  padding:9px 16px;background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  position:sticky;top:0;z-index:2;
+}
+.pl-pt-row {
+  display:grid;padding:9px 16px;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  font-size:11px;font-family:var(--mono);
+}
+.pl-pt-row:hover { background:rgba(200,169,110,0.04); }
+.pl-pt-row:last-child { border-bottom:none; }
+.pa-kpi-card {
+  background:#fff; border-radius:10px;
+  border:1px solid rgba(28,27,24,0.08);
+  padding:14px 16px; display:flex;
+  flex-direction:column; gap:4px;
+}
+.pa-kpi-label {
+  font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--c3);
+  display:flex; align-items:center; gap:5px;
+}
+.pa-kpi-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.pa-kpi-val {
+  font-family:'Syne',sans-serif; font-size:22px;
+  font-weight:800; color:var(--ink); line-height:1;
+  margin-top:2px;
+}
+.pa-kpi-sub { font-size:10px; color:var(--c3); font-family:var(--mono); }
+
+/* Table shared styles */
+.pa-tbl-head {
+  display:grid;
+  grid-template-columns: 3fr 80px 100px 100px 100px 80px 40px;
+  padding:9px 16px;
+  background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px; font-weight:700; color:var(--c3);
+  text-transform:uppercase; letter-spacing:.06em;
+  position:sticky; top:0; z-index:2;
+}
+.pa-th-num { text-align:right; }
+.pa-sortable { cursor:pointer; }
+.pa-sortable:hover { color:var(--gold); }
+.pa-sort-active { color:var(--gold) !important; }
+
+.pa-tbl-row {
+  display:grid;
+  grid-template-columns: 3fr 80px 100px 100px 100px 80px 40px;
+  padding:11px 16px; align-items:center;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  transition:background .12s;
+}
+.pa-tbl-row:hover { background:rgba(200,169,110,0.05); }
+.pa-tbl-row:last-child { border-bottom:none; }
+.pa-cell-num { text-align:right; font-family:var(--mono); font-size:12px; color:var(--c2); }
+.pa-product-name { font-size:12px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pa-product-type { font-size:10px; color:var(--c3); margin-top:1px; }
+
+/* ABC badge */
+.pa-abc { width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; margin:auto; }
+.pa-abc-A { background:rgba(90,158,114,0.15); color:#2d7a50; }
+.pa-abc-B { background:rgba(200,169,110,0.15); color:#8a6a20; }
+.pa-abc-C { background:rgba(217,84,84,0.12); color:var(--red); }
+
+/* View toggle buttons */
+.pa-view-btn {
+  padding:4px 10px; border-radius:5px; border:1px solid rgba(28,27,24,0.12);
+  background:transparent; font-size:10px; font-weight:600; color:var(--c3);
+  cursor:pointer; transition:all .12s;
+}
+.pa-view-btn:hover { border-color:var(--gold); color:var(--gold); }
+.pa-view-active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold) !important; }
+
+/* Inventory health table */
+.pa-inv-row {
+  display:grid; grid-template-columns:2fr 90px 90px 100px 70px;
+  padding:10px 16px; align-items:center;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  font-size:12px;
+}
+.pa-inv-row:last-child { border-bottom:none; }
+.pa-inv-head {
+  display:grid; grid-template-columns:2fr 90px 90px 100px 70px;
+  padding:8px 16px;
+  background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-size:10px; font-weight:700; color:var(--c3);
+  text-transform:uppercase; letter-spacing:.06em;
+}
+
+/* Revenue mix bars */
+.pa-mix-row {
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:10px;
+}
+.pa-mix-label { font-size:11px; color:var(--c2); width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
+.pa-mix-bar-wrap { flex:1; background:rgba(28,27,24,0.06); border-radius:3px; height:8px; overflow:hidden; }
+.pa-mix-bar { height:100%; border-radius:3px; background:var(--gold); transition:width .4s ease; }
+.pa-mix-pct { font-size:11px; color:var(--c3); font-family:var(--mono); width:36px; text-align:right; flex-shrink:0; }
+.pa-mix-val { font-size:11px; color:var(--c2); font-family:var(--mono); width:70px; text-align:right; flex-shrink:0; }
+
+/* ABC panel */
+.pa-abc-bar { display:flex; border-radius:8px; overflow:hidden; height:14px; margin:12px 0 16px; }
+.pa-abc-seg { transition:width .4s ease; }
+.pa-abc-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(28,27,24,0.05); }
+.pa-abc-row:last-child { border-bottom:none; }
+
+/* Variant table */
+.pa-var-row {
+  display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px;
+  padding:10px 16px; align-items:center;
+  border-bottom:1px solid rgba(28,27,24,0.04);
+}
+.pa-var-row:last-child { border-bottom:none; }
+.pa-var-row:hover { background:rgba(200,169,110,0.04); }
+.page-back-btn {
+  background:rgba(28,27,24,0.06); border:none; cursor:pointer;
+  width:32px; height:32px; border-radius:8px; font-size:16px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--c2); transition:background .15s; flex-shrink:0;
+}
+.page-back-btn:hover { background:rgba(28,27,24,0.12); }
+
+.report-coming-soon {
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; text-align:center;
+  padding:60px 32px; max-width:520px; margin:0 auto;
+}
+.rcs-icon { font-size:52px; margin-bottom:20px; opacity:.85; }
+.rcs-title {
+  font-family:'Syne',sans-serif; font-size:26px; font-weight:800;
+  color:var(--ink); margin-bottom:12px; letter-spacing:-.02em;
+}
+.rcs-desc {
+  font-size:14px; color:var(--c2); line-height:1.7;
+  margin-bottom:28px;
+}
+.rcs-features {
+  display:flex; flex-direction:column; gap:10px;
+  width:100%; margin-bottom:32px;
+}
+.rcs-feature {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 16px; border-radius:8px;
+  background:#fff; border:1px solid rgba(28,27,24,0.07);
+  font-size:13px; color:var(--c2); font-weight:500;
+  text-align:left;
+}
+.rcs-badge {
+  padding:8px 24px; border-radius:20px;
+  background:rgba(200,169,110,0.15);
+  color:var(--gold); font-size:12px;
+  font-weight:700; letter-spacing:.06em;
+  border:1px solid rgba(200,169,110,0.3);
+}
 .txfee-grid {
   display:grid;
   grid-template-columns: 2fr 160px 160px 140px;
@@ -1126,10 +1631,34 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">—</span>
     </div>
 
+    <!-- ── REPORTS ── -->
+    <div class="sb-div"></div>
+    <div class="sb-label" style="padding-top:4px">Reports</div>
+    <div class="sb-nav-item" id="navProductAnalytics" onclick="openPage('productAnalytics')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📦</span><span>Product Analytics</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
+    <div class="sb-nav-item" id="navOrderReport" onclick="openPage('orderReport')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">🧾</span><span>Order Report</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
+    <div class="sb-nav-item" id="navPnL" onclick="openPage('pnl')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span><span>P&amp;L Report</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
+    <div class="sb-nav-item" id="navMarketing" onclick="openPage('marketing')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span><span>Marketing Attribution</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
+    <div class="sb-nav-item" id="navCLV" onclick="openPage('clv')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">👥</span><span>Customer Lifetime Value</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
+
     <!-- ── CONFIGURATION ── -->
     <div class="sb-div"></div>
     <div class="sb-label" style="padding-top:4px">Configuration</div>
-    <div class="sb-nav-item" id="txFeeNavItem" onclick="openTxFeePage()" style="cursor:pointer;">
+    <div class="sb-nav-item" id="txFeeNavItem" onclick="openPage('txFee')" style="cursor:pointer;">
       <div class="sb-nav-left">
         <span class="sb-nav-icon">💳</span>
         <span>Transaction Fees</span>
@@ -1590,6 +2119,936 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
   </main><!-- /txfee-main -->
+
+  <!-- ══════════  REPORT PAGES  ══════════ -->
+
+  <!-- Product Analytics — Full Dashboard -->
+  <main class="main report-main" id="pageProductAnalytics" style="display:none">
+
+    <!-- Header -->
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <button onclick="closePage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">PRODUCT</span> <span class="gold">ANALYTICS</span></div>
+      </div>
+      <!-- Date range + sync -->
+      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
+        <select id="pa-range" onchange="paSync()" style="
+          padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);
+          background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);
+          cursor:pointer;
+        ">
+          <option value="7">Last 7 Days</option>
+          <option value="30" selected>Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="365">Last 12 Months</option>
+        </select>
+        <button onclick="paSync()" id="paSyncBtn" style="
+          padding:7px 16px;border-radius:7px;background:var(--gold);
+          color:var(--ink);border:none;font-size:12px;font-weight:700;
+          cursor:pointer;letter-spacing:.04em;
+        ">⟳ REFRESH</button>
+        <button onclick="paExportCSV()" style="
+          padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);
+          background:transparent;color:var(--c2);font-size:12px;cursor:pointer;
+        ">↓ Export CSV</button>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div id="pa-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+
+    <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
+    <div id="pa-kpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="pa-kpi-card" id="pa-k-revenue">
+        <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--gold)"></span>Total Revenue</div>
+        <div class="pa-kpi-val" id="pa-revenue">—</div>
+        <div class="pa-kpi-sub" id="pa-revenue-sub">—</div>
+      </div>
+      <div class="pa-kpi-card" id="pa-k-units">
+        <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#4A7FC1"></span>Units Sold</div>
+        <div class="pa-kpi-val" id="pa-units">—</div>
+        <div class="pa-kpi-sub" id="pa-units-sub">— orders</div>
+      </div>
+      <div class="pa-kpi-card">
+        <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#7E6DB5"></span>Avg Order Value</div>
+        <div class="pa-kpi-val" id="pa-aov">—</div>
+        <div class="pa-kpi-sub" id="pa-aov-sub">per order</div>
+      </div>
+      <div class="pa-kpi-card">
+        <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--green)"></span>Gross Profit</div>
+        <div class="pa-kpi-val" id="pa-profit">—</div>
+        <div class="pa-kpi-sub" id="pa-margin-sub">—% margin</div>
+      </div>
+      <div class="pa-kpi-card">
+        <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--red)"></span>Total COGS</div>
+        <div class="pa-kpi-val" id="pa-cogs">—</div>
+        <div class="pa-kpi-sub" id="pa-cogs-sub">cost of goods</div>
+      </div>
+      <div class="pa-kpi-card">
+        <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#C8A96E"></span>Unique Products</div>
+        <div class="pa-kpi-val" id="pa-products">—</div>
+        <div class="pa-kpi-sub" id="pa-products-sub">— variants</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2+3: Top Products Table + ABC Analysis ─────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;margin:0 28px 20px">
+
+      <!-- Top Products Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Top Products</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Ranked by revenue · click column to sort</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="paSetView('revenue')" id="pa-view-revenue" class="pa-view-btn pa-view-active">Revenue</button>
+            <button onclick="paSetView('units')" id="pa-view-units" class="pa-view-btn">Units</button>
+            <button onclick="paSetView('margin')" id="pa-view-margin" class="pa-view-btn">Margin</button>
+          </div>
+        </div>
+        <!-- Table header -->
+        <div class="pa-tbl-head">
+          <div style="flex:3">Product</div>
+          <div onclick="paSort('units')" class="pa-th-num pa-sortable">Units</div>
+          <div onclick="paSort('revenue')" class="pa-th-num pa-sortable pa-sort-active">Revenue</div>
+          <div onclick="paSort('cogs')" class="pa-th-num pa-sortable">COGS</div>
+          <div onclick="paSort('profit')" class="pa-th-num pa-sortable">Profit</div>
+          <div onclick="paSort('margin')" class="pa-th-num pa-sortable">Margin</div>
+          <div style="width:40px;text-align:center">ABC</div>
+        </div>
+        <div id="pa-product-table" style="max-height:420px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load product data</div>
+        </div>
+      </div>
+
+      <!-- ABC Analysis Panel -->
+      <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">ABC Analysis</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Revenue contribution by grade</div>
+        </div>
+        <div id="pa-abc-panel" style="padding:16px;flex:1">
+          <div style="color:var(--c3);font-family:var(--mono);font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4+5: Inventory Health + Sales Velocity ─────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 28px 20px">
+
+      <!-- Inventory Health -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Inventory Health</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Stock levels &amp; sell-through rates</div>
+          </div>
+          <div id="pa-inv-legend" style="display:flex;gap:10px;font-size:10px;font-family:var(--mono)">
+            <span style="color:var(--red)">🔴 Critical</span>
+            <span style="color:#E5A829">🟡 Watch</span>
+            <span style="color:var(--green)">🟢 Healthy</span>
+          </div>
+        </div>
+        <div id="pa-inventory-table" style="max-height:280px;overflow-y:auto">
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Refresh to load inventory data</div>
+        </div>
+      </div>
+
+      <!-- Revenue Mix Chart -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Revenue Mix</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Share of total revenue by product</div>
+        </div>
+        <div id="pa-revenue-mix" style="padding:16px;max-height:280px;overflow-y:auto">
+          <div style="color:var(--c3);font-family:var(--mono);font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 6: Variant Performance ─────────────────────────────── -->
+    <div style="margin:0 28px 28px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Variant Performance</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Breakdown by SKU/variant — top 20</div>
+          </div>
+        </div>
+        <div class="pa-tbl-head" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px">
+          <div>Variant</div>
+          <div class="pa-th-num">Units</div>
+          <div class="pa-th-num">Revenue</div>
+          <div class="pa-th-num">COGS</div>
+          <div class="pa-th-num">Profit</div>
+          <div class="pa-th-num">Margin</div>
+        </div>
+        <div id="pa-variant-table" style="max-height:320px;overflow-y:auto">
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Refresh to load variant data</div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageProductAnalytics -->
+
+  <!-- Order Report — Full Dashboard -->
+  <main class="main report-main" id="pageOrderReport" style="display:none">
+
+    <!-- Header -->
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <button onclick="closePage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">ORDER</span> <span class="gold">REPORT</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
+        <select id="or-range" onchange="orSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <option value="7">Last 7 Days</option>
+          <option value="30" selected>Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+        </select>
+        <button onclick="orSync()" id="orSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div id="or-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+
+    <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="or-kpi"><div class="or-kpi-lbl">🧾 Total Orders</div><div class="or-kpi-val" id="or-total-orders">—</div><div class="or-kpi-sub" id="or-orders-sub">in period</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--gold)"><div class="or-kpi-lbl">💰 Total Revenue</div><div class="or-kpi-val" id="or-total-revenue" style="color:var(--gold)">—</div><div class="or-kpi-sub" id="or-revenue-sub">gross sales</div></div>
+      <div class="or-kpi" style="border-top:3px solid #4A7FC1"><div class="or-kpi-lbl">🛒 Avg Order Value</div><div class="or-kpi-val" id="or-aov" style="color:#4A7FC1">—</div><div class="or-kpi-sub">per order</div></div>
+      <div class="or-kpi" style="border-top:3px solid #7E6DB5"><div class="or-kpi-lbl">📦 Total COGS</div><div class="or-kpi-val" id="or-total-cogs" style="color:#7E6DB5">—</div><div class="or-kpi-sub" id="or-cogs-sub">product cost</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--red)"><div class="or-kpi-lbl">💳 Transaction Fees</div><div class="or-kpi-val" id="or-total-fees" style="color:var(--red)">—</div><div class="or-kpi-sub" id="or-fees-sub">gateway costs</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--green)"><div class="or-kpi-lbl">✅ Net Profit</div><div class="or-kpi-val" id="or-net-profit" style="color:var(--green)">—</div><div class="or-kpi-sub" id="or-margin-sub">—% margin</div></div>
+    </div>
+
+    <!-- ── SECTION 2: Controls + Cost Breakdown ────────────────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
+
+      <!-- Search & Filter controls -->
+      <div class="card" style="padding:14px 16px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <!-- Search -->
+          <div style="flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:rgba(28,27,24,0.04);border:1.5px solid rgba(28,27,24,0.1);border-radius:8px;padding:8px 12px">
+            <span style="color:var(--c3);font-size:14px">🔍</span>
+            <input id="or-search" type="text" placeholder="Search by order # or customer name…"
+              oninput="orFilterAndRender()"
+              style="border:none;background:transparent;outline:none;font-size:12px;color:var(--ink);width:100%;font-family:var(--sans)">
+          </div>
+          <!-- Status filter -->
+          <select id="or-status-filter" onchange="orFilterAndRender()" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+            <option value="all">All Statuses</option>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="refunded">Refunded</option>
+            <option value="partially_refunded">Partial Refund</option>
+          </select>
+          <!-- Gateway filter -->
+          <select id="or-gateway-filter" onchange="orFilterAndRender()" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+            <option value="all">All Gateways</option>
+          </select>
+          <!-- Entries per page -->
+          <select id="or-per-page" onchange="orSetPage(1)" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+            <option value="20" selected>20 entries</option>
+            <option value="50">50 entries</option>
+            <option value="100">100 entries</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Cost Breakdown summary -->
+      <div class="card" style="padding:14px 16px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:10px">Cost Breakdown (filtered orders)</div>
+        <div id="or-cost-breakdown">
+          <div style="color:var(--c3);font-size:11px;font-family:var(--mono)">Refresh to load</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Order Table ──────────────────────────────────────── -->
+    <div style="margin:0 28px 16px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <!-- Table header — matching the screenshot style -->
+        <div class="or-tbl-head">
+          <div style="width:24px"><input type="checkbox" id="or-check-all" onchange="orToggleAll(this)" style="cursor:pointer"></div>
+          <div onclick="orSort('name')" class="or-th or-sortable" style="flex:1.2">Order ID</div>
+          <div onclick="orSort('date')" class="or-th or-sortable" style="width:100px">Date</div>
+          <div class="or-th" style="width:130px">Customer</div>
+          <div class="or-th" style="width:70px;text-align:center">Items</div>
+          <div onclick="orSort('revenue')" class="or-th or-sortable or-num">Revenue</div>
+          <div onclick="orSort('discounts')" class="or-th or-sortable or-num">Discounts</div>
+          <div onclick="orSort('shipping')" class="or-th or-sortable or-num">Shipping</div>
+          <div onclick="orSort('cogs')" class="or-th or-sortable or-num">Total COGS</div>
+          <div onclick="orSort('txFee')" class="or-th or-sortable or-num">Tx Fees</div>
+          <div onclick="orSort('profit')" class="or-th or-sortable or-num">Net Profit</div>
+          <div class="or-th" style="width:90px;text-align:center">Status</div>
+        </div>
+        <!-- Totals row (like screenshot) -->
+        <div id="or-totals-row" style="display:none" class="or-totals-row">
+          <div style="width:24px"></div>
+          <div style="flex:1.2;font-weight:700;font-size:12px;color:var(--ink)" id="or-totals-label">Total from — orders</div>
+          <div style="width:100px"></div>
+          <div style="width:130px"></div>
+          <div style="width:70px;text-align:center;font-family:var(--mono);font-size:12px;font-weight:700" id="or-totals-items">—</div>
+          <div class="or-num" style="font-weight:700;color:var(--gold);font-family:var(--mono);font-size:12px" id="or-totals-revenue">—</div>
+          <div class="or-num" style="color:var(--red);font-family:var(--mono);font-size:12px" id="or-totals-discounts">—</div>
+          <div class="or-num" style="color:var(--c3);font-family:var(--mono);font-size:12px" id="or-totals-shipping">—</div>
+          <div class="or-num" style="color:#7E6DB5;font-family:var(--mono);font-size:12px" id="or-totals-cogs">—</div>
+          <div class="or-num" style="color:var(--red);font-family:var(--mono);font-size:12px" id="or-totals-fees">—</div>
+          <div class="or-num" style="font-weight:700;font-family:var(--mono);font-size:12px" id="or-totals-profit">—</div>
+          <div style="width:90px"></div>
+        </div>
+        <!-- Body -->
+        <div id="or-table-body" style="max-height:520px;overflow-y:auto">
+          <div style="padding:50px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load order data</div>
+        </div>
+        <!-- Pagination -->
+        <div id="or-pagination" style="display:none;padding:12px 16px;border-top:1px solid rgba(28,27,24,0.06);display:flex;align-items:center;gap:12px">
+          <button onclick="orSetPage(orPage-1)" id="or-prev-btn" class="or-page-btn">‹ Prev</button>
+          <button onclick="orSetPage(orPage+1)" id="or-next-btn" class="or-page-btn">Next ›</button>
+          <span id="or-page-info" style="font-size:11px;color:var(--c3);font-family:var(--mono)"></span>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageOrderReport -->
+
+
+  <!-- P&L Report — Full Dashboard -->
+  <main class="main report-main" id="pagePnL" style="display:none">
+
+    <!-- Header -->
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <button onclick="closePage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">P&amp;L</span> <span class="gold">REPORT</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
+        <!-- Granularity toggle -->
+        <div style="display:flex;gap:4px;background:rgba(28,27,24,0.06);padding:3px;border-radius:8px">
+          <button onclick="plSetGranularity('daily')"   id="pl-g-daily"   class="pl-gran-btn pl-gran-active">Daily</button>
+          <button onclick="plSetGranularity('weekly')"  id="pl-g-weekly"  class="pl-gran-btn">Weekly</button>
+          <button onclick="plSetGranularity('monthly')" id="pl-g-monthly" class="pl-gran-btn">Monthly</button>
+        </div>
+        <select id="pl-range" onchange="plSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <option value="7">Last 7 Days</option>
+          <option value="30" selected>Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="365">Last 12 Months</option>
+        </select>
+        <button onclick="plSync()" id="plSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+
+    <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="pl-kpi">
+        <div class="pl-kpi-lbl">💰 Gross Revenue</div>
+        <div class="pl-kpi-val" id="pl-gross-rev">—</div>
+        <div class="pl-kpi-sub" id="pl-gross-rev-sub">total sales</div>
+      </div>
+      <div class="pl-kpi">
+        <div class="pl-kpi-lbl">🏷️ Net Revenue</div>
+        <div class="pl-kpi-val" id="pl-net-rev">—</div>
+        <div class="pl-kpi-sub" id="pl-net-rev-sub">after discounts & refunds</div>
+      </div>
+      <div class="pl-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="pl-kpi-lbl">📦 Gross Profit</div>
+        <div class="pl-kpi-val" id="pl-gross-profit" style="color:#4A7FC1">—</div>
+        <div class="pl-kpi-sub" id="pl-gross-margin">—% gross margin</div>
+      </div>
+      <div class="pl-kpi" style="border-top:3px solid var(--green)">
+        <div class="pl-kpi-lbl">⚡ Contribution Margin</div>
+        <div class="pl-kpi-val" id="pl-contrib" style="color:var(--green)">—</div>
+        <div class="pl-kpi-sub" id="pl-contrib-pct">—% of revenue</div>
+      </div>
+      <div class="pl-kpi" style="border-top:3px solid var(--gold)">
+        <div class="pl-kpi-lbl">🏆 Net Profit</div>
+        <div class="pl-kpi-val" id="pl-net-profit" style="color:var(--gold)">—</div>
+        <div class="pl-kpi-sub" id="pl-net-margin">—% net margin</div>
+      </div>
+      <div class="pl-kpi">
+        <div class="pl-kpi-lbl">📉 Total Costs</div>
+        <div class="pl-kpi-val" id="pl-total-costs" style="color:var(--red)">—</div>
+        <div class="pl-kpi-sub" id="pl-cost-pct">—% of revenue</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2+3: Waterfall + Period Comparison ─────────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 28px 20px">
+
+      <!-- Waterfall Chart -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Revenue Waterfall</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">From gross revenue to net profit — step by step</div>
+        </div>
+        <div id="pl-waterfall" style="padding:20px 24px">
+          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:30px 0">Click REFRESH to load</div>
+        </div>
+      </div>
+
+      <!-- Period Comparison -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Period Comparison</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Current vs previous period</div>
+          </div>
+        </div>
+        <div id="pl-comparison" style="padding:0">
+          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:40px 0">Click REFRESH to load</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4: Trend Chart ──────────────────────────────────────── -->
+    <div style="margin:0 28px 20px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Profit Trend</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Revenue · Gross Profit · Net Profit over time</div>
+          </div>
+          <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono)">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:var(--gold);display:inline-block;border-radius:2px"></span>Revenue</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#4A7FC1;display:inline-block;border-radius:2px"></span>Gross Profit</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:var(--green);display:inline-block;border-radius:2px"></span>Net Profit</span>
+          </div>
+        </div>
+        <div style="padding:20px 24px 16px">
+          <div id="pl-trend-chart" style="height:140px;position:relative">
+            <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:50px 0">Click REFRESH to load</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 5+6: Income Statement + Cost Breakdown ─────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:16px;margin:0 28px 28px">
+
+      <!-- Income Statement -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Income Statement</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Full P&amp;L — all line items with % of revenue</div>
+        </div>
+        <div id="pl-income-statement" style="padding:0">
+          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:40px 0">Click REFRESH to load</div>
+        </div>
+      </div>
+
+      <!-- Cost Breakdown % of Revenue -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Cost Breakdown</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Each cost as % of net revenue</div>
+        </div>
+        <div id="pl-cost-breakdown" style="padding:20px 16px">
+          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:30px 0">Click REFRESH to load</div>
+        </div>
+
+        <!-- Benchmark section -->
+        <div style="border-top:1px solid rgba(28,27,24,0.06);padding:14px 16px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:10px">Industry Benchmarks (DTC 2025)</div>
+          <div class="pl-bench-row"><span>Gross Margin</span><span style="color:var(--c2);font-family:var(--mono)">51–55%</span></div>
+          <div class="pl-bench-row"><span>Contribution Margin</span><span style="color:var(--c2);font-family:var(--mono)">~25%</span></div>
+          <div class="pl-bench-row"><span>Ad Spend % of Revenue</span><span style="color:var(--c2);font-family:var(--mono)">10–20%</span></div>
+          <div class="pl-bench-row"><span>EBITDA / Net Margin</span><span style="color:var(--c2);font-family:var(--mono)">5–9%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 7: Detailed period table ───────────────────────────── -->
+    <div style="margin:0 28px 28px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase" id="pl-table-title">Daily P&amp;L Breakdown</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">All line items per period — scroll to see all</div>
+        </div>
+        <div style="overflow-x:auto">
+          <div id="pl-period-table">
+            <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pagePnL -->
+
+  <!-- Marketing Attribution — Full Dashboard -->
+  <main class="main report-main" id="pageMarketing" style="display:none">
+
+    <!-- Header -->
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <button onclick="closePage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">MARKETING</span> <span class="gold">ATTRIBUTION</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
+        <select id="ma-range" onchange="maSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <option value="7">Last 7 Days</option>
+          <option value="30" selected>Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="365">Last 12 Months</option>
+        </select>
+        <button onclick="maSync()" id="maSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+
+    <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="ma-kpi" style="border-top:3px solid var(--gold)">
+        <div class="ma-kpi-lbl">💸 Total Ad Spend</div>
+        <div class="ma-kpi-val" id="ma-spend">—</div>
+        <div class="ma-kpi-sub" id="ma-spend-sub">all channels</div>
+      </div>
+      <div class="ma-kpi" style="border-top:3px solid var(--green)">
+        <div class="ma-kpi-lbl">📈 Attributed Revenue</div>
+        <div class="ma-kpi-val" id="ma-revenue" style="color:var(--green)">—</div>
+        <div class="ma-kpi-sub" id="ma-revenue-sub">platform-reported</div>
+      </div>
+      <div class="ma-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="ma-kpi-lbl">🎯 Blended ROAS</div>
+        <div class="ma-kpi-val" id="ma-roas" style="color:#4A7FC1">—</div>
+        <div class="ma-kpi-sub">revenue ÷ spend</div>
+      </div>
+      <div class="ma-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="ma-kpi-lbl">⚡ MER</div>
+        <div class="ma-kpi-val" id="ma-mer" style="color:#7E6DB5">—</div>
+        <div class="ma-kpi-sub">store rev ÷ ad spend</div>
+      </div>
+      <div class="ma-kpi" style="border-top:3px solid var(--red)">
+        <div class="ma-kpi-lbl">🎟️ Blended CPA</div>
+        <div class="ma-kpi-val" id="ma-cpa" style="color:var(--red)">—</div>
+        <div class="ma-kpi-sub" id="ma-cpa-sub">per conversion</div>
+      </div>
+      <div class="ma-kpi">
+        <div class="ma-kpi-lbl">🔢 Total Conversions</div>
+        <div class="ma-kpi-val" id="ma-conv">—</div>
+        <div class="ma-kpi-sub" id="ma-conv-sub">across all channels</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: Channel Comparison ──────────────────────────────── -->
+    <div style="margin:0 28px 20px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Channel Comparison</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Platform-reported metrics side by side</div>
+          </div>
+          <div style="display:flex;gap:8px;font-size:11px;font-family:var(--mono)">
+            <span style="padding:3px 8px;background:rgba(24,119,242,.1);color:#1877F2;border-radius:4px;font-weight:700">● Meta</span>
+            <span style="padding:3px 8px;background:rgba(66,133,244,.1);color:#4285F4;border-radius:4px;font-weight:700">● Google</span>
+            <span style="padding:3px 8px;background:rgba(0,114,206,.1);color:#0072CE;border-radius:4px;font-weight:700">● Microsoft</span>
+          </div>
+        </div>
+        <!-- Channel cards -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(28,27,24,0.06)">
+          <!-- Meta -->
+          <div id="ma-ch-meta" class="ma-ch-card" style="border-right:1px solid rgba(28,27,24,0.06)">
+            <div class="ma-ch-header" style="background:rgba(24,119,242,.06)">
+              <div class="ma-ch-name" style="color:#1877F2">Meta Ads</div>
+              <div id="ma-meta-badge" class="ma-ch-badge" style="background:rgba(24,119,242,.12);color:#1877F2">LIVE</div>
+            </div>
+            <div class="ma-ch-metrics" id="ma-meta-metrics">
+              <div class="ma-ch-metric"><span>Spend</span><span id="ma-meta-spend" class="ma-ch-val">—</span></div>
+              <div class="ma-ch-metric"><span>Revenue</span><span id="ma-meta-rev" class="ma-ch-val green">—</span></div>
+              <div class="ma-ch-metric"><span>ROAS</span><span id="ma-meta-roas" class="ma-ch-val blue">—</span></div>
+              <div class="ma-ch-metric"><span>CPA</span><span id="ma-meta-cpa" class="ma-ch-val red">—</span></div>
+              <div class="ma-ch-metric"><span>Conversions</span><span id="ma-meta-conv" class="ma-ch-val">—</span></div>
+              <div class="ma-ch-metric"><span>Clicks</span><span id="ma-meta-clicks" class="ma-ch-val">—</span></div>
+              <div class="ma-ch-metric"><span>Impressions</span><span id="ma-meta-impr" class="ma-ch-val">—</span></div>
+              <div class="ma-ch-metric"><span>CTR</span><span id="ma-meta-ctr" class="ma-ch-val">—</span></div>
+            </div>
+          </div>
+          <!-- Google -->
+          <div id="ma-ch-google" class="ma-ch-card" style="border-right:1px solid rgba(28,27,24,0.06)">
+            <div class="ma-ch-header" style="background:rgba(66,133,244,.06)">
+              <div class="ma-ch-name" style="color:#4285F4">Google Ads</div>
+              <div class="ma-ch-badge" style="background:rgba(66,133,244,.12);color:#4285F4">PENDING</div>
+            </div>
+            <div class="ma-ch-metrics">
+              <div class="ma-ch-metric"><span>Spend</span><span id="ma-google-spend" class="ma-ch-val">—</span></div>
+              <div class="ma-ch-metric"><span>Revenue</span><span class="ma-ch-val" style="color:var(--c3)">API pending</span></div>
+              <div class="ma-ch-metric"><span>ROAS</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>CPA</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Conversions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Clicks</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Impressions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>CTR</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+            </div>
+          </div>
+          <!-- Microsoft -->
+          <div id="ma-ch-ms" class="ma-ch-card">
+            <div class="ma-ch-header" style="background:rgba(0,114,206,.06)">
+              <div class="ma-ch-name" style="color:#0072CE">Microsoft Ads</div>
+              <div class="ma-ch-badge" style="background:rgba(0,114,206,.12);color:#0072CE">PENDING</div>
+            </div>
+            <div class="ma-ch-metrics">
+              <div class="ma-ch-metric"><span>Spend</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Revenue</span><span class="ma-ch-val" style="color:var(--c3)">API pending</span></div>
+              <div class="ma-ch-metric"><span>ROAS</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>CPA</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Conversions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Clicks</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>Impressions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+              <div class="ma-ch-metric"><span>CTR</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3+4: Spend vs Revenue Chart + Spend Allocation ─────── -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin:0 28px 20px">
+
+      <!-- Spend vs Revenue Trend -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Spend vs Store Revenue</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Daily — the gap is your profit zone</div>
+          </div>
+          <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono)">
+            <span><span style="display:inline-block;width:16px;height:3px;background:var(--gold);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Revenue</span>
+            <span><span style="display:inline-block;width:16px;height:3px;background:var(--red);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Ad Spend</span>
+          </div>
+        </div>
+        <div style="padding:20px 24px 12px">
+          <div id="ma-trend-chart" style="height:150px;position:relative">
+            <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:55px 0">Click REFRESH to load</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spend Allocation + MER Gauge -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Budget Allocation</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Share of total spend by channel</div>
+        </div>
+        <div id="ma-allocation" style="padding:16px">
+          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:20px 0">Click REFRESH to load</div>
+        </div>
+        <!-- MER Gauge -->
+        <div style="border-top:1px solid rgba(28,27,24,0.06);padding:14px 16px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:8px">MER Health</div>
+          <div id="ma-mer-gauge" style="text-align:center;padding:8px 0">
+            <div style="font-size:28px;font-weight:800;font-family:'Syne',sans-serif" id="ma-mer-big">—</div>
+            <div style="font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:2px">Good MER ≥ 3.0 (industry benchmark)</div>
+            <div id="ma-mer-bar-wrap" style="height:6px;background:rgba(28,27,24,0.08);border-radius:3px;margin-top:8px;overflow:hidden">
+              <div id="ma-mer-bar" style="height:100%;width:0%;background:var(--green);border-radius:3px;transition:width .5s ease"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 5: Campaign Performance ────────────────────────────── -->
+    <div style="margin:0 28px 20px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Meta Campaign Performance</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Per-campaign breakdown — click column to sort</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="maSort('spend')"   id="ma-sort-spend"   class="pa-view-btn pa-view-active">Spend</button>
+            <button onclick="maSort('revenue')" id="ma-sort-revenue" class="pa-view-btn">Revenue</button>
+            <button onclick="maSort('roas')"    id="ma-sort-roas"    class="pa-view-btn">ROAS</button>
+          </div>
+        </div>
+        <div class="ma-camp-head">
+          <div style="flex:3">Campaign</div>
+          <div class="ma-camp-num">Spend</div>
+          <div class="ma-camp-num">Revenue</div>
+          <div class="ma-camp-num">ROAS</div>
+          <div class="ma-camp-num">CPA</div>
+          <div class="ma-camp-num">Conv.</div>
+          <div class="ma-camp-num">Clicks</div>
+          <div class="ma-camp-num">CTR</div>
+        </div>
+        <div id="ma-campaign-table" style="max-height:360px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load campaign data</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 6+7: Daily Table + Benchmarks ──────────────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin:0 28px 28px">
+
+      <!-- Daily Spend Breakdown -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Daily Breakdown</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Meta spend · store revenue · MER per day</div>
+        </div>
+        <div style="overflow-x:auto">
+          <div id="ma-daily-table" style="max-height:320px;overflow-y:auto;min-width:600px">
+            <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benchmarks -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Industry Benchmarks</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">2025 data — DTC ecommerce</div>
+        </div>
+        <div style="padding:16px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:8px">META ADS</div>
+          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:var(--mono);font-weight:600">1.86×</span></div>
+          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:var(--mono)">$38.19</span></div>
+          <div class="ma-bench-row"><span>Avg CPM</span><span style="color:var(--c2);font-family:var(--mono)">$20.48</span></div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin:14px 0 8px">GOOGLE ADS</div>
+          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:var(--mono);font-weight:600">3.68×</span></div>
+          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:var(--mono)">$23.74</span></div>
+          <div class="ma-bench-row"><span>Search ROAS</span><span style="color:var(--c2);font-family:var(--mono)">5.17×</span></div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin:14px 0 8px">BLENDED</div>
+          <div class="ma-bench-row"><span>Avg eComm ROAS</span><span style="color:var(--c2);font-family:var(--mono);font-weight:600">2.87×</span></div>
+          <div class="ma-bench-row"><span>Good MER target</span><span style="color:var(--green);font-family:var(--mono);font-weight:600">≥ 3.0</span></div>
+          <div class="ma-bench-row"><span>LTV:CAC target</span><span style="color:var(--c2);font-family:var(--mono)">3:1</span></div>
+          <div style="margin-top:14px;padding:10px 12px;background:var(--gold-bg);border-radius:8px;border-left:3px solid var(--gold)">
+            <div style="font-size:10px;font-weight:700;color:var(--gold);margin-bottom:4px">ROAS CONTEXT</div>
+            <div style="font-size:11px;color:var(--c2);line-height:1.5">ROAS alone doesn't show profitability. A 1.86× Meta ROAS can be profitable at 70% gross margin but loss-making at 30% margin. Always pair with MER and contribution margin.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageMarketing -->
+
+  <!-- Customer Lifetime Value — Full Dashboard -->
+  <main class="main report-main" id="pageCLV" style="display:none">
+
+    <!-- Header -->
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <button onclick="closePage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">CUSTOMER</span> <span class="gold">LIFETIME VALUE</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
+        <select id="clv-range" onchange="clvSync()" style="padding:7px 12px;border-radius:7px;border:1.5px solid var(--cream-3);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <option value="90">Last 90 Days</option>
+          <option value="180">Last 6 Months</option>
+          <option value="365" selected>Last 12 Months</option>
+        </select>
+        <button onclick="clvSync()" id="clvSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+
+    <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="clv-kpi" style="border-top:3px solid var(--gold)">
+        <div class="clv-kpi-lbl">💰 Avg Customer LTV</div>
+        <div class="clv-kpi-val" id="clv-ltv" style="color:var(--gold)">—</div>
+        <div class="clv-kpi-sub">AOV × Freq × Lifespan</div>
+      </div>
+      <div class="clv-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="clv-kpi-lbl">🛒 Avg Order Value</div>
+        <div class="clv-kpi-val" id="clv-aov" style="color:#4A7FC1">—</div>
+        <div class="clv-kpi-sub" id="clv-aov-sub">per order</div>
+      </div>
+      <div class="clv-kpi" style="border-top:3px solid var(--green)">
+        <div class="clv-kpi-lbl">🔁 Repeat Purchase Rate</div>
+        <div class="clv-kpi-val" id="clv-rpr" style="color:var(--green)">—</div>
+        <div class="clv-kpi-sub" id="clv-rpr-sub">bought 2+ times</div>
+      </div>
+      <div class="clv-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="clv-kpi-lbl">📅 Purchase Frequency</div>
+        <div class="clv-kpi-val" id="clv-freq" style="color:#7E6DB5">—</div>
+        <div class="clv-kpi-sub">orders per customer</div>
+      </div>
+      <div class="clv-kpi" style="border-top:3px solid var(--red)">
+        <div class="clv-kpi-lbl">⏱️ Avg Days Between Orders</div>
+        <div class="clv-kpi-val" id="clv-dbo" style="color:var(--red)">—</div>
+        <div class="clv-kpi-sub">re-order interval</div>
+      </div>
+      <div class="clv-kpi">
+        <div class="clv-kpi-lbl">⚖️ LTV:CAC Ratio</div>
+        <div class="clv-kpi-val" id="clv-ltvcac">—</div>
+        <div class="clv-kpi-sub">target ≥ 3:1</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: New vs Returning ────────────────────────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 280px;gap:16px;margin:0 28px 20px">
+
+      <!-- New customers card -->
+      <div class="card" style="padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:10px;height:10px;border-radius:50%;background:#4A7FC1;flex-shrink:0"></div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2)">New Customers</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ink)" id="clv-new-count">—</div>
+        <div style="font-size:11px;color:var(--c3);font-family:var(--mono);margin:4px 0 12px">unique customers</div>
+        <div style="display:flex;gap:20px">
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:var(--mono)" id="clv-new-rev">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">AOV</div><div style="font-size:14px;font-weight:700;color:#4A7FC1;font-family:var(--mono)" id="clv-new-aov">—</div></div>
+        </div>
+      </div>
+
+      <!-- Returning customers card -->
+      <div class="card" style="padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2)">Returning Customers</div>
+          <div style="margin-left:auto;font-size:10px;color:var(--green);background:var(--green-dim);padding:2px 7px;border-radius:4px;font-weight:700">67% more spend</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ink)" id="clv-ret-count">—</div>
+        <div style="font-size:11px;color:var(--c3);font-family:var(--mono);margin:4px 0 12px">2+ orders placed</div>
+        <div style="display:flex;gap:20px">
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:var(--mono)" id="clv-ret-rev">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">AOV</div><div style="font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)" id="clv-ret-aov">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Avg Orders</div><div style="font-size:14px;font-weight:700;color:#7E6DB5;font-family:var(--mono)" id="clv-ret-orders">—</div></div>
+        </div>
+      </div>
+
+      <!-- Revenue split donut -->
+      <div class="card" style="padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2);margin-bottom:12px">Revenue Split</div>
+        <canvas id="clv-split-canvas" width="120" height="120"></canvas>
+        <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;font-family:var(--mono)">
+          <span><span style="display:inline-block;width:8px;height:8px;background:#4A7FC1;border-radius:50%;margin-right:4px;vertical-align:middle"></span>New <span id="clv-new-pct" style="font-weight:700">—</span></span>
+          <span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:4px;vertical-align:middle"></span>Return <span id="clv-ret-pct" style="font-weight:700">—</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Cohort Heatmap ───────────────────────────────────── -->
+    <div style="margin:0 28px 20px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Cohort Retention Heatmap</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Customers grouped by first purchase month — % who returned in subsequent months</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--c3);font-family:var(--mono)">
+            <div style="display:flex;gap:3px;align-items:center">
+              <div style="width:12px;height:12px;background:rgba(200,169,110,0.1);border-radius:2px"></div>
+              <span>0%</span>
+            </div>
+            <div style="display:flex;gap:3px;align-items:center">
+              <div style="width:12px;height:12px;background:rgba(200,169,110,0.5);border-radius:2px"></div>
+              <span>25%</span>
+            </div>
+            <div style="display:flex;gap:3px;align-items:center">
+              <div style="width:12px;height:12px;background:#C8A96E;border-radius:2px"></div>
+              <span>50%+</span>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;padding:16px 20px">
+          <div id="clv-cohort-heatmap">
+            <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:30px 0">Click REFRESH to load cohort data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4+5: RFM Segments + Purchase Timing ────────────────── -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin:0 28px 20px">
+
+      <!-- RFM Segments -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">RFM Customer Segments</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Recency · Frequency · Monetary — auto-classified from order data</div>
+        </div>
+        <div id="clv-rfm-table">
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load</div>
+        </div>
+      </div>
+
+      <!-- Purchase Timing + Benchmarks -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Avg days between orders -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2);margin-bottom:12px">Re-Order Window</div>
+          <div style="text-align:center;padding:8px 0">
+            <div style="font-size:36px;font-weight:800;font-family:'Syne',sans-serif;color:var(--ink)" id="clv-dbo-big">—</div>
+            <div style="font-size:11px;color:var(--c3);font-family:var(--mono);margin-top:2px">avg days between orders</div>
+          </div>
+          <div style="border-top:1px solid rgba(28,27,24,0.06);padding-top:10px;margin-top:8px">
+            <div style="font-size:10px;color:var(--c3);margin-bottom:6px">Customer status thresholds</div>
+            <div style="display:flex;flex-direction:column;gap:4px" id="clv-churn-thresholds">
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:var(--green)">🟢 Active</span><span style="color:var(--c3);font-family:var(--mono)">< avg interval</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:#E5A829">🟡 At-Risk</span><span style="color:var(--c3);font-family:var(--mono)">1–3× interval</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px">
+                <span style="color:var(--red)">🔴 Churned</span><span style="color:var(--c3);font-family:var(--mono)">> 3× interval</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benchmarks -->
+        <div class="card" style="padding:16px;flex:1">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:10px">Industry Benchmarks 2025</div>
+          <div class="clv-bench-row"><span>CLV:CAC target</span><span style="color:var(--gold);font-weight:700;font-family:var(--mono)">≥ 3:1</span></div>
+          <div class="clv-bench-row"><span>Repeat purchase rate</span><span style="color:var(--c2);font-family:var(--mono)">20–35%</span></div>
+          <div class="clv-bench-row"><span>Subscription retention</span><span style="color:var(--c2);font-family:var(--mono)">60–85%</span></div>
+          <div class="clv-bench-row"><span>Avg CLV (general retail)</span><span style="color:var(--c2);font-family:var(--mono)">$168</span></div>
+          <div class="clv-bench-row"><span>Avg CLV (electronics)</span><span style="color:var(--c2);font-family:var(--mono)">$290–$520</span></div>
+          <div class="clv-bench-row"><span>Returning vs new spend</span><span style="color:var(--green);font-family:var(--mono)">+67%</span></div>
+          <div class="clv-bench-row"><span>Retention improves profit</span><span style="color:var(--green);font-family:var(--mono)">+25–95%</span></div>
+          <div style="margin-top:10px;padding:8px 10px;background:var(--gold-bg);border-radius:6px;border-left:3px solid var(--gold)">
+            <div style="font-size:10px;color:var(--gold);font-weight:700">5% MORE RETENTION</div>
+            <div style="font-size:10px;color:var(--c2);margin-top:2px;line-height:1.5">Can increase profits by 25–95% (Bain & Co)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 6: Top Customers Table ─────────────────────────────── -->
+    <div style="margin:0 28px 28px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Top Customers by Lifetime Value</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Your 20 most valuable customers — Pareto: 20% drive 80% of revenue</div>
+          </div>
+        </div>
+        <div class="clv-top-head">
+          <div style="flex:3">Customer</div>
+          <div class="clv-top-num">Orders</div>
+          <div class="clv-top-num">Total Spent</div>
+          <div class="clv-top-num">AOV</div>
+          <div class="clv-top-num">Last Order</div>
+          <div class="clv-top-num">Days Ago</div>
+          <div style="width:80px;text-align:center">RFM Tier</div>
+        </div>
+        <div id="clv-top-table" style="max-height:380px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load customer data</div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageCLV -->
+
 
 </div>
 
@@ -2266,29 +3725,70 @@ function renderBreakdown() {
 }
 
 /* ══════════════════════════════════════════
-   TRANSACTION FEE PAGE
+   PAGE NAVIGATION — unified open/close
 ══════════════════════════════════════════ */
-const FEE_KEYS = ['shopify','stripe','paypal','klarna','afterpay','manual','other'];
+const PAGES = {
+  txFee:            { mainId: 'txFeeMain',            navId: 'txFeeNavItem',          onOpen: () => { loadFeeRates(); updateFeeExamples(); } },
+  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { if (!paData) paSync(); } },
+  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { if (!orAllOrders.length) orSync(); } },
+  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { if (!plData) plSync(); } },
+  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { if (!maData) maSync(); } },
+  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { if (!clvData) clvSync(); } },
+};
 
-function openTxFeePage() {
-  // Hide main dashboard, show fee page
-  document.querySelector('.main:not(.txfee-main)').style.display = 'none';
-  document.getElementById('txFeeMain').style.display = 'block';
-  // Highlight sidebar item
-  document.getElementById('txFeeNavItem').style.background = 'rgba(200,169,110,0.12)';
-  document.getElementById('txFeeNavItem').style.color = 'var(--gold)';
-  // Load saved rates and update examples
-  loadFeeRates();
-  updateFeeExamples();
+let activePage = null;
+
+function openPage(key) {
+  const page = PAGES[key];
+  if (!page) return;
+
+  // Hide dashboard main, show selected page
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
+
+  // Hide all other pages first
+  Object.values(PAGES).forEach(p => {
+    const el = document.getElementById(p.mainId);
+    if (el) el.style.display = 'none';
+    const nav = document.getElementById(p.navId);
+    if (nav) { nav.style.background = ''; nav.style.color = ''; }
+  });
+
+  // Show selected page
+  const mainEl = document.getElementById(page.mainId);
+  if (mainEl) mainEl.style.display = 'block';
+
+  // Highlight nav item
+  const navEl = document.getElementById(page.navId);
+  if (navEl) {
+    navEl.style.background = 'rgba(200,169,110,0.12)';
+    navEl.style.color = 'var(--gold)';
+  }
+
+  // Run page-specific onOpen callback
+  if (page.onOpen) page.onOpen();
+  activePage = key;
 }
 
-function closeTxFeePage() {
-  document.querySelector('.main:not(.txfee-main)').style.display = 'block';
-  document.getElementById('txFeeMain').style.display = 'none';
-  // Reset sidebar highlight
-  document.getElementById('txFeeNavItem').style.background = '';
-  document.getElementById('txFeeNavItem').style.color = '';
+function closePage() {
+  if (!activePage) return;
+  const page = PAGES[activePage];
+
+  // Hide active page
+  const mainEl = document.getElementById(page.mainId);
+  if (mainEl) mainEl.style.display = 'none';
+
+  // Reset nav highlight
+  const navEl = document.getElementById(page.navId);
+  if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
+
+  // Show dashboard
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'block';
+  activePage = null;
 }
+
+// Keep old aliases working
+function openTxFeePage() { openPage('txFee'); }
+function closeTxFeePage() { closePage(); }
 
 function updateFeeExamples() {
   const ORDER = 100;
@@ -3110,8 +4610,1406 @@ function clearAllData() {
   toast('Data reset to sample', 'ok');
 }
 
-// Load saved settings on startup
-loadSettings();
+/* ══════════════════════════════════════════
+   ORDER REPORT
+══════════════════════════════════════════ */
+let orAllOrders   = [];   // raw from API
+let orFiltered    = [];   // after search+filter
+let orPage        = 1;
+let orSortKey     = 'date';
+let orSortDir     = -1;
+let orSelectedIds = new Set();
+
+async function orSync() {
+  const btn  = document.getElementById('orSyncBtn');
+  const days = parseInt(document.getElementById('or-range')?.value || 30);
+  const to   = new Date().toISOString().slice(0,10);
+  const from = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
+
+  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
+  orSetStatus(`⟳ Fetching orders for last ${days} days...`);
+
+  try {
+    const feeParams = getFeeParams();
+    const r = await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
+    if (!r.ok) { const e = await r.json().catch(()=>({})); orSetStatus(`✗ Error: ${e.error||r.status}`, true); return; }
+    const data = await r.json();
+    orAllOrders = data.orders || [];
+
+    // Populate gateway filter
+    const gateways = [...new Set(orAllOrders.map(o => o.gateway).filter(Boolean))];
+    const gwSel = document.getElementById('or-gateway-filter');
+    if (gwSel) {
+      gwSel.innerHTML = '<option value="all">All Gateways</option>' +
+        gateways.map(g => `<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
+    }
+
+    orFilterAndRender();
+    orSetStatus(`✓ ${orAllOrders.length} orders loaded · ${data.debug?.variants_with_cost || 0} variants with COGS data · ${from} → ${to}`);
+  } catch(e) {
+    orSetStatus(`✗ ${e.message}`, true);
+  } finally {
+    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
+  }
+}
+
+function orSetStatus(msg, isErr=false) {
+  const el = document.getElementById('or-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
+  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
+  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
+  el.textContent = msg;
+}
+
+const orFmt$ = n => {
+  const v = Math.abs(parseFloat(n)||0);
+  const s = 'A$' + v.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return parseFloat(n) < 0 ? `(${s})` : s;
+};
+
+function orFilterAndRender() {
+  const search  = (document.getElementById('or-search')?.value || '').toLowerCase();
+  const status  = document.getElementById('or-status-filter')?.value || 'all';
+  const gateway = document.getElementById('or-gateway-filter')?.value || 'all';
+
+  orFiltered = orAllOrders.filter(o => {
+    if (status  !== 'all' && o.status  !== status)  return false;
+    if (gateway !== 'all' && o.gateway !== gateway) return false;
+    if (search) {
+      const haystack = `${o.name} ${o.customer}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  orFiltered.sort((a,b) => {
+    const va = a[orSortKey], vb = b[orSortKey];
+    if (typeof va === 'string') return va.localeCompare(vb) * orSortDir;
+    return ((va||0) - (vb||0)) * orSortDir;
+  });
+
+  orPage = 1;
+  orRenderAll();
+}
+
+function orSort(key) {
+  if (orSortKey === key) orSortDir *= -1;
+  else { orSortKey = key; orSortDir = -1; }
+  orFilterAndRender();
+}
+
+function orSetPage(p) {
+  const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
+  const maxPage = Math.ceil(orFiltered.length / perPage);
+  orPage = Math.max(1, Math.min(p, maxPage));
+  orRenderAll();
+}
+
+function orRenderAll() {
+  orRenderKPIs();
+  orRenderTotalsRow();
+  orRenderTable();
+  orRenderCostBreakdown();
+  orRenderPagination();
+}
+
+function orRenderKPIs() {
+  // Use filtered set for KPIs
+  const orders = orFiltered;
+  const total     = orders.length;
+  const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
+  const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
+  const fees      = orders.reduce((s,o)=>s+o.txFee,0);
+  const profit    = orders.reduce((s,o)=>s+o.profit,0);
+  const aov       = total > 0 ? revenue/total : 0;
+  const margin    = revenue > 0 ? profit/revenue*100 : 0;
+
+  document.getElementById('or-total-orders').textContent   = total.toLocaleString();
+  document.getElementById('or-orders-sub').textContent     = `${orAllOrders.length} total`;
+  document.getElementById('or-total-revenue').textContent  = orFmt$(revenue);
+  document.getElementById('or-revenue-sub').textContent    = `${orders.filter(o=>!o.cancelled).length} active`;
+  document.getElementById('or-aov').textContent            = orFmt$(aov);
+  document.getElementById('or-total-cogs').textContent     = orFmt$(cogs);
+  document.getElementById('or-cogs-sub').textContent       = cogs > 0 ? `${(cogs/revenue*100).toFixed(1)}% of rev` : 'no COGS data';
+  document.getElementById('or-total-fees').textContent     = orFmt$(fees);
+  document.getElementById('or-fees-sub').textContent       = fees > 0 ? `${(fees/revenue*100).toFixed(1)}% of rev` : '';
+  const profEl = document.getElementById('or-net-profit');
+  profEl.textContent  = orFmt$(profit);
+  profEl.style.color  = profit >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('or-margin-sub').textContent = `${margin.toFixed(1)}% margin`;
+}
+
+function orRenderTotalsRow() {
+  const orders    = orFiltered;
+  if (!orders.length) { document.getElementById('or-totals-row').style.display = 'none'; return; }
+  document.getElementById('or-totals-row').style.display = 'flex';
+  const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
+  const discounts = orders.reduce((s,o)=>s+o.discounts,0);
+  const shipping  = orders.reduce((s,o)=>s+o.shipping,0);
+  const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
+  const fees      = orders.reduce((s,o)=>s+o.txFee,0);
+  const profit    = orders.reduce((s,o)=>s+o.profit,0);
+  const items     = orders.reduce((s,o)=>s+o.items,0);
+  document.getElementById('or-totals-label').textContent    = `Total from ${orders.length} orders`;
+  document.getElementById('or-totals-items').textContent    = items;
+  document.getElementById('or-totals-revenue').textContent  = orFmt$(revenue);
+  document.getElementById('or-totals-discounts').textContent= discounts>0?`(${orFmt$(discounts)})`:'—';
+  document.getElementById('or-totals-shipping').textContent = `(${orFmt$(shipping)})`;
+  document.getElementById('or-totals-cogs').textContent     = cogs>0?`(${orFmt$(cogs)})`:'—';
+  document.getElementById('or-totals-fees').textContent     = `(${orFmt$(fees)})`;
+  const profEl = document.getElementById('or-totals-profit');
+  profEl.textContent  = orFmt$(profit);
+  profEl.style.color  = profit >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+function orRenderTable() {
+  const el = document.getElementById('or-table-body');
+  if (!el) return;
+  if (!orFiltered.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">No orders match the current filters</div>';
+    return;
+  }
+  const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
+  const start   = (orPage-1)*perPage;
+  const page    = orFiltered.slice(start, start+perPage);
+
+  const statusBadge = (s) => {
+    const map = { paid:'or-badge-paid', pending:'or-badge-pending', refunded:'or-badge-refunded', partially_refunded:'or-badge-partial' };
+    return `<span class="or-badge ${map[s]||'or-badge-other'}">${(s||'—').replace(/_/g,' ')}</span>`;
+  };
+
+  el.innerHTML = page.map(o => {
+    const profitColor = o.profit >= 0 ? 'var(--green)' : 'var(--red)';
+    const checked = orSelectedIds.has(o.id) ? 'checked' : '';
+    return `<div class="or-row">
+      <div style="width:24px"><input type="checkbox" ${checked} onchange="orToggleOrder(${o.id},this)" style="cursor:pointer"></div>
+      <div class="or-cell" style="flex:1.2;min-width:0">
+        <a href="https://admin.shopify.com/store/${(typeof PROXY!='undefined'?'':'')}orders/${o.id}" target="_blank" style="color:var(--gold);font-weight:700;font-family:var(--mono);font-size:12px;text-decoration:none">${o.name}</a>
+      </div>
+      <div class="or-cell" style="width:100px;color:var(--c3);font-family:var(--mono);font-size:11px">${o.date}</div>
+      <div class="or-cell" style="width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--c2)" title="${o.customer}">${o.customer}</div>
+      <div class="or-cell" style="width:70px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--c2)">${o.items} item${o.items!==1?'s':''}</div>
+      <div class="or-cell-num" style="color:var(--gold);font-weight:600">${orFmt$(o.revenue)}</div>
+      <div class="or-cell-num" style="color:var(--red)">${o.discounts>0?`(${orFmt$(o.discounts)})`:'—'}</div>
+      <div class="or-cell-num" style="color:var(--c3)">${o.shipping>0?`(${orFmt$(o.shipping)})`:'(A$0.00)'}</div>
+      <div class="or-cell-num" style="color:#7E6DB5">${o.cogs>0?`(${orFmt$(o.cogs)})`:'<span style="color:var(--c3)">—</span>'}</div>
+      <div class="or-cell-num" style="color:var(--red)">(${orFmt$(o.txFee)})</div>
+      <div class="or-cell-num" style="color:${profitColor};font-weight:600">${orFmt$(o.profit)} <span style="font-weight:400;font-size:10px;color:var(--c3)">${o.margin.toFixed(0)}%</span></div>
+      <div class="or-cell" style="width:90px;text-align:center">${statusBadge(o.status)}</div>
+    </div>`;
+  }).join('');
+}
+
+function orRenderCostBreakdown() {
+  const el = document.getElementById('or-cost-breakdown');
+  if (!el || !orFiltered.length) return;
+  const orders  = orFiltered;
+  const revenue = orders.reduce((s,o)=>s+o.revenue,0) || 1;
+  const cogs    = orders.reduce((s,o)=>s+o.cogs,0);
+  const fees    = orders.reduce((s,o)=>s+o.txFee,0);
+  const disc    = orders.reduce((s,o)=>s+o.discounts,0);
+  const profit  = orders.reduce((s,o)=>s+o.profit,0);
+  const ship    = orders.reduce((s,o)=>s+o.shipping,0);
+
+  const bar = (label, val, color, isProfit=false) => {
+    const pct = Math.abs(val)/revenue*100;
+    const pctStr = pct.toFixed(1)+'%';
+    return `<div class="or-cb-row">
+      <div class="or-cb-label" style="color:${isProfit?color:'var(--c2)'};font-weight:${isProfit?700:400}">${label}</div>
+      <div class="or-cb-bar-wrap"><div class="or-cb-bar" style="width:${Math.min(pct,100)}%;background:${color}${isProfit?'':';opacity:.7'}"></div></div>
+      <div class="or-cb-val" style="color:${isProfit?color:'var(--c3)'}">${pctStr}</div>
+    </div>`;
+  };
+
+  el.innerHTML = bar('Revenue', revenue, 'var(--gold)', true)
+    + (disc > 0   ? bar('Discounts', disc,   'var(--red)') : '')
+    + bar('COGS',     cogs,    '#7E6DB5')
+    + bar('Tx Fees',  fees,    'var(--red)')
+    + (ship > 0   ? bar('Shipping',  ship,   '#4A7FC1') : '')
+    + `<div style="border-top:1px dashed rgba(28,27,24,0.1);margin:6px 0 4px"></div>`
+    + bar('Net Profit', profit, profit>=0?'var(--green)':'var(--red)', true);
+}
+
+function orRenderPagination() {
+  const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
+  const total   = orFiltered.length;
+  const maxPage = Math.max(1, Math.ceil(total/perPage));
+  const start   = (orPage-1)*perPage + 1;
+  const end     = Math.min(orPage*perPage, total);
+  const pgEl    = document.getElementById('or-pagination');
+  if (pgEl) pgEl.style.display = total > 0 ? 'flex' : 'none';
+  const prevBtn = document.getElementById('or-prev-btn');
+  const nextBtn = document.getElementById('or-next-btn');
+  if (prevBtn) prevBtn.disabled = orPage <= 1;
+  if (nextBtn) nextBtn.disabled = orPage >= maxPage;
+  const info = document.getElementById('or-page-info');
+  if (info) info.textContent = total > 0 ? `${start}–${end} of ${total} orders` : '';
+}
+
+function orToggleOrder(id, el) {
+  if (el.checked) orSelectedIds.add(id);
+  else orSelectedIds.delete(id);
+}
+function orToggleAll(el) {
+  const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
+  const start   = (orPage-1)*perPage;
+  const page    = orFiltered.slice(start, start+perPage);
+  page.forEach(o => { if (el.checked) orSelectedIds.add(o.id); else orSelectedIds.delete(o.id); });
+  orRenderTable();
+}
+
+function orExportCSV() {
+  if (!orFiltered.length) { toast('No orders to export', 'err'); return; }
+  const orders = orAllOrders.includes(orFiltered[0]) ? orFiltered : orFiltered; // use filtered set
+  let csv = 'Order ID,Date,Customer,Items,Revenue,Discounts,Shipping,COGS,Transaction Fee,Net Profit,Margin%,Status,Gateway,Fulfillment\n';
+  orders.forEach(o => {
+    csv += `"${o.name}","${o.date}","${o.customer}",${o.items},${o.revenue},${o.discounts},${o.shipping},${o.cogs},${o.txFee},${o.profit},${o.margin}%,"${o.status}","${o.gateway}","${o.fulfillment}"\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = `orders-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast(`Exported ${orders.length} orders`, 'ok');
+}
+let clvData = null;
+
+async function clvSync() {
+  const btn  = document.getElementById('clvSyncBtn');
+  const days = parseInt(document.getElementById('clv-range')?.value || 365);
+  const to   = new Date().toISOString().slice(0,10);
+  const from = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
+
+  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
+  clvSetStatus(`⟳ Fetching customer data for last ${days} days...`);
+
+  try {
+    const r = await fetch(`${PROXY}?service=shopify&action=clv&from=${from}&to=${to}`);
+    if (!r.ok) { const e = await r.json().catch(()=>({})); clvSetStatus(`✗ Error: ${e.error||r.status}`, true); return; }
+    clvData = await r.json();
+    clvRender();
+    clvSetStatus(`✓ ${clvData.totals.totalCustomers} customers · ${clvData.totals.totalOrders} orders · ${clvData.topCustomers.length} top customers analysed`);
+  } catch(e) {
+    clvSetStatus(`✗ ${e.message}`, true);
+  } finally {
+    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
+  }
+}
+
+function clvSetStatus(msg, isErr=false) {
+  const el = document.getElementById('clv-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
+  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
+  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
+  el.textContent = msg;
+}
+
+const clvFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
+
+function clvRender() {
+  if (!clvData) return;
+  clvRenderKPIs();
+  clvRenderNewVsReturning();
+  clvRenderCohort();
+  clvRenderRFM();
+  clvRenderTopCustomers();
+}
+
+function clvRenderKPIs() {
+  const t = clvData.totals;
+  // Estimated CAC from main dashboard meta spend
+  const totalMetaSpend = rows.reduce((s,r)=>s+(r.meta||0),0);
+  const estCAC   = t.newCusts > 0 && totalMetaSpend > 0 ? Math.round(totalMetaSpend / t.newCusts) : null;
+  const ltvCac   = estCAC && t.clv > 0 ? (t.clv / estCAC).toFixed(1) : null;
+
+  document.getElementById('clv-ltv').textContent      = clvFmt$(t.clv);
+  document.getElementById('clv-aov').textContent      = clvFmt$(t.aov);
+  document.getElementById('clv-aov-sub').textContent  = `${t.totalOrders} total orders`;
+  document.getElementById('clv-rpr').textContent      = t.repeatPurchaseRate + '%';
+  document.getElementById('clv-rpr-sub').textContent  = `${t.retCusts} of ${t.totalCustomers} customers`;
+  document.getElementById('clv-freq').textContent     = t.frequency.toFixed(2);
+  document.getElementById('clv-dbo').textContent      = t.avgDaysBetween ? Math.round(t.avgDaysBetween) + 'd' : '—';
+  document.getElementById('clv-dbo-big').textContent  = t.avgDaysBetween ? Math.round(t.avgDaysBetween) + ' days' : '—';
+
+  const ltvcacEl = document.getElementById('clv-ltvcac');
+  if (ltvCac) {
+    ltvcacEl.textContent     = ltvCac + ':1';
+    ltvcacEl.style.color     = parseFloat(ltvCac) >= 3 ? 'var(--green)' : parseFloat(ltvCac) >= 2 ? 'var(--gold)' : 'var(--red)';
+  } else {
+    ltvcacEl.textContent     = '—';
+    ltvcacEl.style.color     = 'var(--c3)';
+  }
+  ltvcacEl.closest('.clv-kpi').querySelector('.clv-kpi-sub').textContent =
+    estCAC ? `est. CAC: ${clvFmt$(estCAC)}` : 'add ad spend data';
+}
+
+function clvRenderNewVsReturning() {
+  const t = clvData.totals;
+  document.getElementById('clv-new-count').textContent = t.newCusts.toLocaleString();
+  document.getElementById('clv-new-rev').textContent   = clvFmt$(t.newRev);
+  document.getElementById('clv-new-aov').textContent   = clvFmt$(t.newAov);
+  document.getElementById('clv-ret-count').textContent = t.retCusts.toLocaleString();
+  document.getElementById('clv-ret-rev').textContent   = clvFmt$(t.retRev);
+  document.getElementById('clv-ret-aov').textContent   = clvFmt$(t.retAov);
+  document.getElementById('clv-ret-orders').textContent = t.frequency.toFixed(1);
+
+  const totalRev = t.newRev + t.retRev || 1;
+  const newPct   = Math.round(t.newRev / totalRev * 100);
+  const retPct   = 100 - newPct;
+  document.getElementById('clv-new-pct').textContent = newPct + '%';
+  document.getElementById('clv-ret-pct').textContent = retPct + '%';
+
+  // Draw donut on canvas
+  const canvas = document.getElementById('clv-split-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 60, cy = 60, r = 46, rInner = 28;
+  ctx.clearRect(0,0,120,120);
+  const data = [
+    { pct: newPct/100, color: '#4A7FC1' },
+    { pct: retPct/100, color: '#5A9E72' },
+  ];
+  let start = -Math.PI/2;
+  data.forEach(d => {
+    const end = start + d.pct * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = d.color;
+    ctx.fill();
+    start = end;
+  });
+  // Inner circle (donut hole)
+  ctx.beginPath();
+  ctx.arc(cx, cy, rInner, 0, 2*Math.PI);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  // Center label
+  ctx.fillStyle = '#1C1B18';
+  ctx.font = 'bold 14px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(retPct + '%', cx, cy);
+}
+
+function clvRenderCohort() {
+  const el = document.getElementById('clv-cohort-heatmap');
+  if (!el || !clvData) return;
+  const cohorts = clvData.cohorts;
+  if (!cohorts.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--c3);font-size:12px;padding:20px">No cohort data available</div>';
+    return;
+  }
+
+  // Build grid: rows = cohorts, cols = [Month Label, New Customers, Returned %, Status]
+  const heatColor = (pct) => {
+    const alpha = Math.min(pct / 50, 1); // 0–50% maps to 0–1 opacity
+    return `rgba(200,169,110,${0.1 + alpha * 0.85})`;
+  };
+  const textColor = (pct) => pct > 30 ? '#3a2800' : '#888';
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:0;overflow-x:auto">
+      <div style="flex-shrink:0">
+        <div style="height:28px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;padding-bottom:4px;white-space:nowrap;padding-right:8px">Cohort</div>
+        ${cohorts.map(c => `<div style="height:36px;display:flex;align-items:center;font-size:10px;color:var(--c3);font-family:var(--mono);white-space:nowrap;padding-right:8px">${c.month}</div>`).join('')}
+      </div>
+      <div style="flex-shrink:0">
+        <div style="height:28px;width:70px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">New Custs</div>
+        ${cohorts.map(c => `<div style="height:36px;width:70px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--c2);font-family:var(--mono);font-weight:600">${c.total}</div>`).join('')}
+      </div>
+      <div style="flex-shrink:0">
+        <div style="height:28px;width:80px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">Returned</div>
+        ${cohorts.map(c => `<div style="height:36px;width:80px;display:flex;align-items:center;justify-content:center">
+          <div style="width:64px;height:28px;border-radius:4px;background:${heatColor(c.retRate)};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);color:${textColor(c.retRate)};transition:transform .1s" title="${c.returners} of ${c.total} returned">
+            ${c.retRate.toFixed(0)}%
+          </div>
+        </div>`).join('')}
+      </div>
+      <div style="flex:1;min-width:120px">
+        <div style="height:28px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;padding-bottom:4px;padding-left:12px">Retention Rate Bar</div>
+        ${cohorts.map(c => `<div style="height:36px;display:flex;align-items:center;padding-left:12px">
+          <div style="flex:1;background:rgba(28,27,24,0.06);border-radius:3px;height:8px;overflow:hidden">
+            <div style="width:${Math.min(c.retRate*2,100)}%;height:100%;border-radius:3px;background:${heatColor(c.retRate)};border:1px solid rgba(200,169,110,0.4)"></div>
+          </div>
+          <span style="font-size:10px;color:var(--c3);font-family:var(--mono);margin-left:8px;width:30px">${c.total > 0 ? c.retRate.toFixed(0)+'%' : '—'}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function clvRenderRFM() {
+  const el = document.getElementById('clv-rfm-table');
+  if (!el || !clvData) return;
+  const summary = clvData.rfmSummary;
+
+  const segments = [
+    { key:'Champions',   emoji:'🏆', color:'#5A9E72', bg:'rgba(90,158,114,0.1)', action:'Reward with VIP perks, loyalty offers' },
+    { key:'Loyal',       emoji:'💛', color:'#C8A96E', bg:'rgba(200,169,110,0.1)', action:'Upsell, cross-sell, gather reviews' },
+    { key:'Promising',   emoji:'🌱', color:'#4A7FC1', bg:'rgba(74,127,193,0.1)', action:'Nurture toward 2nd & 3rd order' },
+    { key:'At-Risk',     emoji:'⚠️', color:'#E5A829', bg:'rgba(229,168,41,0.1)', action:'Win-back email, special discount' },
+    { key:'Hibernating', emoji:'😴', color:'#7E6DB5', bg:'rgba(126,109,181,0.1)', action:'Heavy offer, highlight new products' },
+    { key:'Lost',        emoji:'❌', color:'var(--red)', bg:'rgba(217,84,84,0.08)', action:'Minimal spend, consider sunsetting' },
+  ];
+
+  el.innerHTML = `
+    <div class="clv-rfm-head">
+      <div>Segment</div>
+      <div class="clv-rfm-num">Customers</div>
+      <div class="clv-rfm-num">Revenue</div>
+      <div class="clv-rfm-num">Avg Orders</div>
+      <div class="clv-rfm-num">Avg LTV</div>
+      <div style="text-align:left;padding-left:8px">Recommended Action</div>
+    </div>
+    ${segments.map(s => {
+      const d = summary[s.key] || { count:0, revenue:0, orders:0 };
+      const avgOrders = d.count > 0 ? (d.orders/d.count).toFixed(1) : '—';
+      const avgLtv    = d.count > 0 ? clvFmt$(d.revenue/d.count) : '—';
+      return `<div class="clv-rfm-row">
+        <div><span class="clv-rfm-badge" style="background:${s.bg};color:${s.color}">${s.emoji} ${s.key}</span></div>
+        <div class="clv-rfm-num" style="font-weight:600">${d.count.toLocaleString()}</div>
+        <div class="clv-rfm-num" style="color:var(--gold)">${d.count>0 ? clvFmt$(d.revenue) : '—'}</div>
+        <div class="clv-rfm-num">${avgOrders}</div>
+        <div class="clv-rfm-num" style="color:var(--green)">${avgLtv}</div>
+        <div style="font-size:11px;color:var(--c3);padding-left:8px">${s.action}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+function clvRenderTopCustomers() {
+  const el = document.getElementById('clv-top-table');
+  if (!el || !clvData) return;
+  const customers = clvData.topCustomers;
+  if (!customers.length) {
+    el.innerHTML = '<div style="padding:30px;text-align:center;color:var(--c3);font-size:12px">No customer data available</div>';
+    return;
+  }
+  const t = clvData.totals;
+  const avgInterval = t.avgDaysBetween || 90;
+
+  const segColor = { Champions:'var(--green)', Loyal:'var(--gold)', Promising:'#4A7FC1', 'At-Risk':'#E5A829', Hibernating:'#7E6DB5', Lost:'var(--red)' };
+  const statusIcon = (days) => days < avgInterval ? '🟢' : days < avgInterval*3 ? '🟡' : '🔴';
+
+  el.innerHTML = customers.map((c, i) => {
+    const color = segColor[c.segment] || 'var(--c3)';
+    return `<div class="clv-top-row">
+      <div style="flex:3;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name || c.email}</div>
+        <div style="font-size:10px;color:var(--c3);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.email}</div>
+      </div>
+      <div class="clv-top-num">${c.ordersCount}</div>
+      <div class="clv-top-num" style="color:var(--gold);font-weight:600">${clvFmt$(c.totalSpent)}</div>
+      <div class="clv-top-num">${clvFmt$(c.aov)}</div>
+      <div class="clv-top-num">${c.lastOrderDate}</div>
+      <div class="clv-top-num">${statusIcon(c.daysSinceLast)} ${c.daysSinceLast}d</div>
+      <div style="width:80px;text-align:center"><span style="font-size:10px;font-weight:700;color:${color};background:rgba(0,0,0,0.04);padding:2px 6px;border-radius:4px">${c.segment}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function clvExportCSV() {
+  if (!clvData) { toast('No data to export', 'err'); return; }
+  let csv = 'Name,Email,Orders,Total Spent,AOV,Last Order,Days Since Last,RFM Segment,R Score,F Score,M Score\n';
+  clvData.topCustomers.forEach(c => {
+    csv += `"${c.name}","${c.email}",${c.ordersCount},${c.totalSpent},${c.aov},${c.lastOrderDate},${c.daysSinceLast},${c.segment},${c.rScore},${c.fScore},${c.mScore}\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = `clv-customers-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('Customer data exported', 'ok');
+}
+let maData     = null; // { meta:{daily,total,campaigns}, storeRevByDate:{} }
+let maSortKey  = 'spend';
+let maSortDir  = -1;
+
+async function maSync() {
+  const btn  = document.getElementById('maSyncBtn');
+  const days = parseInt(document.getElementById('ma-range')?.value || 30);
+  const to   = new Date().toISOString().slice(0,10);
+  const from = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
+
+  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
+  maSetStatus(`⟳ Fetching marketing data for last ${days} days...`);
+
+  try {
+    // Fetch Meta Ads data (includes daily + campaigns)
+    const metaRes = await fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`);
+    let metaJson  = { platform:'meta', daily:[], total:{spend:0,revenue:0,roas:0,cpa:0,conversions:0,clicks:0,impressions:0,ctr:0}, campaigns:[] };
+    if (metaRes.ok) {
+      const d = await metaRes.json();
+      if (!d.error) metaJson = d;
+    }
+
+    // Build store revenue by date from main dashboard rows
+    const storeRevByDate = {};
+    rows.forEach(r => { storeRevByDate[r.date] = (storeRevByDate[r.date] || 0) + r.revenue; });
+    const totalStoreRev = rows.reduce((s,r) => s + r.revenue, 0);
+
+    maData = { meta: metaJson, storeRevByDate, totalStoreRev, from, to, days };
+    maRender();
+    maSetStatus(`✓ Meta: ${metaJson.campaigns.length} campaigns · ${metaJson.daily.length} days · ${from} → ${to}`);
+  } catch(e) {
+    maSetStatus(`✗ ${e.message}`, true);
+  } finally {
+    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
+  }
+}
+
+function maSetStatus(msg, isErr=false) {
+  const el = document.getElementById('ma-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
+  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
+  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
+  el.textContent = msg;
+}
+
+const maFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
+const maFmtK = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n);
+
+function maRender() {
+  if (!maData) return;
+  maRenderKPIs();
+  maRenderChannels();
+  maRenderTrend();
+  maRenderAllocation();
+  maRenderCampaigns();
+  maRenderDailyTable();
+}
+
+function maRenderKPIs() {
+  const t   = maData.meta.total;
+  const rev = maData.totalStoreRev || 0;
+  const mer = t.spend > 0 ? (rev / t.spend) : 0;
+
+  document.getElementById('ma-spend').textContent    = maFmt$(t.spend);
+  document.getElementById('ma-spend-sub').textContent = `Meta: ${maFmt$(t.spend)}`;
+  document.getElementById('ma-revenue').textContent   = maFmt$(t.revenue);
+  document.getElementById('ma-revenue-sub').textContent = 'Meta-attributed';
+  document.getElementById('ma-roas').textContent      = t.roas > 0 ? t.roas.toFixed(2)+'×' : '—';
+  document.getElementById('ma-roas').style.color      = t.roas >= 3 ? 'var(--green)' : t.roas >= 2 ? '#4A7FC1' : 'var(--red)';
+  document.getElementById('ma-mer').textContent       = mer > 0 ? mer.toFixed(2)+'×' : '—';
+  document.getElementById('ma-mer').style.color       = mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
+  document.getElementById('ma-cpa').textContent       = t.cpa > 0 ? maFmt$(t.cpa) : '—';
+  document.getElementById('ma-cpa-sub').textContent   = `${t.conversions} conversions`;
+  document.getElementById('ma-conv').textContent      = t.conversions.toLocaleString();
+  document.getElementById('ma-conv-sub').textContent  = `${t.clicks.toLocaleString()} clicks`;
+
+  // MER gauge
+  const merBig = document.getElementById('ma-mer-big');
+  const merBar = document.getElementById('ma-mer-bar');
+  if (merBig) {
+    merBig.textContent  = mer > 0 ? mer.toFixed(2)+'×' : '—';
+    merBig.style.color  = mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
+  }
+  if (merBar) {
+    const pct = Math.min(mer / 6 * 100, 100);
+    merBar.style.width      = pct + '%';
+    merBar.style.background = mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
+  }
+}
+
+function maRenderChannels() {
+  const t = maData.meta.total;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('ma-meta-spend',  maFmt$(t.spend));
+  set('ma-meta-rev',    t.revenue > 0 ? maFmt$(t.revenue) : '—');
+  set('ma-meta-roas',   t.roas > 0 ? t.roas.toFixed(2)+'×' : '—');
+  set('ma-meta-cpa',    t.cpa > 0 ? maFmt$(t.cpa) : '—');
+  set('ma-meta-conv',   t.conversions.toLocaleString());
+  set('ma-meta-clicks', maFmtK(t.clicks));
+  set('ma-meta-impr',   maFmtK(t.impressions));
+  set('ma-meta-ctr',    t.ctr > 0 ? t.ctr.toFixed(2)+'%' : t.impressions > 0 ? (t.clicks/t.impressions*100).toFixed(2)+'%' : '—');
+
+  // Google stub — use rows data
+  const googleSpend = rows.reduce((s,r) => s + (r.google||0), 0);
+  set('ma-google-spend', googleSpend > 0 ? maFmt$(googleSpend) : '—');
+}
+
+function maRenderTrend() {
+  const el = document.getElementById('ma-trend-chart');
+  if (!el || !maData) return;
+  const daily    = maData.meta.daily;
+  const storeRev = maData.storeRevByDate;
+  if (!daily.length && !Object.keys(storeRev).length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--c3);font-size:12px;padding:55px 0">No data available</div>';
+    return;
+  }
+
+  // Merge all dates from both sources
+  const allDates = [...new Set([...daily.map(d=>d.date), ...Object.keys(storeRev)])].sort();
+  if (!allDates.length) return;
+  const spendMap = {};
+  daily.forEach(d => { spendMap[d.date] = d.spend; });
+
+  const H = 140, W = el.offsetWidth || 700, pad = 24;
+  const vals     = allDates.map(d => ({ date:d, rev: storeRev[d]||0, spend: spendMap[d]||0 }));
+  const maxVal   = Math.max(...vals.map(v => Math.max(v.rev, v.spend)), 1);
+  const xPos     = (i) => pad + (i / Math.max(vals.length-1, 1)) * (W - pad*2);
+  const yPos     = (v) => H - 12 - (v / maxVal) * (H - 24);
+
+  const path = (key, color) => {
+    const pts = vals.map((v,i) => `${i===0?'M':'L'} ${xPos(i).toFixed(1)} ${yPos(v[key]).toFixed(1)}`).join(' ');
+    const fill = `${pts} L ${xPos(vals.length-1).toFixed(1)} ${H} L ${xPos(0).toFixed(1)} ${H} Z`;
+    return `<path d="${fill}" fill="${color}" opacity="0.07"/>
+            <path d="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  };
+
+  // Date labels
+  const step = Math.max(1, Math.floor(vals.length / 7));
+  const labels = vals.filter((_,i) => i % step === 0 || i === vals.length-1).map((v,_,arr) => {
+    const i   = vals.indexOf(v);
+    const lbl = v.date.slice(5); // MM-DD
+    return `<text x="${xPos(i).toFixed(1)}" y="${H+4}" text-anchor="middle" font-size="9" font-family="monospace" fill="#aaa">${lbl}</text>`;
+  }).join('');
+
+  el.innerHTML = `<svg width="100%" height="${H+16}" viewBox="0 0 ${W} ${H+16}" preserveAspectRatio="none">
+    ${path('rev',   '#C8A96E')}
+    ${path('spend', '#D95454')}
+    ${labels}
+  </svg>`;
+}
+
+function maRenderAllocation() {
+  const el = document.getElementById('ma-allocation');
+  if (!el || !maData) return;
+  const t           = maData.meta.total;
+  const googleSpend = rows.reduce((s,r) => s + (r.google||0), 0);
+  const msSpend     = rows.reduce((s,r) => s + (r.ms||0), 0);
+  const totalSpend  = t.spend + googleSpend + msSpend || 1;
+
+  const channels = [
+    { name:'Meta Ads',      spend:t.spend,     color:'#1877F2' },
+    { name:'Google Ads',    spend:googleSpend, color:'#4285F4' },
+    { name:'Microsoft Ads', spend:msSpend,     color:'#0072CE' },
+  ].filter(c => c.spend > 0 || c.name === 'Meta Ads');
+
+  el.innerHTML = channels.map(c => {
+    const pct = (c.spend / totalSpend * 100).toFixed(1);
+    return `<div class="ma-alloc-row">
+      <div class="ma-alloc-label">
+        <span class="ma-alloc-name" style="color:${c.color}">${c.name}</span>
+        <span class="ma-alloc-pct">${pct}% · ${maFmt$(c.spend)}</span>
+      </div>
+      <div class="ma-alloc-bar-wrap">
+        <div class="ma-alloc-bar" style="width:${pct}%;background:${c.color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function maSort(key) {
+  if (maSortKey === key) maSortDir *= -1;
+  else { maSortKey = key; maSortDir = -1; }
+  ['spend','revenue','roas'].forEach(k => {
+    document.getElementById(`ma-sort-${k}`)?.classList.toggle('pa-view-active', k === key);
+  });
+  maRenderCampaigns();
+}
+
+function maRenderCampaigns() {
+  const el = document.getElementById('ma-campaign-table');
+  if (!el || !maData) return;
+  const camps = [...(maData.meta.campaigns || [])].sort((a,b) => (a[maSortKey]-b[maSortKey]) * maSortDir);
+
+  if (!camps.length) {
+    el.innerHTML = `<div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">
+      No campaign data — Meta Ads API may need campaign-level access or the account has no active campaigns in this period.
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = camps.map(c => {
+    const roasColor = c.roas >= 3 ? 'var(--green)' : c.roas >= 1.86 ? 'var(--gold)' : 'var(--red)';
+    const ctrPct    = c.impressions > 0 ? (c.clicks/c.impressions*100).toFixed(2)+'%' : c.ctr > 0 ? c.ctr.toFixed(2)+'%' : '—';
+    return `<div class="ma-camp-row">
+      <div class="ma-camp-name" title="${c.name}">${c.name}</div>
+      <div class="ma-camp-num" style="color:var(--red)">${maFmt$(c.spend)}</div>
+      <div class="ma-camp-num" style="color:var(--green)">${c.revenue > 0 ? maFmt$(c.revenue) : '—'}</div>
+      <div class="ma-camp-num" style="color:${roasColor};font-weight:600">${c.roas > 0 ? c.roas.toFixed(2)+'×' : '—'}</div>
+      <div class="ma-camp-num">${c.cpa > 0 ? maFmt$(c.cpa) : '—'}</div>
+      <div class="ma-camp-num">${c.conversions || '—'}</div>
+      <div class="ma-camp-num">${maFmtK(c.clicks)}</div>
+      <div class="ma-camp-num">${ctrPct}</div>
+    </div>`;
+  }).join('');
+}
+
+function maRenderDailyTable() {
+  const el = document.getElementById('ma-daily-table');
+  if (!el || !maData) return;
+  const daily    = maData.meta.daily;
+  const storeRev = maData.storeRevByDate;
+  const allDates = [...new Set([...daily.map(d=>d.date), ...Object.keys(storeRev)])].sort().reverse();
+  const spendMap = {};
+  daily.forEach(d => { spendMap[d.date] = d; });
+
+  el.innerHTML = `<div class="ma-daily-head">
+    <div>Date</div>
+    <div style="text-align:right">Meta Spend</div>
+    <div style="text-align:right">Store Revenue</div>
+    <div style="text-align:right">MER</div>
+    <div style="text-align:right">Conv.</div>
+  </div>
+  ${allDates.map(date => {
+    const d   = spendMap[date] || { spend:0, conversions:0 };
+    const rev = storeRev[date] || 0;
+    const mer = d.spend > 0 ? (rev / d.spend) : null;
+    const merColor = !mer ? 'var(--c3)' : mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
+    return `<div class="ma-daily-row">
+      <div style="color:var(--c2)">${date}</div>
+      <div style="text-align:right;color:var(--red)">${d.spend > 0 ? maFmt$(d.spend) : '—'}</div>
+      <div style="text-align:right;color:var(--gold)">${rev > 0 ? maFmt$(rev) : '—'}</div>
+      <div style="text-align:right;font-weight:600;color:${merColor}">${mer !== null ? mer.toFixed(2)+'×' : '—'}</div>
+      <div style="text-align:right;color:var(--c3)">${d.conversions || '—'}</div>
+    </div>`;
+  }).join('')}`;
+}
+
+function maExportCSV() {
+  if (!maData) { toast('No data to export', 'err'); return; }
+  // Daily export
+  let csv = 'Date,Meta Spend,Meta Revenue,Meta ROAS,Meta CPA,Meta Conversions,Meta Clicks,Store Revenue,MER\n';
+  const daily    = maData.meta.daily;
+  const storeRev = maData.storeRevByDate;
+  const allDates = [...new Set([...daily.map(d=>d.date), ...Object.keys(storeRev)])].sort();
+  const spendMap = {};
+  daily.forEach(d => { spendMap[d.date] = d; });
+  allDates.forEach(date => {
+    const d   = spendMap[date] || { spend:0, revenue:0, roas:0, cpa:0, conversions:0, clicks:0 };
+    const rev = storeRev[date] || 0;
+    const mer = d.spend > 0 ? (rev/d.spend).toFixed(2) : '';
+    csv += `${date},${d.spend},${d.revenue},${d.roas},${d.cpa},${d.conversions},${d.clicks},${rev},${mer}\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = `marketing-attribution-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('Marketing data exported', 'ok');
+}
+let plData        = null;
+let plGranularity = 'daily'; // daily | weekly | monthly
+
+async function plSync() {
+  const btn    = document.getElementById('plSyncBtn');
+  const days   = parseInt(document.getElementById('pl-range')?.value || 30);
+  const to     = new Date().toISOString().slice(0,10);
+  const from   = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
+
+  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
+  plSetStatus(`⟳ Fetching P&L data for last ${days} days...`);
+
+  try {
+    const feeParams = getFeeParams();
+    const r = await fetch(`${PROXY}?service=shopify&action=pnl&from=${from}&to=${to}&${feeParams}`);
+    if (!r.ok) { const e = await r.json().catch(()=>({})); plSetStatus(`✗ Error: ${e.error || r.status}`, true); return; }
+    plData = await r.json();
+
+    // Inject meta ad spend into daily from main dashboard rows if available
+    if (rows.length && isLiveData) {
+      const metaByDate = {};
+      rows.forEach(r => { metaByDate[r.date] = r.meta || 0; });
+      plData.daily.forEach(d => { d.adSpend = metaByDate[d.date] || 0; });
+      // Recalculate totals with ad spend
+      plData.totals.adSpend       = plData.daily.reduce((s,d) => s + d.adSpend, 0);
+      plData.totals.contribMargin = plData.daily.reduce((s,d) => s + (d.grossProfit - d.txFee - d.adSpend), 0);
+      plData.totals.netProfit     = plData.totals.contribMargin;
+      const nr = plData.totals.netRevenue || 1;
+      plData.totals.contribPct  = Math.round(plData.totals.contribMargin / nr * 10000) / 100;
+      plData.totals.netMargin   = Math.round(plData.totals.netProfit / nr * 10000) / 100;
+      plData.totals.totalCosts  = Math.round((plData.totals.cogs + plData.totals.txFee + plData.totals.adSpend) * 100) / 100;
+      plData.totals.costPct     = Math.round(plData.totals.totalCosts / nr * 10000) / 100;
+    }
+
+    plRender();
+    plSetStatus(`✓ ${plData.total_orders} orders · ${from} → ${to}`);
+  } catch(e) {
+    plSetStatus(`✗ ${e.message}`, true);
+  } finally {
+    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
+  }
+}
+
+function plSetStatus(msg, isErr=false) {
+  const el = document.getElementById('pl-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
+  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
+  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
+  el.textContent = msg;
+}
+
+function plSetGranularity(g) {
+  plGranularity = g;
+  ['daily','weekly','monthly'].forEach(k => {
+    document.getElementById(`pl-g-${k}`)?.classList.toggle('pl-gran-active', k === g);
+  });
+  const titles = {daily:'Daily P&L Breakdown', weekly:'Weekly P&L Breakdown', monthly:'Monthly P&L Breakdown'};
+  const el = document.getElementById('pl-table-title');
+  if (el) el.textContent = titles[g];
+  if (plData) { plRenderTrend(); plRenderPeriodTable(); }
+}
+
+function plRender() {
+  if (!plData) return;
+  plRenderKPIs();
+  plRenderWaterfall();
+  plRenderComparison();
+  plRenderTrend();
+  plRenderIncomeStatement();
+  plRenderCostBreakdown();
+  plRenderPeriodTable();
+}
+
+const plFmt$ = n => {
+  const abs = Math.abs(parseFloat(n)||0);
+  const s   = '$' + abs.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return n < 0 ? `(${s})` : s;
+};
+const plFmtPct = n => `${parseFloat(n).toFixed(1)}%`;
+
+function plRenderKPIs() {
+  const t = plData.totals;
+  document.getElementById('pl-gross-rev').textContent     = plFmt$(t.grossSales);
+  document.getElementById('pl-gross-rev-sub').textContent = `${t.orders} orders`;
+  document.getElementById('pl-net-rev').textContent       = plFmt$(t.netRevenue);
+  document.getElementById('pl-net-rev-sub').textContent   = `−${plFmt$(t.discounts + t.refundAmt)} discounts & refunds`;
+  document.getElementById('pl-gross-profit').textContent  = plFmt$(t.grossProfit);
+  document.getElementById('pl-gross-margin').textContent  = `${t.grossMargin?.toFixed(1)}% gross margin`;
+  document.getElementById('pl-contrib').textContent       = plFmt$(t.contribMargin);
+  document.getElementById('pl-contrib-pct').textContent   = `${t.contribPct?.toFixed(1)}% of revenue`;
+  document.getElementById('pl-net-profit').textContent    = plFmt$(t.netProfit);
+  document.getElementById('pl-net-profit').style.color    = t.netProfit >= 0 ? 'var(--gold)' : 'var(--red)';
+  document.getElementById('pl-net-margin').textContent    = `${t.netMargin?.toFixed(1)}% net margin`;
+  document.getElementById('pl-total-costs').textContent   = plFmt$(t.totalCosts);
+  document.getElementById('pl-cost-pct').textContent      = `${t.costPct?.toFixed(1)}% of revenue`;
+}
+
+function plRenderWaterfall() {
+  const el = document.getElementById('pl-waterfall');
+  if (!el || !plData) return;
+  const t   = plData.totals;
+  const max = t.grossSales || 1;
+
+  const steps = [
+    { label:'Gross Revenue',      val: t.grossSales,    color:'var(--gold)',    type:'start' },
+    { label:'− Discounts',        val:-t.discounts,     color:'var(--red)',     type:'neg' },
+    { label:'− Refunds',          val:-t.refundAmt,     color:'var(--red)',     type:'neg' },
+    { label:'= Net Revenue',      val: t.netRevenue,    color:'#4A7FC1',        type:'sub' },
+    { label:'− COGS',             val:-t.cogs,          color:'#7E6DB5',        type:'neg' },
+    { label:'= Gross Profit',     val: t.grossProfit,   color:'#4A7FC1',        type:'sub' },
+    { label:'− Ad Spend',         val:-t.adSpend,       color:'var(--red)',     type:'neg' },
+    { label:'− Transaction Fees', val:-t.txFee,         color:'#C8A96E',        type:'neg' },
+    { label:'= Net Profit',       val: t.netProfit,     color: t.netProfit>=0 ? 'var(--green)' : 'var(--red)', type:'total' },
+  ];
+
+  el.innerHTML = steps.map(s => {
+    const pct   = Math.abs(s.val) / max * 100;
+    const w     = Math.max(pct, 1).toFixed(1);
+    const isSub = s.type === 'sub' || s.type === 'total';
+    const pctLabel = t.grossSales > 0 ? ((s.val / t.grossSales) * 100).toFixed(1) + '%' : '';
+    return `
+      <div class="pl-wf-row${isSub ? ' pl-wf-subtotal' : ''}">
+        <div class="${isSub?'pl-wf-subtotal-label':'pl-wf-label'}">${s.label}</div>
+        <div class="pl-wf-bar-wrap">
+          <div class="pl-wf-bar" style="width:${w}%;background:${s.color};opacity:${isSub?1:.85}">
+            ${Math.abs(s.val) > max*0.08 ? plFmt$(s.val) : ''}
+          </div>
+        </div>
+        <div class="pl-wf-val" style="color:${s.val<0?'var(--red)':'var(--c2)'}">${plFmt$(s.val)}</div>
+        <div class="pl-wf-pct">${pctLabel}</div>
+      </div>`;
+  }).join('');
+}
+
+function plRenderComparison() {
+  const el = document.getElementById('pl-comparison');
+  if (!el || !plData) return;
+  const daily = plData.daily;
+  if (!daily.length) { el.innerHTML = '<div style="padding:30px;text-align:center;color:var(--c3);font-size:12px">No data</div>'; return; }
+
+  // Split into two halves for comparison
+  const mid  = Math.floor(daily.length / 2);
+  const curr = daily.slice(mid);
+  const prev = daily.slice(0, mid);
+  const sum  = arr => ({
+    grossSales:   arr.reduce((s,d) => s+d.grossSales,0),
+    netRevenue:   arr.reduce((s,d) => s+d.netRevenue,0),
+    cogs:         arr.reduce((s,d) => s+d.cogs,0),
+    grossProfit:  arr.reduce((s,d) => s+d.grossProfit,0),
+    adSpend:      arr.reduce((s,d) => s+d.adSpend,0),
+    txFee:        arr.reduce((s,d) => s+d.txFee,0),
+    netProfit:    arr.reduce((s,d) => s+d.netProfit,0),
+  });
+  const c = sum(curr), p = sum(prev);
+  const chg = (c, p) => {
+    if (!p) return '—';
+    const pct = ((c-p)/Math.abs(p)*100).toFixed(1);
+    const col = c >= p ? 'var(--green)' : 'var(--red)';
+    const arrow = c >= p ? '▲' : '▼';
+    return `<span style="color:${col};font-family:var(--mono);font-size:11px">${arrow} ${Math.abs(pct)}%</span>`;
+  };
+  const prevLabel = prev.length ? `${prev[0].date} – ${prev[prev.length-1].date}` : 'Prev';
+  const currLabel = curr.length ? `${curr[0].date} – ${curr[curr.length-1].date}` : 'Curr';
+
+  const rows = [
+    { label:'Gross Revenue',   c:c.grossSales,  p:p.grossSales,  section:'REVENUE' },
+    { label:'Net Revenue',     c:c.netRevenue,  p:p.netRevenue },
+    { label:'COGS',            c:-c.cogs,       p:-p.cogs,         section:'COSTS', neg:true },
+    { label:'Ad Spend',        c:-c.adSpend,    p:-p.adSpend,      neg:true },
+    { label:'Transaction Fees',c:-c.txFee,      p:-p.txFee,        neg:true },
+    { label:'Gross Profit',    c:c.grossProfit, p:p.grossProfit,   section:'PROFIT', bold:true },
+    { label:'Net Profit',      c:c.netProfit,   p:p.netProfit,     bold:true },
+  ];
+
+  el.innerHTML = `
+    <div class="pl-comp-header">
+      <div>Line Item</div>
+      <div class="pl-comp-num">${currLabel}</div>
+      <div class="pl-comp-num">${prevLabel}</div>
+      <div class="pl-comp-num">Change $</div>
+      <div class="pl-comp-num">Change %</div>
+    </div>
+    ${rows.map(r => `
+      ${r.section ? `<div class="pl-comp-section">${r.section}</div>` : ''}
+      <div class="pl-comp-row${r.bold?' pl-comp-subtotal':''}">
+        <div style="color:var(--c2)">${r.label}</div>
+        <div class="pl-comp-num" style="color:${r.neg?'var(--red)':'var(--c1)'};font-family:var(--mono)">${plFmt$(r.c)}</div>
+        <div class="pl-comp-num" style="color:var(--c3);font-family:var(--mono)">${plFmt$(r.p)}</div>
+        <div class="pl-comp-num" style="font-family:var(--mono);color:${r.c>=r.p?'var(--green)':'var(--red)'}">${plFmt$(r.c - r.p)}</div>
+        <div class="pl-comp-num">${chg(r.c, r.p)}</div>
+      </div>`).join('')}`;
+}
+
+function plGroupDaily(daily) {
+  if (plGranularity === 'daily') return daily;
+  const groups = {};
+  daily.forEach(d => {
+    let key;
+    const dt = new Date(d.date + 'T00:00:00');
+    if (plGranularity === 'weekly') {
+      const dayOfWeek = dt.getDay();
+      const monday    = new Date(dt); monday.setDate(dt.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+      key = monday.toISOString().slice(0,10);
+    } else {
+      key = d.date.slice(0,7); // YYYY-MM
+    }
+    if (!groups[key]) groups[key] = { date:key, orders:0, grossSales:0, discounts:0, refundAmt:0, netRevenue:0, cogs:0, grossProfit:0, adSpend:0, txFee:0, netProfit:0 };
+    const g = groups[key];
+    ['orders','grossSales','discounts','refundAmt','netRevenue','cogs','grossProfit','adSpend','txFee','netProfit'].forEach(k => { g[k] += d[k]||0; });
+  });
+  return Object.values(groups).sort((a,b) => a.date.localeCompare(b.date));
+}
+
+function plRenderTrend() {
+  const el = document.getElementById('pl-trend-chart');
+  if (!el || !plData) return;
+  const periods = plGroupDaily(plData.daily);
+  if (!periods.length) { el.innerHTML = '<div style="text-align:center;color:var(--c3);font-size:12px;padding:50px 0">No data</div>'; return; }
+
+  const H = 130, W = el.offsetWidth || 700;
+  const maxVal = Math.max(...periods.map(p => p.grossSales), 1);
+  const pts    = (key, color) => periods.map((p, i) => {
+    const x = (i / Math.max(periods.length - 1, 1)) * (W - 40) + 20;
+    const y = H - 10 - ((p[key] || 0) / maxVal) * (H - 20);
+    return { x, y, val: p[key] || 0 };
+  });
+
+  const line = (pts, color, fill=false) => {
+    const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const fillPath = fill ? `${d} L ${pts[pts.length-1].x.toFixed(1)} ${H} L ${pts[0].x.toFixed(1)} ${H} Z` : '';
+    return `${fill ? `<path d="${fillPath}" fill="${color}" opacity="0.06"/>` : ''}<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  };
+
+  const revPts    = pts('grossSales',  '#C8A96E');
+  const gpPts     = pts('grossProfit', '#4A7FC1');
+  const npPts     = pts('netProfit',   '#5A9E72');
+
+  // Date labels (show max 6)
+  const step  = Math.max(1, Math.floor(periods.length / 6));
+  const labels = periods.filter((_, i) => i % step === 0 || i === periods.length - 1)
+    .map(p => {
+      const i = periods.indexOf(p);
+      const x = (i / Math.max(periods.length - 1, 1)) * (W - 40) + 20;
+      const lbl = plGranularity === 'monthly' ? p.date.slice(0,7) : p.date.slice(5);
+      return `<text x="${x.toFixed(1)}" y="${H+2}" text-anchor="middle" font-size="9" font-family="monospace" fill="#888">${lbl}</text>`;
+    }).join('');
+
+  el.innerHTML = `<svg width="100%" height="${H+14}" viewBox="0 0 ${W} ${H+14}" preserveAspectRatio="none">
+    ${line(revPts, '#C8A96E', true)}
+    ${line(gpPts,  '#4A7FC1', true)}
+    ${line(npPts,  '#5A9E72', true)}
+    ${labels}
+  </svg>`;
+}
+
+function plRenderIncomeStatement() {
+  const el = document.getElementById('pl-income-statement');
+  if (!el || !plData) return;
+  const t  = plData.totals;
+  const nr = t.netRevenue || 1;
+  const pct = n => `${(n/nr*100).toFixed(1)}%`;
+  const row = (label, val, cls='', bold=false) => {
+    const isNeg = val < 0;
+    const color = isNeg ? 'var(--red)' : label.includes('Profit') || label.includes('Margin') ? 'var(--green)' : 'var(--c1)';
+    return `<div class="pl-is-row ${cls}" style="${bold?'font-weight:700':''}">
+      <div style="color:var(--c2)">${label}</div>
+      <div class="pl-is-num" style="color:${color}">${plFmt$(val)}</div>
+      <div class="pl-is-pct">${pct(val)}</div>
+    </div>`;
+  };
+
+  el.innerHTML = `
+    <div class="pl-comp-header" style="grid-template-columns:1.6fr 1fr 80px">
+      <div>Line Item</div><div class="pl-comp-num">Amount</div><div class="pl-comp-num">% Rev</div>
+    </div>
+    <div class="pl-is-section">REVENUE</div>
+    ${row('Gross Sales',         t.grossSales)}
+    ${row('− Discounts',        -t.discounts, '', false)}
+    ${row('− Refunds',          -t.refundAmt, '', false)}
+    <div class="pl-is-row subtotal">
+      <div>= NET REVENUE</div>
+      <div class="pl-is-num" style="color:#4A7FC1">${plFmt$(t.netRevenue)}</div>
+      <div class="pl-is-pct">100.0%</div>
+    </div>
+    <div class="pl-is-section">COST OF GOODS SOLD</div>
+    ${row('− Product Cost (COGS)', -t.cogs)}
+    <div class="pl-is-row subtotal">
+      <div>= GROSS PROFIT</div>
+      <div class="pl-is-num" style="color:#4A7FC1">${plFmt$(t.grossProfit)}</div>
+      <div class="pl-is-pct" style="color:#4A7FC1">${t.grossMargin?.toFixed(1)}%</div>
+    </div>
+    <div class="pl-is-section">VARIABLE COSTS</div>
+    ${row('− Ad Spend',          -t.adSpend)}
+    ${row('− Transaction Fees',  -t.txFee)}
+    ${row('− Shipping Charged',  -t.shippingCharged || 0)}
+    <div class="pl-is-row subtotal">
+      <div>= CONTRIBUTION MARGIN</div>
+      <div class="pl-is-num" style="color:var(--green)">${plFmt$(t.contribMargin)}</div>
+      <div class="pl-is-pct" style="color:var(--green)">${t.contribPct?.toFixed(1)}%</div>
+    </div>
+    <div class="pl-is-row total">
+      <div>NET PROFIT</div>
+      <div class="pl-is-num" style="color:${t.netProfit>=0?'var(--gold)':'var(--red)'}">${plFmt$(t.netProfit)}</div>
+      <div class="pl-is-pct" style="color:${t.netProfit>=0?'var(--gold)':'var(--red)'}">${t.netMargin?.toFixed(1)}%</div>
+    </div>`;
+}
+
+function plRenderCostBreakdown() {
+  const el = document.getElementById('pl-cost-breakdown');
+  if (!el || !plData) return;
+  const t  = plData.totals;
+  const nr = t.netRevenue || 1;
+  const costs = [
+    { name:'COGS',             val:t.cogs,             color:'#7E6DB5' },
+    { name:'Ad Spend',         val:t.adSpend,          color:'var(--red)' },
+    { name:'Transaction Fees', val:t.txFee,            color:'#C8A96E' },
+    { name:'Shipping',         val:t.shippingCharged||0, color:'#4A7FC1' },
+  ].filter(c => c.val > 0);
+  const maxCost = Math.max(...costs.map(c => c.val), 1);
+
+  el.innerHTML = costs.map(c => {
+    const pct = (c.val / nr * 100).toFixed(1);
+    const w   = (c.val / maxCost * 100).toFixed(1);
+    return `<div class="pl-cb-row">
+      <div class="pl-cb-label">
+        <span class="pl-cb-name">${c.name}</span>
+        <span class="pl-cb-pct">${pct}% of revenue &nbsp; ${plFmt$(c.val)}</span>
+      </div>
+      <div class="pl-cb-bar-wrap"><div class="pl-cb-bar" style="width:${w}%;background:${c.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function plRenderPeriodTable() {
+  const el = document.getElementById('pl-period-table');
+  if (!el || !plData) return;
+  const periods = plGroupDaily(plData.daily);
+  const cols = 'grid-template-columns:110px 60px 1fr 1fr 1fr 1fr 1fr 1fr 90px';
+
+  el.innerHTML = `<div class="pl-pt-wrap">
+    <div class="pl-pt-head" style="${cols}">
+      <div>Date</div><div style="text-align:right">Orders</div>
+      <div style="text-align:right">Revenue</div>
+      <div style="text-align:right">Net Rev</div>
+      <div style="text-align:right">COGS</div>
+      <div style="text-align:right">Gross Profit</div>
+      <div style="text-align:right">Ad Spend</div>
+      <div style="text-align:right">Tx Fees</div>
+      <div style="text-align:right">Net Profit</div>
+    </div>
+    ${periods.map(p => {
+      const gm = p.netRevenue > 0 ? (p.grossProfit/p.netRevenue*100).toFixed(0) : 0;
+      const nm = p.netRevenue > 0 ? (p.netProfit/p.netRevenue*100).toFixed(0) : 0;
+      return `<div class="pl-pt-row" style="${cols}">
+        <div style="color:var(--c2)">${p.date}</div>
+        <div style="text-align:right;color:var(--c3)">${p.orders}</div>
+        <div style="text-align:right;color:var(--gold)">${plFmt$(p.grossSales)}</div>
+        <div style="text-align:right;color:var(--c2)">${plFmt$(p.netRevenue)}</div>
+        <div style="text-align:right;color:#7E6DB5">${p.cogs>0?plFmt$(p.cogs):'—'}</div>
+        <div style="text-align:right;color:#4A7FC1">${plFmt$(p.grossProfit)} <span style="color:var(--c3)">${gm}%</span></div>
+        <div style="text-align:right;color:var(--red)">${p.adSpend>0?plFmt$(p.adSpend):'—'}</div>
+        <div style="text-align:right;color:var(--c3)">${plFmt$(p.txFee)}</div>
+        <div style="text-align:right;color:${p.netProfit>=0?'var(--green)':'var(--red)'};font-weight:600">${plFmt$(p.netProfit)} <span style="font-weight:400;color:var(--c3)">${nm}%</span></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function plExportCSV() {
+  if (!plData) { toast('No data to export', 'err'); return; }
+  const periods = plGroupDaily(plData.daily);
+  let csv = 'Date,Orders,Gross Sales,Discounts,Refunds,Net Revenue,COGS,Gross Profit,Gross Margin%,Ad Spend,Tx Fees,Net Profit,Net Margin%\n';
+  periods.forEach(p => {
+    const gm = p.netRevenue > 0 ? (p.grossProfit/p.netRevenue*100).toFixed(2) : 0;
+    const nm = p.netRevenue > 0 ? (p.netProfit/p.netRevenue*100).toFixed(2) : 0;
+    csv += `${p.date},${p.orders},${p.grossSales},${p.discounts||0},${p.refundAmt||0},${p.netRevenue},${p.cogs},${p.grossProfit},${gm}%,${p.adSpend},${p.txFee},${p.netProfit},${nm}%\n`;
+  });
+  // Totals row
+  const t = plData.totals;
+  csv += `TOTAL,${t.orders},${t.grossSales},${t.discounts},${t.refundAmt},${t.netRevenue},${t.cogs},${t.grossProfit},${t.grossMargin}%,${t.adSpend},${t.txFee},${t.netProfit},${t.netMargin}%\n`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = `pnl-report-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('P&L exported to CSV', 'ok');
+}
+let paData       = null; // full API response
+let paSortKey    = 'revenue';
+let paSortDir    = -1; // -1 = desc
+let paViewMode   = 'revenue'; // revenue | units | margin
+
+async function paSync() {
+  const btn    = document.getElementById('paSyncBtn');
+  const status = document.getElementById('pa-status');
+  const days   = parseInt(document.getElementById('pa-range')?.value || 30);
+  const to     = new Date().toISOString().slice(0,10);
+  const from   = new Date(Date.now() - (days-1)*86400000).toISOString().slice(0,10);
+
+  if (btn) { btn.textContent = '⟳ LOADING...'; btn.disabled = true; }
+  paSetStatus(`⟳ Fetching product data for last ${days} days...`);
+
+  try {
+    const feeParams = getFeeParams();
+    const r  = await fetch(`${PROXY}?service=shopify&action=product-analytics&from=${from}&to=${to}&${feeParams}`);
+    if (!r.ok) {
+      const e = await r.json().catch(()=>({}));
+      paSetStatus(`✗ Error: ${e.error || r.status}`, true);
+      return;
+    }
+    paData = await r.json();
+    paRender();
+    paSetStatus(`✓ ${paData.total_products} products · ${paData.total_variants} variants · ${paData.totals.orders} orders · ${from} → ${to}`);
+  } catch(e) {
+    paSetStatus(`✗ ${e.message}`, true);
+  } finally {
+    if (btn) { btn.textContent = '⟳ REFRESH'; btn.disabled = false; }
+  }
+}
+
+function paSetStatus(msg, isErr=false) {
+  const el = document.getElementById('pa-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
+  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
+  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
+  el.textContent = msg;
+}
+
+function paRender() {
+  if (!paData) return;
+  paRenderKPIs();
+  paRenderTable();
+  paRenderABC();
+  paRenderInventory();
+  paRenderMix();
+  paRenderVariants();
+}
+
+const paFmt$ = n => '$' + Math.abs(n).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+const paFmtN = n => n.toLocaleString('en-AU');
+
+function paRenderKPIs() {
+  const t = paData.totals;
+  document.getElementById('pa-revenue').textContent    = paFmt$(t.revenue);
+  document.getElementById('pa-revenue-sub').textContent = `${paData.total_products} products`;
+  document.getElementById('pa-units').textContent      = paFmtN(t.units);
+  document.getElementById('pa-units-sub').textContent  = `${paFmtN(t.orders)} orders`;
+  document.getElementById('pa-aov').textContent        = paFmt$(t.aov);
+  document.getElementById('pa-profit').textContent     = paFmt$(t.profit);
+  document.getElementById('pa-profit').style.color     = t.profit >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('pa-margin-sub').textContent = `${t.margin.toFixed(2)}% margin`;
+  document.getElementById('pa-cogs').textContent       = paFmt$(t.cogs);
+  document.getElementById('pa-cogs-sub').textContent   = t.revenue > 0 ? `${(t.cogs/t.revenue*100).toFixed(1)}% of revenue` : 'cost of goods';
+  document.getElementById('pa-products').textContent   = paData.total_products;
+  document.getElementById('pa-products-sub').textContent = `${paData.total_variants} variants`;
+}
+
+function paSort(key) {
+  if (paSortKey === key) paSortDir *= -1;
+  else { paSortKey = key; paSortDir = -1; }
+  // Update header UI
+  document.querySelectorAll('.pa-sort-active').forEach(el => el.classList.remove('pa-sort-active'));
+  paRenderTable();
+}
+
+function paSetView(mode) {
+  paViewMode = mode;
+  ['revenue','units','margin'].forEach(v => {
+    document.getElementById(`pa-view-${v}`)?.classList.toggle('pa-view-active', v === mode);
+  });
+  paRenderTable();
+}
+
+function paRenderTable() {
+  const el = document.getElementById('pa-product-table');
+  if (!el || !paData) return;
+  const products = [...paData.products].sort((a,b) => (a[paSortKey] - b[paSortKey]) * paSortDir);
+
+  el.innerHTML = products.map((p, i) => {
+    const barW = paViewMode === 'revenue' ? p.revPct
+               : paViewMode === 'units'   ? (p.units / (paData.totals.units||1) * 100)
+               :                            Math.max(0, p.margin);
+    const barColor = p.margin > 30 ? 'var(--green)' : p.margin > 10 ? 'var(--gold)' : 'var(--red)';
+    return `<div class="pa-tbl-row">
+      <div>
+        <div class="pa-product-name" title="${p.title}">${p.title}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <div style="height:3px;width:${Math.min(barW,100)}px;max-width:120px;background:${barColor};border-radius:2px;min-width:2px;transition:width .3s"></div>
+          <span class="pa-product-type">${p.productType || ''}</span>
+        </div>
+      </div>
+      <div class="pa-cell-num">${paFmtN(p.units)}</div>
+      <div class="pa-cell-num" style="color:var(--gold);font-weight:600">${paFmt$(p.revenue)}</div>
+      <div class="pa-cell-num" style="color:var(--red)">${p.cogs > 0 ? paFmt$(p.cogs) : '<span style="color:var(--c3)">—</span>'}</div>
+      <div class="pa-cell-num" style="color:${p.profit>=0?'var(--green)':'var(--red)'};font-weight:600">${paFmt$(p.profit)}</div>
+      <div class="pa-cell-num" style="color:${p.margin>20?'var(--green)':p.margin>5?'var(--c2)':'var(--red)'}">${p.margin.toFixed(1)}%</div>
+      <div><div class="pa-abc pa-abc-${p.abc}">${p.abc}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function paRenderABC() {
+  const el = document.getElementById('pa-abc-panel');
+  if (!el || !paData) return;
+  const products = paData.products;
+  const aCount = products.filter(p=>p.abc==='A').length;
+  const bCount = products.filter(p=>p.abc==='B').length;
+  const cCount = products.filter(p=>p.abc==='C').length;
+  const aRev   = products.filter(p=>p.abc==='A').reduce((s,p)=>s+p.revenue,0);
+  const bRev   = products.filter(p=>p.abc==='B').reduce((s,p)=>s+p.revenue,0);
+  const cRev   = products.filter(p=>p.abc==='C').reduce((s,p)=>s+p.revenue,0);
+  const total  = paData.totals.revenue || 1;
+  const aPct   = (aRev/total*100).toFixed(1);
+  const bPct   = (bRev/total*100).toFixed(1);
+  const cPct   = (cRev/total*100).toFixed(1);
+
+  el.innerHTML = `
+    <div class="pa-abc-bar">
+      <div class="pa-abc-seg" style="width:${aPct}%;background:#5A9E72" title="A: ${aPct}%"></div>
+      <div class="pa-abc-seg" style="width:${bPct}%;background:#C8A96E" title="B: ${bPct}%"></div>
+      <div class="pa-abc-seg" style="width:${cPct}%;background:#D95454" title="C: ${cPct}%"></div>
+    </div>
+    ${[['A','#2d7a50','rgba(90,158,114,0.12)',aCount,aPct,paFmt$(aRev),'Heroes — prioritise restocking'],
+       ['B','#8a6a20','rgba(200,169,110,0.12)',bCount,bPct,paFmt$(bRev),'Mid-tier — bundle & cross-sell'],
+       ['C','var(--red)','rgba(217,84,84,0.08)',cCount,cPct,paFmt$(cRev),'Slow movers — discount to clear']
+      ].map(([grade,color,bg,count,pct,rev,tip]) => `
+      <div class="pa-abc-row">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pa-abc pa-abc-${grade}">${grade}</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink)">${count} product${count!==1?'s':''}</div>
+            <div style="font-size:10px;color:var(--c3)">${tip}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;font-weight:700;color:${color};font-family:var(--mono)">${rev}</div>
+          <div style="font-size:10px;color:var(--c3);font-family:var(--mono)">${pct}% of rev</div>
+        </div>
+      </div>`).join('')}`;
+}
+
+function paRenderInventory() {
+  const el = document.getElementById('pa-inventory-table');
+  if (!el || !paData) return;
+  const items = paData.inventoryHealth.filter(i => i.totalStock !== null);
+  if (!items.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px;font-family:var(--mono)">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
+    return;
+  }
+  const sorted = [...items].sort((a,b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
+  const statusIcon = s => s==='critical'?'🔴':s==='watch'?'🟡':'🟢';
+  el.innerHTML = `<div class="pa-inv-head"><div>Product</div><div style="text-align:right">Stock</div><div style="text-align:right">Daily Sales</div><div style="text-align:right">Days Left</div><div style="text-align:right">Status</div></div>`
+    + sorted.map(i => `
+    <div class="pa-inv-row">
+      <div style="font-size:11px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${i.title}">${i.title}</div>
+      <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--c2)">${paFmtN(i.totalStock)}</div>
+      <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--c3)">${i.dailySales.toFixed(1)}/day</div>
+      <div style="text-align:right;font-family:var(--mono);font-size:11px;font-weight:600;color:${i.status==='critical'?'var(--red)':i.status==='watch'?'#E5A829':'var(--green)'}">${i.daysLeft !== null ? i.daysLeft+'d' : '—'}</div>
+      <div style="text-align:right;font-size:13px">${statusIcon(i.status)}</div>
+    </div>`).join('');
+}
+
+function paRenderMix() {
+  const el = document.getElementById('pa-revenue-mix');
+  if (!el || !paData) return;
+  const top15 = paData.products.slice(0,15);
+  const maxRev = top15[0]?.revenue || 1;
+  el.innerHTML = top15.map((p,i) => {
+    const colors = ['var(--gold)','#5A9E72','#4A7FC1','#7E6DB5','#D95454','#C8A96E','#5A9E72'];
+    const color = colors[i % colors.length];
+    return `<div class="pa-mix-row">
+      <div class="pa-mix-label" title="${p.title}">${p.title}</div>
+      <div class="pa-mix-bar-wrap"><div class="pa-mix-bar" style="width:${(p.revenue/maxRev*100).toFixed(1)}%;background:${color}"></div></div>
+      <div class="pa-mix-pct">${p.revPct}%</div>
+      <div class="pa-mix-val">${paFmt$(p.revenue)}</div>
+    </div>`;
+  }).join('');
+}
+
+function paRenderVariants() {
+  const el = document.getElementById('pa-variant-table');
+  if (!el || !paData) return;
+  // Flatten all variants from all products, top 20 by revenue
+  const allVariants = paData.products.flatMap(p =>
+    p.variants.map(v => ({ ...v, productTitle: p.title }))
+  ).sort((a,b) => b.revenue - a.revenue).slice(0,20);
+
+  el.innerHTML = allVariants.map(v => `
+    <div class="pa-var-row">
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--ink)">${v.title || '—'}</div>
+        <div style="font-size:10px;color:var(--c3)">${v.productTitle}</div>
+      </div>
+      <div class="pa-cell-num">${paFmtN(v.units)}</div>
+      <div class="pa-cell-num" style="color:var(--gold)">${paFmt$(v.revenue)}</div>
+      <div class="pa-cell-num" style="color:var(--red)">${v.cogs > 0 ? paFmt$(v.cogs) : '<span style="color:var(--c3)">—</span>'}</div>
+      <div class="pa-cell-num" style="color:${v.profit>=0?'var(--green)':'var(--red)'}">${paFmt$(v.profit)}</div>
+      <div class="pa-cell-num" style="color:${v.margin>20?'var(--green)':v.margin>5?'var(--c2)':'var(--red)'}">${v.margin.toFixed(1)}%</div>
+    </div>`).join('');
+}
+
+function paExportCSV() {
+  if (!paData) { toast('No data to export', 'err'); return; }
+  let csv = 'Product,Type,Units,Orders,Revenue,COGS,Profit,Margin%,ABC Grade\n';
+  paData.products.forEach(p => {
+    csv += `"${p.title}","${p.productType}",${p.units},${p.orders},${p.revenue},${p.cogs},${p.profit},${p.margin},${p.abc}\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = `product-analytics-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('CSV exported', 'ok');
+}
 </script>
 
 </body>
