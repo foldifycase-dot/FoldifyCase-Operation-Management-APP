@@ -4928,13 +4928,13 @@ function orRenderTotalsRow() {
   document.getElementById('or-totals-label').textContent    = `Total from ${orders.length} orders`;
   document.getElementById('or-totals-items').textContent    = items;
   document.getElementById('or-totals-revenue').textContent  = orFmt$(revenue);
-  document.getElementById('or-totals-discounts').textContent= discounts>0?`(${orFmt$(discounts)})`:'—';
-  document.getElementById('or-totals-cogs').textContent     = cogs>0?`(${orFmt$(cogs)})`:'—';
+  document.getElementById('or-totals-discounts').textContent= discounts>0?('('+orFmt$(discounts)+')'):'—';
+  document.getElementById('or-totals-cogs').textContent     = cogs>0?('('+orFmt$(cogs)+')'):'—';
   const gpEl = document.getElementById('or-totals-grossprofit');
   if(gpEl){ gpEl.textContent=orFmt$(grossProfitTotal); gpEl.style.color=grossProfitTotal>=0?'var(--green)':'var(--red)'; }
   const gmEl = document.getElementById('or-totals-grossmargin');
   if(gmEl) gmEl.textContent=grossMarginTotal.toFixed(1)+'%';
-  document.getElementById('or-totals-fees').textContent     = `(${orFmt$(fees)})`;
+  document.getElementById('or-totals-fees').textContent     = '('+orFmt$(fees)+')';
   const profEl = document.getElementById('or-totals-profit');
   profEl.textContent  = orFmt$(profit);
   profEl.style.color  = profit >= 0 ? 'var(--green)' : 'var(--red)';
@@ -4969,8 +4969,8 @@ function orRenderTable() {
       <div class="or-cell" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--c2)" title="${o.customer}">${o.customer}</div>
       <div class="or-cell" style="text-align:center;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2)">${o.items}</div>
       <div class="or-cell-num" style="color:var(--gold);font-weight:600">${orFmt$(o.revenue)}</div>
-      <div class="or-cell-num" style="color:var(--red)">${o.discounts>0?`(${orFmt$(o.discounts)})`:'—'}</div>
-      <div class="or-cell-num" style="color:#7E6DB5">${o.cogs>0?`(${orFmt$(o.cogs)})`:'—'}</div>
+      <div class="or-cell-num" style="color:var(--red)">${o.discounts>0?('('+orFmt$(o.discounts)+')'):'—'}</div>
+      <div class="or-cell-num" style="color:#7E6DB5">${o.cogs>0?('('+orFmt$(o.cogs)+')'):'—'}</div>
       <div class="or-cell-num" style="color:${gpColor};font-weight:600">${orFmt$(o.grossProfit||0)}</div>
       <div class="or-cell-num" style="color:var(--c3);font-size:11px">${(o.grossMargin||0).toFixed(1)}%</div>
       <div class="or-cell-num" style="color:var(--red)">(${orFmt$(o.txFee)})</div>
