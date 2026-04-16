@@ -1348,9 +1348,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 /* ══════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════ */
-const PROXY      = 'https://foldify-case-operation-management-a.vercel.app/api/proxy';
-const UNIT_COST  = 12.50; // default cost per unit — update to match your products
-const SHIP_RATE  = 0.045; // shipping as % of revenue — update to match your rates
+const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy';
 
 /* ══════════════════════════════════════════
    STATE
@@ -1422,23 +1420,27 @@ async function doSync() {
 
     // ── Parse Shopify ──────────────────────────────────────────
     let shopifyDays  = {};
-    let shopifyTotal = { revenue:0, orders:0 };
+    let shopifyTotal = { revenue:0, orders:0, cogs:0, shipping_cost:0, shipping_charged:0 };
+    let shopifyHasCogs = false;
 
     if (shopifyRes.status === 'fulfilled') {
       const resp = shopifyRes.value;
       if (resp.ok) {
         const d = await resp.json();
         console.log('[Shopify] raw response:', d);
+        shopifyHasCogs = d.has_cogs || false;
         (d.daily || []).forEach(day => {
           shopifyDays[day.date] = day;
-          shopifyTotal.revenue += day.revenue || 0;
-          shopifyTotal.orders  += day.orders  || 0;
+          shopifyTotal.revenue          += day.revenue || 0;
+          shopifyTotal.orders           += day.orders  || 0;
+          shopifyTotal.cogs             += day.cogs    || 0;
+          shopifyTotal.shipping_charged += day.shipping_charged || 0;
+          shopifyTotal.shipping_cost    += day.shipping_cost    || 0;
         });
         isLiveData = Object.keys(shopifyDays).length > 0;
         if (isLiveData) {
-          console.log(`[Shopify] ✓ ${Object.keys(shopifyDays).length} days, $${shopifyTotal.revenue.toFixed(2)} revenue`);
-        } else {
-          console.warn('[Shopify] No orders found for this date range');
+          console.log(`[Shopify] ✓ ${Object.keys(shopifyDays).length} days | rev=$${shopifyTotal.revenue.toFixed(2)} | cogs=$${shopifyTotal.cogs.toFixed(2)} | ship=$${shopifyTotal.shipping_cost.toFixed(2)}`);
+          if (!shopifyHasCogs) console.warn('[Shopify] ⚠ No COGS found — add cost per item in Shopify Admin → Products → Variants → Cost per item');
         }
       } else {
         const err = await resp.json().catch(()=>({}));
@@ -1492,41 +1494,40 @@ async function doSync() {
         const rev    = +(day.revenue || 0).toFixed(2);
         const orders = day.orders || 0;
 
-        // Use actual daily Meta spend if available, else spread total proportionally
+        // ── COGS: from Shopify inventory_items cost ──────────
+        // Falls back to 0 if not set in Shopify (user warned in console)
+        const cogs = +(day.cogs || 0).toFixed(2);
+
+        // ── Shipping: what you paid for labels (Shopify Shipping) ──
+        // shipping_cost = label cost from Shopify Shipping
+        // shipping_charged = what customer paid (revenue component)
+        const ship = +(day.shipping_cost || 0).toFixed(2);
+
+        // ── Meta spend: use daily if available, else spread total ──
         const dayShare = rev / totalShopifyRev;
         const meta = metaDaySpend[day.date] !== undefined
           ? +metaDaySpend[day.date].toFixed(2)
           : +(totalMetaSpend * dayShare).toFixed(2);
 
-        // Load saved settings for COGS/shipping
-        let unitCost = UNIT_COST, shipRate = SHIP_RATE;
-        try {
-          const cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}');
-          if (cfg.unitCost) unitCost = cfg.unitCost;
-          if (cfg.shipRate) shipRate = cfg.shipRate / 100;
-        } catch(e) {}
-
         return {
           date:    day.date,
+          displayDate: new Date(day.date+'T00:00:00').toLocaleDateString('en-AU',{month:'short',day:'2-digit'}),
           orders,
           revenue: rev,
-          cogs:    +(orders * unitCost).toFixed(2),
-          google:  0,   // live when Google Ads API approved
+          cogs,
+          google:  0,
           meta,
-          ms:      0,   // live when Microsoft Ads connected
-          ship:    +(rev * shipRate).toFixed(2),
+          ms:      0,
+          ship,
+          shipping_charged: +(day.shipping_charged || 0).toFixed(2),
         };
       }).sort((a,b) => a.date.localeCompare(b.date));
 
-      // Pretty-format dates for display
-      rows = rows.map(r => ({
-        ...r,
-        displayDate: new Date(r.date+'T00:00:00').toLocaleDateString('en-AU',{month:'short',day:'2-digit'}),
-      }));
-
+      // Build toast message
       const sources = ['Shopify'];
       if (livePlatforms.meta) sources.push('Meta Ads');
-      toast(`✓ Live — ${sources.join(' + ')}`, 'ok');
+      const cogsNote = shopifyHasCogs ? '' : ' ⚠ Add cost/item in Shopify';
+      toast(`✓ Live — ${sources.join(' + ')}${cogsNote}`, 'ok');
 
     } else {
       console.warn('[Sync] No Shopify data — falling back to sample');
@@ -2247,7 +2248,6 @@ doSync();
     <!-- Tabs -->
     <div class="settings-tabs">
       <button class="stab active" onclick="switchStab(this,'store')">🏪 Store</button>
-      <button class="stab" onclick="switchStab(this,'costs')">💰 Costs & Margins</button>
       <button class="stab" onclick="switchStab(this,'apis')">🔌 API Connections</button>
       <button class="stab" onclick="switchStab(this,'alerts')">🔔 Alerts</button>
       <button class="stab" onclick="switchStab(this,'display')">🎨 Display</button>
@@ -2347,94 +2347,6 @@ doSync();
         </div>
       </div>
 
-      <!-- ── COSTS & MARGINS ── -->
-      <div class="stab-panel" id="panel-costs">
-        <div class="s-section">
-          <div class="s-section-title">Cost of Goods (COGS)</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Default Unit Cost</div>
-              <div class="s-row-desc">Average cost per unit when product-specific cost is unavailable</div>
-            </div>
-            <input class="s-input" id="cfg-unit-cost" type="number" value="12.50" step="0.01" placeholder="12.50">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Z Fold Cases — Unit Cost</div>
-              <div class="s-row-desc">Average landed cost per Z Fold case (incl. freight)</div>
-            </div>
-            <input class="s-input" id="cfg-fold-cost" type="number" value="14.00" step="0.01" placeholder="14.00">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Z Flip Cases — Unit Cost</div>
-              <div class="s-row-desc">Average landed cost per Z Flip case (incl. freight)</div>
-            </div>
-            <input class="s-input" id="cfg-flip-cost" type="number" value="10.50" step="0.01" placeholder="10.50">
-          </div>
-        </div>
-
-        <div class="s-section">
-          <div class="s-section-title">Shipping & Fulfilment</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Shipping Cost Method</div>
-              <div class="s-row-desc">How shipping costs are calculated in profit</div>
-            </div>
-            <select class="s-select" id="cfg-ship-method">
-              <option value="pct" selected>% of Revenue</option>
-              <option value="flat">Flat Rate per Order</option>
-              <option value="actual">Actual from Shopify</option>
-            </select>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Shipping Rate (% of revenue)</div>
-              <div class="s-row-desc">Used when Actual is unavailable — typical 4–6%</div>
-            </div>
-            <input class="s-input" id="cfg-ship-rate" type="number" value="4.5" step="0.1" placeholder="4.5">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">US Warehouse Handling Fee</div>
-              <div class="s-row-desc">Per-order fee charged by US warehouse for pick & pack</div>
-            </div>
-            <input class="s-input" id="cfg-us-fee" type="number" value="2.50" step="0.25" placeholder="2.50">
-          </div>
-        </div>
-
-        <div class="s-section">
-          <div class="s-section-title">Platform & Payment Fees</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Shopify Transaction Fee (%)</div>
-              <div class="s-row-desc">Shopify's cut per transaction — typically 0.5–2%</div>
-            </div>
-            <input class="s-input" id="cfg-shopify-fee" type="number" value="0.5" step="0.1" placeholder="0.5">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Payment Gateway Fee (%)</div>
-              <div class="s-row-desc">Stripe / PayPal rate — typically 1.7–2.9%</div>
-            </div>
-            <input class="s-input" id="cfg-gateway-fee" type="number" value="1.75" step="0.05" placeholder="1.75">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Target Profit Margin (%)</div>
-              <div class="s-row-desc">Dashboard highlights days below this margin in red</div>
-            </div>
-            <input class="s-input" id="cfg-target-margin" type="number" value="20" step="1" placeholder="20">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Minimum ROAS Target</div>
-              <div class="s-row-desc">Ad platform ROAS below this is flagged as underperforming</div>
-            </div>
-            <input class="s-input" id="cfg-min-roas" type="number" value="3.0" step="0.1" placeholder="3.0">
-          </div>
-        </div>
-      </div>
 
       <!-- ── API CONNECTIONS ── -->
       <div class="stab-panel" id="panel-apis">
@@ -2766,12 +2678,6 @@ function saveSettings() {
   // Save to localStorage
   const cfg = {
     storeName:      document.getElementById('cfg-store-name').value,
-    unitCost:       parseFloat(document.getElementById('cfg-unit-cost').value) || 12.50,
-    shipRate:       parseFloat(document.getElementById('cfg-ship-rate').value) || 4.5,
-    shopifyFee:     parseFloat(document.getElementById('cfg-shopify-fee').value) || 0.5,
-    gatewayFee:     parseFloat(document.getElementById('cfg-gateway-fee').value) || 1.75,
-    targetMargin:   parseFloat(document.getElementById('cfg-target-margin').value) || 20,
-    minRoas:        parseFloat(document.getElementById('cfg-min-roas').value) || 3.0,
     currency:       document.getElementById('cfg-currency').value,
     defaultRange:   document.getElementById('cfg-default-range').value,
     notifEmail:     document.getElementById('cfg-notif-email').value,
@@ -2783,9 +2689,6 @@ function saveSettings() {
   localStorage.setItem('fc_settings', JSON.stringify(cfg));
 
   // Apply immediately
-  UNIT_COST = cfg.unitCost;
-  SHIP_RATE = cfg.shipRate / 100;
-
   closeSettings();
   toast('✓ Settings saved', 'ok');
   renderAll();
@@ -2794,12 +2697,6 @@ function saveSettings() {
 function loadSettings() {
   try {
     const cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}');
-    if (cfg.unitCost)     document.getElementById('cfg-unit-cost').value     = cfg.unitCost;
-    if (cfg.shipRate)     document.getElementById('cfg-ship-rate').value     = cfg.shipRate;
-    if (cfg.shopifyFee)   document.getElementById('cfg-shopify-fee').value   = cfg.shopifyFee;
-    if (cfg.gatewayFee)   document.getElementById('cfg-gateway-fee').value   = cfg.gatewayFee;
-    if (cfg.targetMargin) document.getElementById('cfg-target-margin').value = cfg.targetMargin;
-    if (cfg.minRoas)      document.getElementById('cfg-min-roas').value      = cfg.minRoas;
     if (cfg.currency)     document.getElementById('cfg-currency').value      = cfg.currency;
     if (cfg.defaultRange) document.getElementById('cfg-default-range').value = cfg.defaultRange;
     if (cfg.notifEmail)   document.getElementById('cfg-notif-email').value   = cfg.notifEmail;
