@@ -533,6 +533,8 @@ module.exports = async function handler(req, res) {
           ? `${o.customer.first_name||''} ${o.customer.last_name||''}`.trim() || o.customer.email || 'Guest'
           : 'Guest';
 
+        const grossProfit = round2(revenue - discounts - cogs);
+        const grossMargin = revenue > 0 ? round2(grossProfit / revenue * 100) : 0;
         return {
           id:          o.id,
           name:        o.name,
@@ -544,6 +546,8 @@ module.exports = async function handler(req, res) {
           shipping,
           cogs,
           txFee,
+          grossProfit,
+          grossMargin,
           profit,
           margin,
           status:      o.financial_status,
