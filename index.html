@@ -1744,14 +1744,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <!-- Sync status bar -->
-    <div id="syncStatus" style="
-      display:none; margin:8px 28px 0;
-      padding:8px 14px; border-radius:6px;
-      font-family:'Inter',sans-serif; font-size:11px;
-      border:1px solid rgba(28,27,24,0.1);
-      background:rgba(28,27,24,0.04);
-    "></div>
+
 
     <!-- ── 1. KPI STRIP ── -->
     <div class="pad">
@@ -2542,12 +2535,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
-      <!-- Granularity toggle -->
-      <div style="display:flex;gap:4px;background:rgba(28,27,24,0.06);padding:3px;border-radius:8px;margin-left:12px">
-        <button onclick="plSetGranularity('daily')"   id="pl-g-daily"   class="pl-gran-btn pl-gran-active">Daily</button>
-        <button onclick="plSetGranularity('weekly')"  id="pl-g-weekly"  class="pl-gran-btn">Weekly</button>
-        <button onclick="plSetGranularity('monthly')" id="pl-g-monthly" class="pl-gran-btn">Monthly</button>
-      </div>
+
       <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="plSync()" id="plSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
         <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
@@ -3306,20 +3294,12 @@ function getRange(key) {
 ══════════════════════════════════════════ */
 async function doSync() {
   const btn = document.getElementById('syncBtn');
-  const statusBar = document.getElementById('syncStatus');
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
   const { from, to } = getRange(activeRange);
   const feeParams = getFeeParams(); // configured gateway rates
 
-  const setStatus = (msg, isError=false) => {
-    if (!statusBar) return;
-    statusBar.style.display = 'block';
-    statusBar.style.color   = isError ? 'var(--red)' : 'var(--green)';
-    statusBar.style.borderColor = isError ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-    statusBar.style.background  = isError ? 'rgba(217,84,84,0.05)' : 'rgba(90,158,114,0.05)';
-    statusBar.textContent = msg;
-  };
+  const setStatus = (msg, isError=false) => { /* status bar removed */ };
 
   setStatus(`⟳ Fetching ${from} → ${to}...`);
 
