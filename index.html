@@ -5567,7 +5567,7 @@ function clvExportCSV() {
 ══════════════════════════════════════════ */
 (function() {
   const STATE = {};
-  const _fmtISO  = d => d.toISOString().slice(0,10);
+  const _fmtISO  = d => { const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0'); return y+'-'+mo+'-'+dy; };
   const _fmtDisp = d => d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
   const _now  = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
   const _ago  = n => { const d=_now(); d.setDate(d.getDate()-n); return d; };
