@@ -3228,6 +3228,11 @@ const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy'
 ══════════════════════════════════════════ */
 let rows         = [];          // live data merged from Shopify + ad platforms
 let activeRange  = '7d';
+const _gN=new Date();_gN.setHours(0,0,0,0);
+const _gF=new Date(_gN.getTime()-6*86400000);
+window.GLOBAL_FROM=_gF.toISOString().slice(0,10);
+window.GLOBAL_TO=_gN.toISOString().slice(0,10);
+window.GLOBAL_LABEL='Last 7 Days';
 let activeMkt    = 'all';
 let isLiveData   = false;
 
@@ -3889,11 +3894,11 @@ function renderBreakdown() {
 ══════════════════════════════════════════ */
 const PAGES = {
   txFee:            { mainId: 'txFeeMain',            navId: 'txFeeNavItem',          onOpen: () => { loadFeeRates(); updateFeeExamples(); } },
-  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { if (!paData) paSync(); } },
-  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { if (!orAllOrders.length) orSync(); } },
-  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { if (!plData) plSync(); } },
-  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { if (!maData) maSync(); } },
-  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { if (!clvData) clvSync(); } },
+  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { paSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
+  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { orSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
+  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { plSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
+  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { maSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
+  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { clvSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
 };
 
 let activePage = null;
@@ -4205,15 +4210,16 @@ function applyCustomRange() {
   const end = dpSelEnd || dpSelStart;
   const label = fmtDisplay(dpSelStart) + ' – ' + fmtDisplay(end);
   document.getElementById('dpTriggerText').textContent = label;
-  dpCustomFrom = fmtISO(dpSelStart);
-  dpCustomTo   = fmtISO(end);
-  closeDatePicker();
-  doSync();
+  dpCustomFrom=fmtISO(dpSelStart);dpCustomTo=fmtISO(end);
+  window.GLOBAL_FROM=dpCustomFrom;window.GLOBAL_TO=dpCustomTo;window.GLOBAL_LABEL=label;
+  closeDatePicker();doSync();broadcastToReports(dpCustomFrom,dpCustomTo,label,null);
 }
 
 function applyAndSync(label) {
-  closeDatePicker();
-  doSync();
+  var r=getRange(activeRange);
+  window.GLOBAL_FROM=r.from;window.GLOBAL_TO=r.to;window.GLOBAL_LABEL=label;
+  closeDatePicker();doSync();
+  broadcastToReports(r.from,r.to,label,null);
 }
 
 // Date helpers
@@ -4264,6 +4270,33 @@ function toast(msg, type='ok') {
 loadSampleData();
 renderAll();
 loadFeeRates();
+(function(){var r=getRange(activeRange);window.GLOBAL_FROM=r.from;window.GLOBAL_TO=r.to;})();
+
+function broadcastToReports(from,to,label,sourcePid){
+  window.GLOBAL_FROM=from;window.GLOBAL_TO=to;window.GLOBAL_LABEL=label||window.GLOBAL_LABEL;
+  var mt=document.getElementById('dpTriggerText');if(mt)mt.textContent=label;
+  dpCustomFrom=from;dpCustomTo=to;activeRange='custom';
+  document.querySelectorAll('#dpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  doSync();
+  ['or','pl','ma','clv','pa'].forEach(function(pid){
+    if(pid===sourcePid)return;
+    var el=document.getElementById(pid+'DpText');if(el)el.textContent=label;
+    document.querySelectorAll('#'+pid+'DpPanel .dp-preset').forEach(function(b){
+      b.classList.toggle('active',b.textContent.trim()===label);
+    });
+    if(window._setDpState)window._setDpState(pid,from,to);
+  });
+  syncOpenReport(from,to);
+}
+function syncOpenReport(from,to){
+  var f=from||window.GLOBAL_FROM,t=to||window.GLOBAL_TO;
+  [['pageOrderReport',function(){orSyncWithRange(f,t);}],
+   ['pagePnL',function(){plSyncWithRange(f,t);}],
+   ['pageMarketing',function(){maSyncWithRange(f,t);}],
+   ['pageCLV',function(){clvSyncWithRange(f,t);}],
+   ['pageProductAnalytics',function(){paSyncWithRange(f,t);}]
+  ].forEach(function(p){var el=document.getElementById(p[0]);if(el&&el.style.display!=='none')p[1]();});
+}
 // Wire up live fee example updates
 FEE_KEYS.forEach(k => {
   ['pct','flat'].forEach(t => {
@@ -4790,7 +4823,7 @@ let orSortKey     = 'date';
 let orSortDir     = -1;
 let orSelectedIds = new Set();
 
-async function orSync() { const r=window.orDpGetRange?.(); orSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function orSync() { orSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
 function orSetStatus(msg, isErr=false) {
   const el = document.getElementById('or-status');
@@ -5020,7 +5053,7 @@ function orExportCSV() {
 }
 let clvData = null;
 
-async function clvSync() { const r=window.clvDpGetRange?.(); clvSyncWithRange(r?.from||new Date(Date.now()-364*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function clvSync() { clvSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
 function clvSetStatus(msg, isErr=false) {
   const el = document.getElementById('clv-status');
@@ -5347,7 +5380,8 @@ function clvExportCSV() {
       document.querySelectorAll(`#${pid}DpPanel .dp-preset`).forEach(b=>b.classList.remove('active'));
       if(event?.target) event.target.classList.add('active');
       const tx=document.getElementById(`${pid}DpText`); if(tx) tx.textContent=res.label;
-      render(pid); window[`${pid}DpClose`](); syncFn(s.fromISO,s.toISO);
+      render(pid); window[`${pid}DpClose`]();
+      broadcastToReports(s.fromISO,s.toISO,res.label,pid);
     };
     window[`${pid}DpDone`]=function(){
       init(pid); const s=STATE[pid];
@@ -5355,12 +5389,20 @@ function clvExportCSV() {
       const end=s.selEnd||s.selStart;
       s.fromISO=_fmtISO(s.selStart); s.toISO=_fmtISO(end);
       const same=end.getTime()===s.selStart.getTime();
+      const _lbl=same?_fmtDisp(s.selStart):_fmtDisp(s.selStart)+' – '+_fmtDisp(end);
       const tx=document.getElementById(`${pid}DpText`);
-      if(tx) tx.textContent=same?_fmtDisp(s.selStart):_fmtDisp(s.selStart)+' – '+_fmtDisp(end);
-      window[`${pid}DpClose`](); syncFn(s.fromISO,s.toISO);
+      if(tx) tx.textContent=_lbl;
+      window[`${pid}DpClose`]();
+      broadcastToReports(s.fromISO,s.toISO,_lbl,pid);
     };
     window[`${pid}DpGetRange`]=function(){ init(pid); return {from:STATE[pid].fromISO,to:STATE[pid].toISO}; };
   }
+  window._setDpState=function(pid,from,to){
+    init(pid);var s=STATE[pid];if(!s)return;
+    var f=new Date(from);f.setHours(0,0,0,0);
+    var t=new Date(to);t.setHours(0,0,0,0);
+    s.selStart=f;s.selEnd=t;s.fromISO=from;s.toISO=to;
+  };
 
   register('or',  (f,t)=>orSyncWithRange(f,t));
   register('pl',  (f,t)=>plSyncWithRange(f,t));
@@ -5451,7 +5493,7 @@ async function paSyncWithRange(from,to){
 let maSortKey  = 'spend';
 let maSortDir  = -1;
 
-async function maSync() { const r=window.maDpGetRange?.(); maSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function maSync() { maSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
 function maSetStatus(msg, isErr=false) {
   const el = document.getElementById('ma-status');
@@ -5689,7 +5731,7 @@ function maExportCSV() {
 let plData        = null;
 let plGranularity = 'daily'; // daily | weekly | monthly
 
-async function plSync() { const r=window.plDpGetRange?.(); plSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function plSync() { plSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
 function plSetStatus(msg, isErr=false) {
   const el = document.getElementById('pl-status');
@@ -6046,7 +6088,7 @@ function paDpToggle() { window.paDpToggle?.(); }
 
 function paApplyPreset(key) { window.paApplyPreset?.(key); }
 
-async function paSync() { const r=window.paDpGetRange?.(); paSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function paSync() { paSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
 function paSetStatus(msg, isErr=false) {
   const el = document.getElementById('pa-status');
