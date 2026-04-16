@@ -1583,13 +1583,13 @@ function updateAdCard(platform, data) {
 /* ── Sample data fallback ── */
 function loadSampleData() {
   rows = [
-    {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225, google:0,meta:310,ms:0,ship:96,  ship_label:0,txFee:11,gwFee:37},
-    {date:'2026-04-10',displayDate:'10 Apr',orders:27,revenue:3210,cogs:338, google:0,meta:470,ms:0,ship:144, ship_label:0,txFee:16,gwFee:56},
-    {date:'2026-04-11',displayDate:'11 Apr',orders:21,revenue:2480,cogs:263, google:0,meta:380,ms:0,ship:111, ship_label:0,txFee:12,gwFee:43},
-    {date:'2026-04-12',displayDate:'12 Apr',orders:24,revenue:2890,cogs:300, google:0,meta:420,ms:0,ship:130, ship_label:0,txFee:14,gwFee:51},
-    {date:'2026-04-13',displayDate:'13 Apr',orders:16,revenue:1980,cogs:200, google:0,meta:280,ms:0,ship:84,  ship_label:0,txFee:10,gwFee:35},
-    {date:'2026-04-14',displayDate:'14 Apr',orders:26,revenue:3140,cogs:325, google:0,meta:450,ms:0,ship:134, ship_label:0,txFee:16,gwFee:55},
-    {date:'2026-04-15',displayDate:'15 Apr',orders:22,revenue:2700,cogs:275, google:0,meta:340,ms:0,ship:120, ship_label:0,txFee:14,gwFee:47},
+    {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225,google:0,meta:310,ms:0,ship:96, ship_label:0,txFee:11,gwFee:37},
+    {date:'2026-04-10',displayDate:'10 Apr',orders:27,revenue:3210,cogs:338,google:0,meta:470,ms:0,ship:144,ship_label:0,txFee:16,gwFee:56},
+    {date:'2026-04-11',displayDate:'11 Apr',orders:21,revenue:2480,cogs:263,google:0,meta:380,ms:0,ship:111,ship_label:0,txFee:12,gwFee:43},
+    {date:'2026-04-12',displayDate:'12 Apr',orders:24,revenue:2890,cogs:300,google:0,meta:420,ms:0,ship:130,ship_label:0,txFee:14,gwFee:51},
+    {date:'2026-04-13',displayDate:'13 Apr',orders:16,revenue:1980,cogs:200,google:0,meta:280,ms:0,ship:84, ship_label:0,txFee:10,gwFee:35},
+    {date:'2026-04-14',displayDate:'14 Apr',orders:26,revenue:3140,cogs:325,google:0,meta:450,ms:0,ship:134,ship_label:0,txFee:16,gwFee:55},
+    {date:'2026-04-15',displayDate:'15 Apr',orders:22,revenue:2700,cogs:275,google:0,meta:340,ms:0,ship:120,ship_label:0,txFee:14,gwFee:47},
   ];
   isLiveData = false;
 }
@@ -1598,14 +1598,21 @@ function loadSampleData() {
    CALC + FORMAT
 ══════════════════════════════════════════ */
 const calc = r => {
-  const ad     = (r.google||0) + (r.meta||0) + (r.ms||0);
-  const txFee  = r.txFee  || r.revenue * 0.005;
-  const gwFee  = r.gwFee  || r.revenue * 0.0175;
-  const total  = (r.cogs||0) + ad + (r.ship||0) + txFee + gwFee;
+  const ad = (r.google||0) + (r.meta||0) + (r.ms||0);
+
+  // txFee and gwFee: use || only if genuinely missing (not just 0)
+  const txFee = (r.txFee != null && r.txFee > 0) ? r.txFee : +(r.revenue * 0.005).toFixed(2);
+  const gwFee = (r.gwFee != null && r.gwFee > 0) ? r.gwFee : +(r.revenue * 0.0175).toFixed(2);
+
+  // Shipping cost = what YOU pay for labels (ship_label)
+  // shipping_charged = what customer paid — already IN revenue, not a cost
+  const shipCost = r.ship_label || 0;
+
+  const total  = (r.cogs||0) + ad + shipCost + txFee + gwFee;
   const profit = r.revenue - total;
   const margin = r.revenue > 0 ? ((profit/r.revenue)*100).toFixed(1) : '0.0';
   const aov    = r.orders  > 0 ? (r.revenue/r.orders).toFixed(2)    : '0.00';
-  return { ad, total, profit, margin, aov, txFee, gwFee };
+  return { ad, total, profit, margin, aov, txFee, gwFee, shipCost };
 };
 
 const f$   = n  => '$' + Math.abs(Math.round(n)).toLocaleString();
@@ -1614,17 +1621,17 @@ const fPct = n  => parseFloat(n).toFixed(1) + '%';
 function totals() {
   return rows.reduce((a,r) => {
     const c = calc(r);
-    a.rev       += r.revenue;
-    a.profit    += c.profit;
-    a.ad        += c.ad;
-    a.cogs      += r.cogs      || 0;
-    a.ship      += r.ship      || 0;
-    a.ship_label+= r.ship_label|| 0;
-    a.txFee     += c.txFee     || 0;
-    a.gwFee     += c.gwFee     || 0;
-    a.orders    += r.orders;
+    a.rev          += r.revenue;
+    a.profit       += c.profit;
+    a.ad           += c.ad;
+    a.cogs         += r.cogs       || 0;
+    a.ship         += c.shipCost   || 0;  // label cost only
+    a.ship_charged += r.ship       || 0;  // customer paid (for info only)
+    a.txFee        += c.txFee      || 0;
+    a.gwFee        += c.gwFee      || 0;
+    a.orders       += r.orders;
     return a;
-  }, {rev:0, profit:0, ad:0, cogs:0, ship:0, ship_label:0, txFee:0, gwFee:0, orders:0});
+  }, {rev:0, profit:0, ad:0, cogs:0, ship:0, ship_charged:0, txFee:0, gwFee:0, orders:0});
 }
 
 /* ══════════════════════════════════════════
@@ -1879,14 +1886,15 @@ function renderBreakdown() {
     return;
   }
 
-  // Use real data from Shopify if available, else estimates based on revenue
+  // Use real data from Shopify — t.ship is label cost (what you pay)
+  // t.ship_charged is what customers paid — already in revenue, not deducted
   const txFee = t.txFee > 0 ? t.txFee : +(t.rev * 0.005).toFixed(2);
   const gwFee = t.gwFee > 0 ? t.gwFee : +(t.rev * 0.0175).toFixed(2);
-  const ship  = t.ship  > 0 ? t.ship  : +(t.rev * 0.045).toFixed(2);
+  const ship  = t.ship  > 0 ? t.ship  : 0;  // label cost only
   const cogs  = t.cogs  > 0 ? t.cogs  : 0;
   const ad    = t.ad    > 0 ? t.ad    : 0;
 
-  // totalCosts derived from revenue - profit so it exactly matches Stats card
+  // profit and totalCosts come from calc() via totals() — single source of truth
   const profit     = t.profit;
   const totalCosts = +(t.rev - profit).toFixed(2);
 
