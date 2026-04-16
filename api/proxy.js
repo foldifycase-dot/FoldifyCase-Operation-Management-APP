@@ -315,7 +315,7 @@ module.exports = async function handler(req, res) {
       }
 
       // Separate active vs refunded/cancelled
-      const orders   = allOrders.filter(o => !o.cancelled_at && o.financial_status !== "voided");
+      const orders   = allOrders.filter(o => !o.cancelled_at && o.financial_status !== "refunded" && o.financial_status !== "voided");
       const refunded = allOrders.filter(o => o.financial_status === "refunded" || o.financial_status === "partially_refunded");
 
       // Step 4: COGS via GraphQL
@@ -506,6 +506,14 @@ module.exports = async function handler(req, res) {
       }).format(new Date(iso));
 
       // Build order rows
+      // Apply same filter as main dashboard: exclude cancelled, refunded, voided
+      const filteredOrders = allOrders.filter(o =>
+        !o.cancelled_at &&
+        o.financial_status !== "refunded" &&
+        o.financial_status !== "voided"
+      );
+      // Also keep refunded/cancelled for the table (user sees full picture)
+      // but tag them so frontend can show correct KPIs
       const orders = allOrders.map(o => {
         const revenue   = parseFloat(o.total_price || 0);
         const subtotal  = parseFloat(o.subtotal_price || 0);
@@ -548,6 +556,8 @@ module.exports = async function handler(req, res) {
 
       return res.status(200).json({
         orders,
+        kpi_orders: filteredOrders.length,
+        kpi_revenue: Math.round(filteredOrders.reduce((s,o)=>s+parseFloat(o.total_price||0),0)*100)/100,
         total_count: orders.length,
         debug: { store_timezone: tz, utc_window: { from: fromUTC, to: toUTC }, variants_with_cost: Object.keys(costMap).length },
       });
