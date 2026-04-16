@@ -1503,9 +1503,10 @@ async function doSync() {
         const ship         = +(day.shipping_charged || 0).toFixed(2);
         const ship_label   = +(day.shipping_cost    || 0).toFixed(2);
 
-        // ── Transaction fees from Shopify ────────────────────
-        const txFee  = +(day.transaction_fees || rev * 0.005).toFixed(2);
-        const gwFee  = +(day.gateway_fees     || rev * 0.0175).toFixed(2);
+        // ── Single blended transaction fee (Shopify + PayPal + Afterpay) ──
+        // 5.7424% = $18.95 / $330 — your actual blended rate
+        // Falls back to blended estimate if Shopify doesn't return it
+        const txFee = +(day.transaction_fees || rev * 0.057424).toFixed(2);
 
         // ── Meta spend ───────────────────────────────────────
         const dayShare = rev / totalShopifyRev;
@@ -1525,7 +1526,6 @@ async function doSync() {
           ship,
           ship_label,
           txFee,
-          gwFee,
           shipping_charged: ship,
         };
       }).sort((a,b) => a.date.localeCompare(b.date));
@@ -1583,13 +1583,13 @@ function updateAdCard(platform, data) {
 /* ── Sample data fallback ── */
 function loadSampleData() {
   rows = [
-    {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225,google:0,meta:310,ms:0,ship:96, ship_label:0,txFee:11,gwFee:37},
-    {date:'2026-04-10',displayDate:'10 Apr',orders:27,revenue:3210,cogs:338,google:0,meta:470,ms:0,ship:144,ship_label:0,txFee:16,gwFee:56},
-    {date:'2026-04-11',displayDate:'11 Apr',orders:21,revenue:2480,cogs:263,google:0,meta:380,ms:0,ship:111,ship_label:0,txFee:12,gwFee:43},
-    {date:'2026-04-12',displayDate:'12 Apr',orders:24,revenue:2890,cogs:300,google:0,meta:420,ms:0,ship:130,ship_label:0,txFee:14,gwFee:51},
-    {date:'2026-04-13',displayDate:'13 Apr',orders:16,revenue:1980,cogs:200,google:0,meta:280,ms:0,ship:84, ship_label:0,txFee:10,gwFee:35},
-    {date:'2026-04-14',displayDate:'14 Apr',orders:26,revenue:3140,cogs:325,google:0,meta:450,ms:0,ship:134,ship_label:0,txFee:16,gwFee:55},
-    {date:'2026-04-15',displayDate:'15 Apr',orders:22,revenue:2700,cogs:275,google:0,meta:340,ms:0,ship:120,ship_label:0,txFee:14,gwFee:47},
+    {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225,google:0,meta:310,ms:0,ship:96, ship_label:0,txFee:122.89},
+    {date:'2026-04-10',displayDate:'10 Apr',orders:27,revenue:3210,cogs:338,google:0,meta:470,ms:0,ship:144,ship_label:0,txFee:184.33},
+    {date:'2026-04-11',displayDate:'11 Apr',orders:21,revenue:2480,cogs:263,google:0,meta:380,ms:0,ship:111,ship_label:0,txFee:142.41},
+    {date:'2026-04-12',displayDate:'12 Apr',orders:24,revenue:2890,cogs:300,google:0,meta:420,ms:0,ship:130,ship_label:0,txFee:165.95},
+    {date:'2026-04-13',displayDate:'13 Apr',orders:16,revenue:1980,cogs:200,google:0,meta:280,ms:0,ship:84, ship_label:0,txFee:113.70},
+    {date:'2026-04-14',displayDate:'14 Apr',orders:26,revenue:3140,cogs:325,google:0,meta:450,ms:0,ship:134,ship_label:0,txFee:180.31},
+    {date:'2026-04-15',displayDate:'15 Apr',orders:22,revenue:2700,cogs:275,google:0,meta:340,ms:0,ship:120,ship_label:0,txFee:155.04},
   ];
   isLiveData = false;
 }
@@ -1599,14 +1599,14 @@ function loadSampleData() {
 ══════════════════════════════════════════ */
 const calc = r => {
   const ad     = (r.google||0) + (r.meta||0) + (r.ms||0);
-  const txFee  = (r.txFee != null && r.txFee > 0) ? r.txFee : r.revenue * 0.005;
-  const gwFee  = (r.gwFee != null && r.gwFee > 0) ? r.gwFee : r.revenue * 0.0175;
+  // Single blended transaction fee: Shopify + PayPal + Afterpay = 5.7424%
+  const txFee  = (r.txFee != null && r.txFee > 0) ? r.txFee : r.revenue * 0.057424;
   const shipCost = r.ship_label || 0;
-  const total  = (r.cogs||0) + ad + shipCost + txFee + gwFee;
+  const total  = (r.cogs||0) + ad + shipCost + txFee;
   const profit = r.revenue - total;
   const margin = r.revenue > 0 ? ((profit/r.revenue)*100).toFixed(2) : '0.00';
   const aov    = r.orders  > 0 ? (r.revenue/r.orders).toFixed(2)    : '0.00';
-  return { ad, total, profit, margin, aov, txFee, gwFee, shipCost };
+  return { ad, total, profit, margin, aov, txFee, shipCost };
 };
 
 const f$   = n  => {
@@ -1622,13 +1622,12 @@ function totals() {
     a.profit       += c.profit;
     a.ad           += c.ad;
     a.cogs         += r.cogs       || 0;
-    a.ship         += c.shipCost   || 0;  // label cost only
-    a.ship_charged += r.ship       || 0;  // customer paid (for info only)
+    a.ship         += c.shipCost   || 0;
+    a.ship_charged += r.ship       || 0;
     a.txFee        += c.txFee      || 0;
-    a.gwFee        += c.gwFee      || 0;
     a.orders       += r.orders;
     return a;
-  }, {rev:0, profit:0, ad:0, cogs:0, ship:0, ship_charged:0, txFee:0, gwFee:0, orders:0});
+  }, {rev:0, profit:0, ad:0, cogs:0, ship:0, ship_charged:0, txFee:0, orders:0});
 }
 
 /* ══════════════════════════════════════════
@@ -1802,7 +1801,7 @@ function renderAdSummary() {
 
 function renderKPIs() {
   const t      = totals();
-  const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(1) : '0.0';
+  const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(2) : '0.00';
   const aov    = t.orders > 0 ? (t.rev/t.orders).toFixed(2) : '0.00';
   document.getElementById('kpi-profit').textContent = f$(t.profit);
   document.getElementById('kpi-profit').className   = 'kpi-val ' + (t.profit>=0?'green':'red');
@@ -1817,7 +1816,7 @@ function renderKPIs() {
 
 function renderSidebar() {
   const t      = totals();
-  const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(1) : '0.0';
+  const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(2) : '0.00';
   document.getElementById('sb-profit').textContent  = f$(t.profit);
   document.getElementById('sb-rev').textContent     = f$(t.rev);
   document.getElementById('sb-spend').textContent   = f$(t.ad);
@@ -1883,25 +1882,20 @@ function renderBreakdown() {
     return;
   }
 
-  // Use real data from Shopify — t.ship is label cost (what you pay)
-  // t.ship_charged is what customers paid — already in revenue, not deducted
-  const txFee = t.txFee > 0 ? t.txFee : +(t.rev * 0.005).toFixed(2);
-  const gwFee = t.gwFee > 0 ? t.gwFee : +(t.rev * 0.0175).toFixed(2);
-  const ship  = t.ship  > 0 ? t.ship  : 0;  // label cost only
+  const txFee = t.txFee > 0 ? t.txFee : +(t.rev * 0.057424).toFixed(2);
+  const ship  = t.ship  > 0 ? t.ship  : 0;
   const cogs  = t.cogs  > 0 ? t.cogs  : 0;
   const ad    = t.ad    > 0 ? t.ad    : 0;
 
-  // profit and totalCosts come from calc() via totals() — single source of truth
   const profit     = t.profit;
   const totalCosts = +(t.rev - profit).toFixed(2);
 
   // Cost segments for donut
   const items = [
-    { name:'Ad Spend',   amt:ad,    color:'#D95454' },
-    { name:'COGS',       amt:cogs,  color:'#7E6DB5' },
-    { name:'Shipping',   amt:ship,  color:'#4A7FC1' },
-    { name:'Shopify Fee',amt:txFee, color:'#C8A96E' },
-    { name:'Gateway Fee',amt:gwFee, color:'#5A9E72' },
+    { name:'Ad Spend',       amt:ad,    color:'#D95454' },
+    { name:'COGS',           amt:cogs,  color:'#7E6DB5' },
+    { name:'Shipping',       amt:ship,  color:'#4A7FC1' },
+    { name:'Transaction Fee',amt:txFee, color:'#C8A96E' },
   ].filter(i => i.amt > 0);
 
   // SVG donut — single ring, segments per cost item
@@ -1944,17 +1938,16 @@ function renderBreakdown() {
 
   // Legend items — all 6 including net profit
   const legendItems = [
-    { name:'Ad Spend',    amt:ad,    pct: t.rev>0?(ad/t.rev*100).toFixed(1):0,    color:'#D95454' },
-    { name:'COGS',        amt:cogs,  pct: t.rev>0?(cogs/t.rev*100).toFixed(1):0,  color:'#7E6DB5' },
-    { name:'Shipping',    amt:ship,  pct: t.rev>0?(ship/t.rev*100).toFixed(1):0,  color:'#4A7FC1' },
-    { name:'Shopify Fee', amt:txFee, pct: t.rev>0?(txFee/t.rev*100).toFixed(1):0, color:'#C8A96E' },
-    { name:'Gateway Fee', amt:gwFee, pct: t.rev>0?(gwFee/t.rev*100).toFixed(1):0, color:'#5A9E72' },
-    { name:'Net Profit',  amt:profit,pct: profitPct,                               color: profit>=0?'#5A9E72':'#D95454' },
+    { name:'Ad Spend',        amt:ad,    pct: t.rev>0?((ad/t.rev)*100).toFixed(2):0,    color:'#D95454', icon:'📣' },
+    { name:'COGS',            amt:cogs,  pct: t.rev>0?((cogs/t.rev)*100).toFixed(2):0,  color:'#7E6DB5', icon:'📦' },
+    { name:'Shipping',        amt:ship,  pct: t.rev>0?((ship/t.rev)*100).toFixed(2):0,  color:'#4A7FC1', icon:'🚚' },
+    { name:'Transaction Fee', amt:txFee, pct: t.rev>0?((txFee/t.rev)*100).toFixed(2):0, color:'#C8A96E', icon:'💳' },
+    { name:'Net Profit',      amt:profit,pct: profitPct,                                 color: profit>=0?'#5A9E72':'#D95454', icon:'💰' },
   ];
 
   const legendHTML = legendItems.map(i => `
     <div class="bd-legend-item">
-      <div class="bd-legend-dot" style="background:${i.color}"></div>
+      <div class="bd-legend-dot" style="background:${i.color};display:flex;align-items:center;justify-content:center;font-size:7px;">${i.icon||''}</div>
       <div class="bd-legend-text">
         <div class="bd-legend-name">${i.name}</div>
         <div class="bd-legend-amt">${f$(i.amt)}</div>
