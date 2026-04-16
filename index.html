@@ -2462,7 +2462,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div onclick="orSort('profit')" class="or-th or-sortable or-num">Net Profit</div>
           <div class="or-th" style="text-align:center">Status</div>
         </div>
-        <!-- Totals row <div class="or-totals-row" id="or-totals-row" style="display:none" class="or-totals-row or-row" data-totals="1">
+        <!-- Totals row <div class="or-totals-row" id="or-totals-row" style="display:none" class="or-totals-row" data-totals="1">
           <div></div>
           <div style="font-weight:700;font-size:12px;color:var(--ink)" id="or-totals-label">Total</div>
           <div></div>
@@ -3891,11 +3891,11 @@ function renderBreakdown() {
 ══════════════════════════════════════════ */
 const PAGES = {
   txFee:            { mainId: 'txFeeMain',            navId: 'txFeeNavItem',          onOpen: () => { loadFeeRates(); updateFeeExamples(); } },
-  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { paSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
-  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { orSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
-  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { plSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
-  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { maSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
-  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { clvSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); } },
+  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); paSyncWithRange(f,t); } },
+  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); orSyncWithRange(f,t); } },
+  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); plSyncWithRange(f,t); } },
+  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); maSyncWithRange(f,t); } },
+  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); clvSyncWithRange(f,t); } },
 };
 
 let activePage = null;
