@@ -1351,32 +1351,48 @@ let livePlatforms = {
 /* ══════════════════════════════════════════
    DATE HELPERS
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   DATE HELPERS — defined early, used by getRange + date picker
+══════════════════════════════════════════ */
+// These must be defined before getRange and doSync
+let dpCustomFrom = null;
+let dpCustomTo   = null;
+
+const _fmtISO = d => d.toISOString().slice(0,10);
+
 function getRange(key) {
-  // If custom range was set via calendar
+  // If custom range was set via calendar picker
   if (dpCustomFrom && dpCustomTo) {
     return { from: dpCustomFrom, to: dpCustomTo };
   }
   const now   = new Date();
   const today = now.toISOString().slice(0,10);
-  const map   = { today:0, yesterday:1, '7d':6, '30d':29, '90d':89,
-    thismonth: Math.floor((now - new Date(now.getFullYear(),now.getMonth(),1))/86400000),
-    ytd: Math.floor((now - new Date(now.getFullYear(),0,1)) / 86400000),
-    lastyear: 0, lastmonth: 0 };
 
-  // Special cases
+  if (key === 'today') {
+    return { from: today, to: today };
+  }
   if (key === 'yesterday') {
-    const y = new Date(now-86400000).toISOString().slice(0,10);
+    const y = new Date(now - 86400000).toISOString().slice(0,10);
     return { from: y, to: y };
   }
   if (key === 'lastmonth') {
-    return { from: fmtISO(startOfLastMonth()), to: fmtISO(endOfLastMonth()) };
+    const s = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const e = new Date(now.getFullYear(), now.getMonth(), 0);
+    return { from: _fmtISO(s), to: _fmtISO(e) };
   }
   if (key === 'lastyear') {
-    return { from: fmtISO(startOfLastYear()), to: fmtISO(endOfLastYear()) };
+    const y = now.getFullYear() - 1;
+    return { from: `${y}-01-01`, to: `${y}-12-31` };
+  }
+  if (key === 'thismonth') {
+    const s = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { from: _fmtISO(s), to: today };
   }
 
-  const days  = map[key] ?? 6;
-  const from  = new Date(now - days*86400000).toISOString().slice(0,10);
+  const map = { '7d':6, '30d':29, '90d':89,
+    ytd: Math.floor((now - new Date(now.getFullYear(),0,1)) / 86400000) };
+  const days = map[key] ?? 0;
+  const from = new Date(now - days * 86400000).toISOString().slice(0,10);
   return { from, to: today };
 }
 
@@ -1977,12 +1993,11 @@ function clearForm() {
    DATE PICKER
 ══════════════════════════════════════════ */
 let dpOpen      = false;
-let dpSelStart  = null;  // Date object
-let dpSelEnd    = null;  // Date object
+let dpSelStart  = null;
+let dpSelEnd    = null;
 let dpHover     = null;
-let dpViewLeft  = new Date(); // month shown on left
-let dpCustomFrom = null;
-let dpCustomTo   = null;
+let dpViewLeft  = new Date();
+// dpCustomFrom and dpCustomTo declared earlier in DATE HELPERS section
 
 // Initialise: left = current month, right = next month
 dpViewLeft = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
