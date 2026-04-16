@@ -1412,155 +1412,187 @@ function getRange(key) {
 ══════════════════════════════════════════ */
 async function doSync() {
   const btn = document.getElementById('syncBtn');
-  if (btn) {
-    btn.innerHTML = '<span>⟳</span> SYNCING...';
-    btn.style.opacity = '0.7';
-    btn.disabled = true;
-  }
+  if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
   const { from, to } = getRange(activeRange);
-  toast('Fetching live data from Shopify + Meta...', 'ok');
+  toast('Fetching live data...', 'ok');
 
   try {
-    // Fetch Shopify + Meta in parallel
-    // Google + Microsoft will be added once API keys are in Vercel
+    // ── Fetch Shopify + Meta in parallel ──────────────────────
     const [shopifyRes, metaRes] = await Promise.allSettled([
       fetch(`${PROXY}?service=shopify&action=daily-sales&from=${from}&to=${to}`),
       fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`),
-      // Google: uncomment when approved
+      // Google Ads — uncomment once API approved & env vars added to Vercel:
       // fetch(`${PROXY}?service=google-ads&from=${from}&to=${to}`),
-      // Microsoft: uncomment when ready
+      // Microsoft Ads — uncomment once Azure OAuth set up:
       // fetch(`${PROXY}?service=ms-ads&from=${from}&to=${to}`),
     ]);
 
-    // ── Parse Shopify ─────────────────────────────────────────
-    let shopifyDays = {};
-    if (shopifyRes.status === 'fulfilled' && shopifyRes.value.ok) {
-      const d = await shopifyRes.value.json();
-      (d.daily || []).forEach(day => { shopifyDays[day.date] = day; });
-      isLiveData = Object.keys(shopifyDays).length > 0;
-    }
+    // ── Parse Shopify ──────────────────────────────────────────
+    let shopifyDays  = {};
+    let shopifyTotal = { revenue:0, orders:0 };
 
-    // ── Parse Meta ────────────────────────────────────────────
-    let metaDays = {};
-    if (metaRes.status === 'fulfilled' && metaRes.value.ok) {
-      const d = await metaRes.value.json();
-      if (d.total) {
-        livePlatforms.meta = d.total;
-        updateAdCard('meta', d.total);
-        // Update sidebar ROAS badge
-        const roas = d.total.roas || 0;
-        document.getElementById('meta-roas-badge').textContent = roas.toFixed(1) + '×';
-        document.getElementById('meta-roas-badge').style.color =
-          roas >= 3 ? 'var(--green)' : roas >= 2 ? 'var(--orange)' : 'var(--red)';
+    if (shopifyRes.status === 'fulfilled') {
+      const resp = shopifyRes.value;
+      if (resp.ok) {
+        const d = await resp.json();
+        console.log('[Shopify] raw response:', d);
+        (d.daily || []).forEach(day => {
+          shopifyDays[day.date] = day;
+          shopifyTotal.revenue += day.revenue || 0;
+          shopifyTotal.orders  += day.orders  || 0;
+        });
+        isLiveData = Object.keys(shopifyDays).length > 0;
+        if (isLiveData) {
+          console.log(`[Shopify] ✓ ${Object.keys(shopifyDays).length} days, $${shopifyTotal.revenue.toFixed(2)} revenue`);
+        } else {
+          console.warn('[Shopify] No orders found for this date range');
+        }
+      } else {
+        const err = await resp.json().catch(()=>({}));
+        console.error('[Shopify] HTTP error:', resp.status, err);
       }
-      (d.daily || []).forEach(day => { metaDays[day.date] = day.spend || 0; });
+    } else {
+      console.error('[Shopify] Fetch failed:', shopifyRes.reason);
     }
 
-    // ── Merge into rows ───────────────────────────────────────
+    // ── Parse Meta Ads ─────────────────────────────────────────
+    let metaDaySpend = {}; // date → spend
+
+    if (metaRes.status === 'fulfilled') {
+      const resp = metaRes.value;
+      if (resp.ok) {
+        const d = await resp.json();
+        console.log('[Meta] raw response:', d);
+        if (d.error) {
+          console.error('[Meta] API error:', d.error);
+        } else if (d.total) {
+          livePlatforms.meta = d.total;
+          // Update sidebar ROAS badge
+          const roas = d.total.roas || 0;
+          const roasBadge = document.getElementById('meta-roas-badge');
+          if (roasBadge) {
+            roasBadge.textContent = roas > 0 ? roas.toFixed(1)+'×' : '—';
+            roasBadge.style.color = roas>=3?'var(--green)':roas>=2?'var(--orange)':'var(--red)';
+          }
+          // Update Meta ad card
+          updateAdCard('meta', d.total);
+          console.log(`[Meta] ✓ spend=$${d.total.spend}, roas=${d.total.roas}`);
+        }
+        // Store daily spend by date for row merging
+        (d.daily || []).forEach(day => {
+          metaDaySpend[day.date] = day.spend || 0;
+        });
+      } else {
+        const err = await resp.json().catch(()=>({}));
+        console.error('[Meta] HTTP error:', resp.status, err);
+      }
+    } else {
+      console.error('[Meta] Fetch failed:', metaRes.reason);
+    }
+
+    // ── Merge into rows ────────────────────────────────────────
     if (isLiveData) {
-      // Total meta spend across period, spread proportionally by day revenue
-      const totalMetaSpend = livePlatforms.meta?.spend || 0;
-      const totalShopifyRev = Object.values(shopifyDays).reduce((s,d) => s+d.revenue, 0);
+      const totalMetaSpend  = livePlatforms.meta?.spend || 0;
+      const totalShopifyRev = shopifyTotal.revenue || 1;
 
       rows = Object.values(shopifyDays).map(day => {
-        const rev    = day.revenue || 0;
-        const orders = day.orders  || 0;
-        // Spread meta spend proportionally by revenue share
-        const dayShare = totalShopifyRev > 0 ? rev / totalShopifyRev : 0;
-        const meta   = metaDays[day.date] !== undefined
-          ? metaDays[day.date]
+        const rev    = +(day.revenue || 0).toFixed(2);
+        const orders = day.orders || 0;
+
+        // Use actual daily Meta spend if available, else spread total proportionally
+        const dayShare = rev / totalShopifyRev;
+        const meta = metaDaySpend[day.date] !== undefined
+          ? +metaDaySpend[day.date].toFixed(2)
           : +(totalMetaSpend * dayShare).toFixed(2);
-        const google = 0; // will be live once Google API approved
-        const ms     = 0; // will be live once Microsoft connected
-        const cogs   = +(orders * UNIT_COST).toFixed(2);
-        const ship   = +(rev * SHIP_RATE).toFixed(2);
+
+        // Load saved settings for COGS/shipping
+        let unitCost = UNIT_COST, shipRate = SHIP_RATE;
+        try {
+          const cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}');
+          if (cfg.unitCost) unitCost = cfg.unitCost;
+          if (cfg.shipRate) shipRate = cfg.shipRate / 100;
+        } catch(e) {}
+
         return {
           date:    day.date,
           orders,
           revenue: rev,
-          cogs,
-          google,
+          cogs:    +(orders * unitCost).toFixed(2),
+          google:  0,   // live when Google Ads API approved
           meta,
-          ms,
-          ship,
+          ms:      0,   // live when Microsoft Ads connected
+          ship:    +(rev * shipRate).toFixed(2),
         };
       }).sort((a,b) => a.date.localeCompare(b.date));
 
-      // Format dates nicely for display
+      // Pretty-format dates for display
       rows = rows.map(r => ({
         ...r,
-        date: new Date(r.date).toLocaleDateString('en-AU', {month:'short', day:'2-digit'})
+        displayDate: new Date(r.date+'T00:00:00').toLocaleDateString('en-AU',{month:'short',day:'2-digit'}),
       }));
 
-      toast('✓ Live data loaded — Shopify + Meta', 'ok');
+      const sources = ['Shopify'];
+      if (livePlatforms.meta) sources.push('Meta Ads');
+      toast(`✓ Live — ${sources.join(' + ')}`, 'ok');
+
     } else {
-      toast('Using sample data — check proxy connection', 'err');
+      console.warn('[Sync] No Shopify data — falling back to sample');
+      toast('No data for this period — showing sample', 'err');
       loadSampleData();
     }
 
   } catch (err) {
-    console.error('Sync error:', err);
-    toast('Sync failed — using sample data', 'err');
+    console.error('[Sync] Unexpected error:', err);
+    toast('Sync error — using sample data', 'err');
     loadSampleData();
   }
 
-  if (btn) {
-    btn.innerHTML = '<span>⟳</span> REFRESH DATA';
-    btn.style.opacity = '1';
-    btn.disabled = false;
-  }
-
+  if (btn) { btn.innerHTML = '<span>⟳</span> REFRESH DATA'; btn.style.opacity='1'; btn.disabled=false; }
   renderAll();
 }
 
-/* ── Update an ad platform card with live data ── */
+/* ── Update ad platform card with live data ── */
 function updateAdCard(platform, data) {
   if (!data) return;
-  const pfx = platform === 'ms' ? 'ms' : platform;
-  const spendEl  = document.getElementById(`${pfx}-spend-val`);
-  const roasEl   = document.getElementById(`${pfx}-roas-val`);
-  const revEl    = document.getElementById(`${pfx}-rev-val`);
-  const cpaEl    = document.getElementById(`${pfx}-cpa-val`);
-  const convEl   = document.getElementById(`${pfx}-conv-val`);
-  const roasBar  = document.getElementById(`${pfx}-roas-bar`);
-
-  if (spendEl) spendEl.textContent = '$' + (data.spend||0).toLocaleString(undefined,{maximumFractionDigits:0});
-  if (revEl)   revEl.textContent   = '$' + (data.revenue||0).toLocaleString(undefined,{maximumFractionDigits:0});
-  if (cpaEl)   cpaEl.textContent   = '$' + (data.cpa||0).toFixed(2);
-  if (convEl)  convEl.textContent  = Math.round(data.conversions||0);
-  if (roasEl) {
-    const roas = data.roas || 0;
-    roasEl.textContent  = roas.toFixed(1) + '×';
-    roasEl.className    = 'am-v ' + (roas>=3?'good':roas>=2?'warn':'bad');
+  const ids = {
+    spend: `${platform}-spend-val`,
+    roas:  `${platform}-roas-val`,
+    rev:   `${platform}-rev-val`,
+    cpa:   `${platform}-cpa-val`,
+    conv:  `${platform}-conv-val`,
+    bar:   `${platform}-roas-bar`,
+  };
+  const get = id => document.getElementById(id);
+  if (get(ids.spend)) get(ids.spend).textContent = f$(data.spend||0);
+  if (get(ids.rev))   get(ids.rev).textContent   = f$(data.revenue||0);
+  if (get(ids.cpa))   get(ids.cpa).textContent   = '$'+(data.cpa||0).toFixed(2);
+  if (get(ids.conv))  get(ids.conv).textContent  = Math.round(data.conversions||0);
+  if (get(ids.roas)) {
+    const roas = data.roas||0;
+    get(ids.roas).textContent = roas>0 ? roas.toFixed(1)+'×' : '—';
+    get(ids.roas).className   = 'am-v '+(roas>=3?'good':roas>=2?'warn':'bad');
   }
-  if (roasBar) {
-    const pct = Math.min(100, ((data.roas||0)/5)*100);
-    roasBar.style.width = pct + '%';
-    roasBar.style.background = (data.roas||0)>=3 ? 'var(--green)' : 'var(--orange)';
+  if (get(ids.bar)) {
+    const pct = Math.min(100,((data.roas||0)/5)*100);
+    get(ids.bar).style.width = pct+'%';
+    get(ids.bar).style.background = (data.roas||0)>=3?'var(--green)':'var(--orange)';
   }
 }
 
 /* ── Sample data fallback ── */
 function loadSampleData() {
   rows = [
-    {date:'Apr 09', orders:18, revenue:2140, cogs:816,  google:380, meta:310, ms:110, ship:96},
-    {date:'Apr 10', orders:27, revenue:3210, cogs:1224, google:540, meta:470, ms:150, ship:144},
-    {date:'Apr 11', orders:21, revenue:2480, cogs:946,  google:410, meta:380, ms:120, ship:111},
-    {date:'Apr 12', orders:24, revenue:2890, cogs:1102, google:480, meta:420, ms:130, ship:130},
-    {date:'Apr 13', orders:16, revenue:1980, cogs:755,  google:320, meta:280, ms:90,  ship:84},
-    {date:'Apr 14', orders:26, revenue:3140, cogs:1197, google:520, meta:450, ms:140, ship:134},
-    {date:'Apr 15', orders:22, revenue:2700, cogs:1030, google:390, meta:340, ms:120, ship:120},
+    {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225, google:0,meta:310,ms:0,ship:96},
+    {date:'2026-04-10',displayDate:'10 Apr',orders:27,revenue:3210,cogs:338, google:0,meta:470,ms:0,ship:144},
+    {date:'2026-04-11',displayDate:'11 Apr',orders:21,revenue:2480,cogs:263, google:0,meta:380,ms:0,ship:111},
+    {date:'2026-04-12',displayDate:'12 Apr',orders:24,revenue:2890,cogs:300, google:0,meta:420,ms:0,ship:130},
+    {date:'2026-04-13',displayDate:'13 Apr',orders:16,revenue:1980,cogs:200, google:0,meta:280,ms:0,ship:84},
+    {date:'2026-04-14',displayDate:'14 Apr',orders:26,revenue:3140,cogs:325, google:0,meta:450,ms:0,ship:134},
+    {date:'2026-04-15',displayDate:'15 Apr',orders:22,revenue:2700,cogs:275, google:0,meta:340,ms:0,ship:120},
   ];
   isLiveData = false;
 }
-  {date:'Apr 10', orders:27, revenue:3210, cogs:1224, google:540, meta:470, ms:150, ship:144},
-  {date:'Apr 11', orders:21, revenue:2480, cogs:946,  google:410, meta:380, ms:120, ship:111},
-  {date:'Apr 12', orders:24, revenue:2890, cogs:1102, google:480, meta:420, ms:130, ship:130},
-  {date:'Apr 13', orders:16, revenue:1980, cogs:755,  google:320, meta:280, ms:90,  ship:84},
-  {date:'Apr 14', orders:26, revenue:3140, cogs:1197, google:520, meta:450, ms:140, ship:134},
-  {date:'Apr 15', orders:22, revenue:2700, cogs:1030, google:390, meta:340, ms:120, ship:120},
-];
 
 /* ══════════════════════════════════════════
    CALC + FORMAT
@@ -1798,10 +1830,11 @@ function renderChart() {
     const c    = calc(r);
     const revH = Math.round((r.revenue/maxRev)*H);
     const cstH = Math.round((c.total/maxRev)*H);
-    const lbl  = r.date.includes(' ') ? r.date.split(' ')[1] : r.date.slice(-2);
+    const d    = r.displayDate || r.date;
+    const lbl  = d.includes(' ') ? d.split(' ')[1] : d.slice(-2);
     const div  = document.createElement('div');
     div.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;height:100%;cursor:pointer';
-    div.title = `${r.date} | Revenue: ${f$(r.revenue)} | Costs: ${f$(c.total)} | Profit: ${f$(c.profit)} | Margin: ${c.margin}%`;
+    div.title = `${d} | Revenue: ${f$(r.revenue)} | Costs: ${f$(c.total)} | Profit: ${f$(c.profit)} | Margin: ${c.margin}%`;
     div.innerHTML = `
       <div style="display:flex;gap:2px;align-items:flex-end;width:90%;height:${H}px">
         <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
