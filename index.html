@@ -2199,7 +2199,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status bar -->
-    <div id="pa-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div id="pa-kpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2391,7 +2390,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status -->
-    <div id="or-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2555,7 +2553,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <div id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2747,7 +2744,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <div id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -3028,7 +3024,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <div id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -4839,15 +4834,7 @@ let orSelectedIds = new Set();
 
 async function orSync() { orSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function orSetStatus(msg, isErr=false) {
-  const el = document.getElementById('or-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function orSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const orFmt$ = n => {
   const v = Math.abs(parseFloat(n)||0);
@@ -5069,15 +5056,7 @@ let clvData = null;
 
 async function clvSync() { clvSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function clvSetStatus(msg, isErr=false) {
-  const el = document.getElementById('clv-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function clvSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const clvFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -5509,15 +5488,7 @@ let maSortDir  = -1;
 
 async function maSync() { maSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function maSetStatus(msg, isErr=false) {
-  const el = document.getElementById('ma-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function maSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const maFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
 const maFmtK = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n);
@@ -5747,15 +5718,7 @@ let plGranularity = 'daily'; // daily | weekly | monthly
 
 async function plSync() { plSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function plSetStatus(msg, isErr=false) {
-  const el = document.getElementById('pl-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function plSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 function plSetGranularity(g) {
   plGranularity = g;
@@ -6104,15 +6067,7 @@ function paApplyPreset(key) { window.paApplyPreset?.(key); }
 
 async function paSync() { paSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function paSetStatus(msg, isErr=false) {
-  const el = document.getElementById('pa-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function paSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 function paRender() {
   if (!paData) return;
