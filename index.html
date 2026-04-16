@@ -2144,10 +2144,15 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div class="dp-panel" id="paDpPanel">
           <div class="dp-presets">
+            <button class="dp-preset" onclick="paApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="paApplyPreset('yesterday')">Yesterday</button>
             <button class="dp-preset" onclick="paApplyPreset('7d')">Last 7 days</button>
             <button class="dp-preset active" onclick="paApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="paApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="paApplyPreset('lastmonth')">Last month</button>
             <button class="dp-preset" onclick="paApplyPreset('90d')">Last 90 days</button>
-            <button class="dp-preset" onclick="paApplyPreset('365d')">Last 12 months</button>
+            <button class="dp-preset" onclick="paApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="paApplyPreset('lastyear')">Last year</button>
           </div>
           <div style="flex:1;display:flex;flex-direction:column">
             <div class="dp-cal-area">
@@ -2339,9 +2344,15 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div class="dp-panel" id="orDpPanel">
           <div class="dp-presets">
+            <button class="dp-preset" onclick="orApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="orApplyPreset('yesterday')">Yesterday</button>
             <button class="dp-preset" onclick="orApplyPreset('7d')">Last 7 days</button>
             <button class="dp-preset active" onclick="orApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="orApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="orApplyPreset('lastmonth')">Last month</button>
             <button class="dp-preset" onclick="orApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="orApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="orApplyPreset('lastyear')">Last year</button>
           </div>
           <div style="flex:1;display:flex;flex-direction:column">
             <div class="dp-cal-area">
@@ -2497,14 +2508,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
           <div class="dp-panel" id="plDpPanel">
             <div class="dp-presets">
-              <button class="dp-preset" onclick="plApplyPreset('7d')">Last 7 days</button>
-              <button class="dp-preset active" onclick="plApplyPreset('30d')">Last 30 days</button>
-              <button class="dp-preset" onclick="plApplyPreset('thismonth')">This month</button>
-              <button class="dp-preset" onclick="plApplyPreset('lastmonth')">Last month</button>
-              <button class="dp-preset" onclick="plApplyPreset('90d')">Last 90 days</button>
-              <button class="dp-preset" onclick="plApplyPreset('ytd')">This year</button>
-              <button class="dp-preset" onclick="plApplyPreset('lastyear')">Last year</button>
-            </div>
+            <button class="dp-preset" onclick="plApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="plApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="plApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="plApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="plApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="plApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="plApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="plApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="plApplyPreset('lastyear')">Last year</button>
+          </div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div class="dp-cal-area">
                 <div class="dp-inputs">
@@ -2686,14 +2699,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
           <div class="dp-panel" id="maDpPanel">
             <div class="dp-presets">
-              <button class="dp-preset" onclick="maApplyPreset('7d')">Last 7 days</button>
-              <button class="dp-preset active" onclick="maApplyPreset('30d')">Last 30 days</button>
-              <button class="dp-preset" onclick="maApplyPreset('thismonth')">This month</button>
-              <button class="dp-preset" onclick="maApplyPreset('lastmonth')">Last month</button>
-              <button class="dp-preset" onclick="maApplyPreset('90d')">Last 90 days</button>
-              <button class="dp-preset" onclick="maApplyPreset('ytd')">This year</button>
-              <button class="dp-preset" onclick="maApplyPreset('lastyear')">Last year</button>
-            </div>
+            <button class="dp-preset" onclick="maApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="maApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="maApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="maApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="maApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="maApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="maApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="maApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="maApplyPreset('lastyear')">Last year</button>
+          </div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div class="dp-cal-area">
                 <div class="dp-inputs">
@@ -2964,12 +2979,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
           <div class="dp-panel" id="clvDpPanel">
             <div class="dp-presets">
-              <button class="dp-preset" onclick="clvApplyPreset('90d')">Last 90 days</button>
-              <button class="dp-preset" onclick="clvApplyPreset('thismonth')">This month</button>
-              <button class="dp-preset" onclick="clvApplyPreset('lastmonth')">Last month</button>
-              <button class="dp-preset active" onclick="clvApplyPreset('ytd')">This year</button>
-              <button class="dp-preset" onclick="clvApplyPreset('lastyear')">Last year</button>
-            </div>
+            <button class="dp-preset" onclick="clvApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="clvApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="clvApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset" onclick="clvApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="clvApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="clvApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="clvApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset active" onclick="clvApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="clvApplyPreset('lastyear')">Last year</button>
+          </div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div class="dp-cal-area">
                 <div class="dp-inputs">
@@ -5239,6 +5258,8 @@ function clvExportCSV() {
   const _eom  = d => new Date(d.getFullYear(),d.getMonth()+1,0);
   const _solm = () => { const n=_now(); return new Date(n.getFullYear(),n.getMonth()-1,1); };
   const PRESETS = {
+    'today':     ()=>({from:_now(),                           to:_now(), label:'Today'}),
+    'yesterday': ()=>{ const y=_ago(1); return {from:y, to:y, label:'Yesterday'}; },
     '7d':        ()=>({from:_ago(6),                          to:_now(), label:'Last 7 Days'}),
     '30d':       ()=>({from:_ago(29),                         to:_now(), label:'Last 30 Days'}),
     '90d':       ()=>({from:_ago(89),                         to:_now(), label:'Last 90 Days'}),
