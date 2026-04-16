@@ -4889,7 +4889,7 @@ function orRenderTable() {
   const el = document.getElementById('or-table-body');
   if (!el) return;
   if (!orFiltered.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">No orders match the current filters</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-size:12px">No orders match the current filters</div>';
     return;
   }
   const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
@@ -6150,7 +6150,7 @@ function paRenderInventory() {
   if (!el || !paData) return;
   const items = paData.inventoryHealth.filter(i => i.totalStock !== null);
   if (!items.length) {
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px;font-family:'Inter',sans-serif">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
     return;
   }
   const sorted = [...items].sort((a,b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
