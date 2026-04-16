@@ -1666,9 +1666,9 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <div class="sb-div"></div>
     <div class="sb-label" style="padding-top:4px">Platform ROAS</div>
 
-    <div class="sb-nav-item" onclick="void(0)">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">●</span>Google Ads</div>
-      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">4.2×</span>
+    <div class="sb-nav-item" id="navGoogleAds2" onclick="openPage('googleAds')" style="cursor:pointer">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">G</span>Google Ads</div>
+      <span class="sb-nav-badge" id="ga-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
     </div>
     <div class="sb-nav-item" onclick="void(0)">
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">●</span>Meta Ads</div>
@@ -1700,10 +1700,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
     <div class="sb-nav-item" id="navCLV" onclick="openPage('clv')" style="cursor:pointer;">
       <div class="sb-nav-left"><span class="sb-nav-icon">👥</span><span>Customer Lifetime Value</span></div></div>
-    <div class="sb-nav-item" id="navGoogleAds" onclick="openPage('googleAds')" style="cursor:pointer;">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">G</span><span>Google Ads</span></div>
-      <span style="font-size:9px;color:var(--c3);opacity:0.7">→</span>
-    </div>
 
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
@@ -5300,36 +5296,36 @@ function gaRender() {
   const fmtX = n => n > 0 ? n.toFixed(2) + '×' : '—';
   const fmtPct = n => n > 0 ? n.toFixed(1) + '%' : '—';
 
-  setText('ga-spend',        fmt(spend));
-  setText('ga-spend-sub',    spend > 0 ? 'total ad spend' : 'awaiting API');
-  setText('ga-conv-value',   fmt(convVal));
-  setText('ga-conv-value-sub', convVal > 0 ? 'attributed revenue' : 'awaiting API');
-  setText('ga-roas',         fmtX(roas));
-  setText('ga-cpa',          fmt(cpa));
-  setText('ga-conv',         conv > 0 ? conv.toLocaleString() : '—');
-  setText('ga-conv-sub',     conv > 0 ? 'purchases' : 'awaiting API');
-  setText('ga-cpc',          fmt(cpc));
-  setText('ga-ctr-sub',      ctr > 0 ? 'CTR: ' + fmtPct(ctr) : 'CTR: —');
+  _gaSetText('ga-spend',        fmt(spend));
+  _gaSetText('ga-spend-sub',    spend > 0 ? 'total ad spend' : 'awaiting API');
+  _gaSetText('ga-conv-value',   fmt(convVal));
+  _gaSetText('ga-conv-value-sub', convVal > 0 ? 'attributed revenue' : 'awaiting API');
+  _gaSetText('ga-roas',         fmtX(roas));
+  _gaSetText('ga-cpa',          fmt(cpa));
+  _gaSetText('ga-conv',         conv > 0 ? conv.toLocaleString() : '—');
+  _gaSetText('ga-conv-sub',     conv > 0 ? 'purchases' : 'awaiting API');
+  _gaSetText('ga-cpc',          fmt(cpc));
+  _gaSetText('ga-ctr-sub',      ctr > 0 ? 'CTR: ' + fmtPct(ctr) : 'CTR: —');
 
   // Impression Share bars (from live data or mock)
   const is       = d?.impressionShare     || 0;
   const isTop    = d?.absTopIS            || 0;
   const isBudget = d?.lostISBudget        || 0;
   const isRank   = d?.lostISRank          || 0;
-  setBar('ga-is-search', is,       'ga-is-search-pct',  fmtPct(is * 100));
-  setBar('ga-is-budget', isBudget, 'ga-is-budget-pct',  fmtPct(isBudget * 100));
-  setBar('ga-is-rank',   isRank,   'ga-is-rank-pct',    fmtPct(isRank * 100));
-  setBar('ga-is-top',    isTop,    'ga-is-top-pct',     fmtPct(isTop * 100));
+  _gaSetBar('ga-is-search', is,       'ga-is-search-pct',  fmtPct(is * 100));
+  _gaSetBar('ga-is-budget', isBudget, 'ga-is-budget-pct',  fmtPct(isBudget * 100));
+  _gaSetBar('ga-is-rank',   isRank,   'ga-is-rank-pct',    fmtPct(isRank * 100));
+  _gaSetBar('ga-is-top',    isTop,    'ga-is-top-pct',     fmtPct(isTop * 100));
 
   // Performance scorecard
-  gaScore('ga-roas-score', roas, roas >= 4 ? 'good' : roas >= 2 ? 'warn' : 'bad',
+  _gaScore('ga-roas-score', roas, roas >= 4 ? 'good' : roas >= 2 ? 'warn' : 'bad',
     roas > 0 ? (roas >= 4 ? '✅ ' + fmtX(roas) : '⚠ ' + fmtX(roas)) : '—');
-  gaScore('ga-ctr-score',  ctr,  ctr  >= 3 ? 'good' : ctr  >= 1.5 ? 'warn' : 'bad',
+  _gaScore('ga-ctr-score',  ctr,  ctr  >= 3 ? 'good' : ctr  >= 1.5 ? 'warn' : 'bad',
     ctr > 0 ? (ctr >= 3 ? '✅ ' + fmtPct(ctr) : '⚠ ' + fmtPct(ctr)) : '—');
-  gaScore('ga-cvr-score',  cvr,  cvr  >= 4 ? 'good' : cvr  >= 2 ? 'warn' : 'bad',
+  _gaScore('ga-cvr-score',  cvr,  cvr  >= 4 ? 'good' : cvr  >= 2 ? 'warn' : 'bad',
     cvr > 0 ? (cvr >= 4 ? '✅ ' + fmtPct(cvr) : '⚠ ' + fmtPct(cvr)) : '—');
   const aov = 120; // approximate AOV in AUD
-  gaScore('ga-cpa-score',  cpa,  cpa  > 0 && cpa < aov*0.4 ? 'good' : cpa < aov ? 'warn' : 'bad',
+  _gaScore('ga-cpa-score',  cpa,  cpa  > 0 && cpa < aov*0.4 ? 'good' : cpa < aov ? 'warn' : 'bad',
     cpa > 0 ? (cpa < aov*0.4 ? '✅ ' + fmt(cpa) : '⚠ ' + fmt(cpa)) : '—');
 
   // Campaign table
@@ -5392,12 +5388,12 @@ function gaRender() {
   }
 }
 
-function setText(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
-function setBar(barId, val, pctId, pctLabel) {
+function _gaSetText(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+function _gaSetBar(barId, val, pctId, pctLabel) {
   const bar=document.getElementById(barId); if(bar) bar.style.width=(Math.min(val*100,100))+'%';
   const pct=document.getElementById(pctId); if(pct) pct.textContent=pctLabel;
 }
-function gaScore(id, val, cls, label) {
+function _gaScore(id, val, cls, label) {
   const el=document.getElementById(id); if(!el) return;
   el.textContent=label;
   const colors={good:'rgba(90,158,114,0.15)',warn:'rgba(212,135,74,0.15)',bad:'rgba(217,84,84,0.15)'};
