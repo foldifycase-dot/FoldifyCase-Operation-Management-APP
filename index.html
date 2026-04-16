@@ -110,7 +110,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   padding:8px 14px;
   background:#fff; border:1px solid var(--cream-3);
   border-radius:var(--r-s); cursor:pointer;
-  font-family:var(--mono); font-size:12px; color:var(--c2);
+  font-family:'Inter',sans-serif; font-size:12px; color:var(--c2);
   transition:all 0.15s; user-select:none;
 }
 .dp-trigger:hover { border-color:var(--gold); }
@@ -163,7 +163,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.12);
   border-radius:var(--r-s); color:var(--t1);
-  font-family:var(--mono); font-size:12px;
+  font-family:'Inter',sans-serif; font-size:12px;
   outline:none; text-align:center;
   transition:border-color 0.2s;
 }
@@ -194,12 +194,12 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   gap:2px;
 }
 .dp-day-name {
-  text-align:center; font-family:var(--mono);
+  text-align:center; font-family:'Inter',sans-serif;
   font-size:10px; color:var(--t3);
   padding:4px 0; letter-spacing:0.05em;
 }
 .dp-day {
-  text-align:center; font-family:var(--mono);
+  text-align:center; font-family:'Inter',sans-serif;
   font-size:12px; color:var(--t2);
   padding:6px 2px; border-radius:5px;
   cursor:pointer; transition:all 0.1s;
@@ -327,9 +327,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 
 .sb-label {
-  font-family:'Syne', sans-serif;
-  font-size:9px;
-  font-weight:700;
+  font-family:'Inter',sans-serif;x0;
   letter-spacing:0.18em;
   text-transform:uppercase;
   color:var(--gold);
@@ -408,9 +406,9 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
 }
-.or-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
-.or-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
-.or-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+.or-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.or-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
+.or-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
 
 /* Table header */
 .or-tbl-head {
@@ -451,7 +449,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .or-row:hover { background:rgba(200,169,110,0.04); }
 .or-row:last-child { border-bottom:none; }
 .or-cell { flex-shrink:0;padding:0 6px;font-size:12px; }
-.or-cell-num { width:100px;text-align:right;font-family:var(--mono);font-size:12px;padding:0 6px;color:var(--c2); }
+.or-cell-num { width:100px;text-align:right;font-family:'Inter',sans-serif;font-size:12px;padding:0 6px;color:var(--c2); }
 
 /* Status badges */
 .or-badge {
@@ -470,7 +468,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .or-cb-label { font-size:10px;color:var(--c2);width:90px;flex-shrink:0; }
 .or-cb-bar-wrap { flex:1;background:rgba(28,27,24,0.06);border-radius:3px;height:7px;overflow:hidden; }
 .or-cb-bar { height:100%;border-radius:3px;transition:width .4s ease; }
-.or-cb-val { font-size:10px;font-family:var(--mono);color:var(--c3);width:42px;text-align:right;flex-shrink:0; }
+.or-cb-val { font-size:10px;font-family:'Inter',sans-serif;color:var(--c3);width:42px;text-align:right;flex-shrink:0; }
 
 /* Pagination */
 .or-page-btn {
@@ -486,27 +484,27 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
 }
-.clv-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
-.clv-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
-.clv-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+.clv-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.clv-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
+.clv-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
 
 /* Cohort heatmap */
 .clv-cohort-grid { display:grid;border-collapse:collapse; }
 .clv-cohort-cell {
   width:52px;height:34px;
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-family:var(--mono);font-weight:600;
+  font-size:10px;font-family:'Inter',sans-serif;font-weight:600;
   border-radius:4px;
   transition:transform .1s;cursor:default;
 }
 .clv-cohort-cell:hover { transform:scale(1.1);z-index:2;position:relative; }
 .clv-cohort-label {
-  font-size:10px;color:var(--c3);font-family:var(--mono);
+  font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;
   white-space:nowrap;padding-right:8px;
   display:flex;align-items:center;
 }
 .clv-cohort-header-cell {
-  font-size:9px;color:var(--c3);font-family:var(--mono);
+  font-size:9px;color:var(--c3);font-family:'Inter',sans-serif;
   text-align:center;width:52px;padding-bottom:4px;
 }
 
@@ -524,7 +522,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .clv-rfm-row:last-child { border-bottom:none; }
 .clv-rfm-row:hover { background:rgba(200,169,110,0.04); }
-.clv-rfm-num { text-align:right;font-family:var(--mono);font-size:12px;color:var(--c2); }
+.clv-rfm-num { text-align:right;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2); }
 .clv-rfm-badge {
   display:inline-flex;align-items:center;gap:4px;
   padding:3px 8px;border-radius:5px;
@@ -546,7 +544,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .clv-top-row:hover { background:rgba(200,169,110,0.04); }
 .clv-top-row:last-child { border-bottom:none; }
-.clv-top-num { text-align:right;font-family:var(--mono);font-size:12px;color:var(--c2);flex-shrink:0;width:90px; }
+.clv-top-num { text-align:right;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2);flex-shrink:0;width:90px; }
 
 /* Benchmarks */
 .clv-bench-row {
@@ -561,9 +559,9 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
 }
-.ma-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
-.ma-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
-.ma-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+.ma-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.ma-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
+.ma-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
 
 /* Channel cards */
 .ma-ch-card { padding:0; }
@@ -577,7 +575,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   font-size:12px;color:var(--c3);
 }
 .ma-ch-metric:last-child { border-bottom:none; }
-.ma-ch-val { font-family:var(--mono);font-size:12px;color:var(--c1);font-weight:500; }
+.ma-ch-val { font-family:'Inter',sans-serif;font-size:12px;color:var(--c1);font-weight:600; }
 .ma-ch-val.green { color:var(--green); }
 .ma-ch-val.blue  { color:#4A7FC1; }
 .ma-ch-val.red   { color:var(--red); }
@@ -598,14 +596,14 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .ma-camp-row:hover { background:rgba(200,169,110,0.04); }
 .ma-camp-row:last-child { border-bottom:none; }
-.ma-camp-num { text-align:right;font-family:var(--mono);font-size:12px;color:var(--c2);flex-shrink:0;width:80px; }
+.ma-camp-num { text-align:right;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2);flex-shrink:0;width:80px; }
 .ma-camp-name { font-size:12px;font-weight:500;color:var(--ink);flex:3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px; }
 
 /* Allocation bars */
 .ma-alloc-row { margin-bottom:10px; }
 .ma-alloc-label { display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px; }
 .ma-alloc-name { color:var(--c2);font-weight:500; }
-.ma-alloc-pct { color:var(--c3);font-family:var(--mono); }
+.ma-alloc-pct { color:var(--c3);font-family:'Inter',sans-serif; }
 .ma-alloc-bar-wrap { background:rgba(28,27,24,0.06);border-radius:3px;height:8px;overflow:hidden; }
 .ma-alloc-bar { height:100%;border-radius:3px;transition:width .4s ease; }
 
@@ -621,7 +619,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .ma-daily-row {
   display:grid;grid-template-columns:100px 1fr 1fr 1fr 80px;
   padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.04);
-  font-size:11px;font-family:var(--mono);
+  font-size:11px;font-family:'Inter',sans-serif;
 }
 .ma-daily-row:last-child { border-bottom:none; }
 .ma-daily-row:hover { background:rgba(200,169,110,0.04); }
@@ -639,9 +637,9 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
 }
-.pl-kpi-lbl { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c3);margin-bottom:6px; }
-.pl-kpi-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--ink);line-height:1; }
-.pl-kpi-sub { font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:4px; }
+.pl-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.pl-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
+.pl-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
 
 /* Granularity toggle */
 .pl-gran-btn {
@@ -663,12 +661,12 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   height:22px;border-radius:4px;
   display:flex;align-items:center;
   padding:0 8px;font-size:11px;font-weight:700;
-  font-family:var(--mono);color:#fff;
+  font-family:'Inter',sans-serif;color:#fff;
   white-space:nowrap;min-width:4px;
   transition:width .4s ease;
 }
-.pl-wf-val { font-size:11px;font-family:var(--mono);color:var(--c2);width:80px;text-align:right;flex-shrink:0; }
-.pl-wf-pct { font-size:10px;font-family:var(--mono);color:var(--c3);width:44px;text-align:right;flex-shrink:0; }
+.pl-wf-val { font-size:11px;font-family:'Inter',sans-serif;color:var(--c2);width:80px;text-align:right;flex-shrink:0; }
+.pl-wf-pct { font-size:10px;font-family:'Inter',sans-serif;color:var(--c3);width:44px;text-align:right;flex-shrink:0; }
 .pl-wf-subtotal { border-top:1px dashed rgba(28,27,24,0.1);margin:4px 0 10px; }
 .pl-wf-subtotal-label { font-size:11px;font-weight:700;color:var(--ink);width:140px;flex-shrink:0; }
 
@@ -693,7 +691,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   background:rgba(28,27,24,0.02);
   border-bottom:1px solid rgba(28,27,24,0.04);
 }
-.pl-comp-num { text-align:right;font-family:var(--mono); }
+.pl-comp-num { text-align:right;font-family:'Inter',sans-serif; }
 .pl-comp-subtotal {
   background:rgba(28,27,24,0.03);font-weight:700;
   border-top:1px solid rgba(28,27,24,0.08);
@@ -721,20 +719,20 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   border-bottom:1px solid rgba(28,27,24,0.08) !important;
 }
 .pl-is-row.total {
-  font-weight:800;font-size:14px;
-  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:14px;
+  font-family:'Inter',sans-serif;
   background:var(--gold-bg);
   border-top:2px solid var(--gold);
   border-bottom:none !important;
 }
-.pl-is-num { text-align:right;font-family:var(--mono); }
-.pl-is-pct { text-align:right;font-family:var(--mono);font-size:11px;color:var(--c3); }
+.pl-is-num { text-align:right;font-family:'Inter',sans-serif; }
+.pl-is-pct { text-align:right;font-family:'Inter',sans-serif;font-size:11px;color:var(--c3); }
 
 /* Cost breakdown bars */
 .pl-cb-row { margin-bottom:12px; }
 .pl-cb-label { display:flex;justify-content:space-between;margin-bottom:4px; }
 .pl-cb-name { font-size:12px;color:var(--c2);font-weight:500; }
-.pl-cb-pct { font-size:11px;font-family:var(--mono);color:var(--c3); }
+.pl-cb-pct { font-size:11px;font-family:'Inter',sans-serif;color:var(--c3); }
 .pl-cb-bar-wrap { background:rgba(28,27,24,0.06);border-radius:4px;height:8px;overflow:hidden; }
 .pl-cb-bar { height:100%;border-radius:4px;transition:width .4s ease; }
 
@@ -758,7 +756,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .pl-pt-row {
   display:grid;padding:9px 16px;
   border-bottom:1px solid rgba(28,27,24,0.04);
-  font-size:11px;font-family:var(--mono);
+  font-size:11px;font-family:'Inter',sans-serif;
 }
 .pl-pt-row:hover { background:rgba(200,169,110,0.04); }
 .pl-pt-row:last-child { border-bottom:none; }
@@ -769,17 +767,18 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   flex-direction:column; gap:4px;
 }
 .pa-kpi-label {
-  font-size:10px; font-weight:700; text-transform:uppercase;
-  letter-spacing:.07em; color:var(--c3);
-  display:flex; align-items:center; gap:5px;
+  font-family:'Inter',sans-serif; font-size:10px; font-weight:500; 
+  text-transform:uppercase; letter-spacing:.06em; 
+  color:rgba(28,27,24,0.45);
+  display:flex; align-items:center; gap:5px; margin-bottom:8px;
 }
 .pa-kpi-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .pa-kpi-val {
-  font-family:'Syne',sans-serif; font-size:22px;
-  font-weight:800; color:var(--ink); line-height:1;
+  font-family:'Inter',sans-serif;x0; color:var(--ink); line-height:1;
   margin-top:2px;
+  letter-spacing:-0.01em;
 }
-.pa-kpi-sub { font-size:10px; color:var(--c3); font-family:var(--mono); }
+.pa-kpi-sub { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); }
 
 /* Table shared styles */
 .pa-tbl-head {
@@ -806,7 +805,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .pa-tbl-row:hover { background:rgba(200,169,110,0.05); }
 .pa-tbl-row:last-child { border-bottom:none; }
-.pa-cell-num { text-align:right; font-family:var(--mono); font-size:12px; color:var(--c2); }
+.pa-cell-num { text-align:right; font-family:'Inter',sans-serif; font-size:12px; color:var(--c2); }
 .pa-product-name { font-size:12px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pa-product-type { font-size:10px; color:var(--c3); margin-top:1px; }
 
@@ -838,7 +837,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   padding:8px 16px;
   background:rgba(28,27,24,0.03);
   border-bottom:1px solid rgba(28,27,24,0.06);
-  font-size:10px; font-weight:700; color:var(--c3);
+  font-family:'Inter',sans-serif; font-size:10px; font-weight:500; color:var(--c3);
   text-transform:uppercase; letter-spacing:.06em;
 }
 
@@ -850,8 +849,8 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .pa-mix-label { font-size:11px; color:var(--c2); width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
 .pa-mix-bar-wrap { flex:1; background:rgba(28,27,24,0.06); border-radius:3px; height:8px; overflow:hidden; }
 .pa-mix-bar { height:100%; border-radius:3px; background:var(--gold); transition:width .4s ease; }
-.pa-mix-pct { font-size:11px; color:var(--c3); font-family:var(--mono); width:36px; text-align:right; flex-shrink:0; }
-.pa-mix-val { font-size:11px; color:var(--c2); font-family:var(--mono); width:70px; text-align:right; flex-shrink:0; }
+.pa-mix-pct { font-size:11px; color:var(--c3); font-family:'Inter',sans-serif; width:36px; text-align:right; flex-shrink:0; }
+.pa-mix-val { font-size:11px; color:var(--c2); font-family:'Inter',sans-serif; width:70px; text-align:right; flex-shrink:0; }
 
 /* ABC panel */
 .pa-abc-bar { display:flex; border-radius:8px; overflow:hidden; height:14px; margin:12px 0 16px; }
@@ -864,6 +863,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px;
   padding:10px 16px; align-items:center;
   border-bottom:1px solid rgba(28,27,24,0.04);
+  font-family:'Inter',sans-serif;
 }
 .pa-var-row:last-child { border-bottom:none; }
 .pa-var-row:hover { background:rgba(200,169,110,0.04); }
@@ -882,7 +882,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .rcs-icon { font-size:52px; margin-bottom:20px; opacity:.85; }
 .rcs-title {
-  font-family:'Syne',sans-serif; font-size:26px; font-weight:800;
+  font-family:'Inter',sans-serif;x0;
   color:var(--ink); margin-bottom:12px; letter-spacing:-.02em;
 }
 .rcs-desc {
@@ -931,23 +931,23 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .txfee-icon {
   width:34px;height:34px;border-radius:9px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:800;color:#fff;
-  font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;color:#fff;
+  font-family:'Inter',sans-serif;
 }
 .txfee-name { font-size:13px;font-weight:500;color:var(--ink); }
-.txfee-desc { font-size:11px;color:var(--c3);margin-top:1px;font-family:var(--mono); }
+.txfee-desc { font-size:11px;color:var(--c3);margin-top:1px;font-family:'Inter',sans-serif; }
 .txfee-cell { display:flex;align-items:center;gap:5px;justify-content:flex-end; }
 .txfee-inp {
   width:72px;padding:7px 10px;border-radius:7px;
   border:1.5px solid rgba(28,27,24,0.12);
   background:#FAFAF8;color:var(--ink);
-  font-size:13px;font-family:var(--mono);
+  font-size:13px;font-family:'Inter',sans-serif;
   text-align:right;transition:border-color .15s;
 }
 .txfee-inp:focus { outline:none;border-color:var(--gold);background:#fff; }
-.txfee-unit,.txfee-prefix { font-size:11px;color:var(--c3);font-family:var(--mono); }
+.txfee-unit,.txfee-prefix { font-size:11px;color:var(--c3);font-family:'Inter',sans-serif; }
 .txfee-example {
-  text-align:right;font-family:var(--mono);
+  text-align:right;font-family:'Inter',sans-serif;
   font-size:13px;color:var(--c2);font-weight:600;
 }
 
@@ -971,7 +971,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .sb-nav-item:not(.active):hover .sb-nav-left { color:var(--t2); }
 .sb-nav-icon { font-size:11px; width:15px; text-align:center; }
 .sb-nav-badge {
-  font-size:9px; font-family:var(--mono);
+  font-size:9px; font-family:'Inter',sans-serif;
   padding:2px 7px; border-radius:20px;
   background:rgba(255,255,255,0.09); color:var(--t3);
 }
@@ -1025,7 +1025,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 /* ── Section label ── */
 .sec {
-  font-family:var(--mono); font-size:9px;
+  font-family:'Inter',sans-serif; font-size:9px;
   letter-spacing:0.2em; text-transform:uppercase;
   color:var(--c3); display:flex; align-items:center; gap:10px;
   margin-bottom:12px;
@@ -1117,7 +1117,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   font-size:12px; color:var(--c1); letter-spacing:0.01em;
 }
 .badge {
-  font-family:var(--mono); font-size:9px;
+  font-family:'Inter',sans-serif; font-size:9px;
   padding:2px 8px; border-radius:20px; border:1px solid;
 }
 .badge.gold   { border-color:rgba(200,169,110,0.4); color:var(--gold-2); background:var(--gold-bg); }
@@ -1143,7 +1143,7 @@ svg.spark { width:100%; height:100%; }
 .cost-row:last-child { border-bottom:none; }
 .cost-left { }
 .cost-name { font-size:12px; color:var(--c1); margin-bottom:2px; }
-.cost-pct  { font-family:var(--mono); font-size:10px; color:var(--c3); }
+.cost-pct  { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); }
 .cost-right { display:flex; align-items:center; gap:8px; }
 .cost-bar-track {
   width:72px; height:4px;
@@ -1151,7 +1151,7 @@ svg.spark { width:100%; height:100%; }
   border-radius:2px; overflow:hidden;
 }
 .cost-bar-fill { height:100%; border-radius:2px; }
-.cost-amount { font-family:var(--mono); font-size:12px; font-weight:500; min-width:58px; text-align:right; }
+.cost-amount { font-family:'Inter',sans-serif; font-size:12px; font-weight:500; min-width:58px; text-align:right; }
 
 /* ════════════════════════  AD PLATFORM CARDS  */
 .ad-card {
@@ -1171,7 +1171,7 @@ svg.spark { width:100%; height:100%; }
 .ad-card.ms::before     { background:linear-gradient(90deg,#00A4EF,#107C10,#FFB900); }
 
 .ad-pname {
-  font-family:var(--mono); font-size:9px;
+  font-family:'Inter',sans-serif; font-size:9px;
   letter-spacing:0.16em; text-transform:uppercase;
   color:var(--c3); margin-bottom:10px;
   display:flex; align-items:center; gap:6px;
@@ -1194,11 +1194,11 @@ svg.spark { width:100%; height:100%; }
   border-top:1px solid rgba(28,27,24,0.07);
 }
 .am-l {
-  font-family:var(--mono); font-size:8.5px;
+  font-family:'Inter',sans-serif; font-size:8.5px;
   letter-spacing:0.1em; text-transform:uppercase;
   color:var(--c3); margin-bottom:2px;
 }
-.am-v { font-family:var(--mono); font-size:13px; font-weight:500; color:var(--c2); }
+.am-v { font-family:'Inter',sans-serif; font-size:13px; font-weight:500; color:var(--c2); }
 .am-v.good { color:var(--green); }
 .am-v.warn { color:var(--orange); }
 .am-v.bad  { color:var(--red); }
@@ -1216,7 +1216,7 @@ table { width:100%; border-collapse:collapse; }
 thead tr { background:var(--cream-2); }
 th {
   padding:9px 14px; text-align:left;
-  font-family:var(--mono); font-size:8.5px;
+  font-family:'Inter',sans-serif; font-size:8.5px;
   letter-spacing:0.18em; text-transform:uppercase;
   color:var(--c3); font-weight:400;
   border-bottom:1px solid rgba(28,27,24,0.08);
@@ -1228,21 +1228,21 @@ td {
   vertical-align:middle;
 }
 td.r { text-align:right; }
-td.mono { font-family:var(--mono); font-size:12px; }
+td.mono { font-family:'Inter',sans-serif; font-size:12px; }
 tr:last-child td { border-bottom:none; }
 tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
 .chip {
   display:inline-flex; align-items:center;
   padding:3px 9px; border-radius:20px;
-  font-family:var(--mono); font-size:11px; font-weight:500;
+  font-family:'Inter',sans-serif; font-size:11px; font-weight:500;
 }
 .chip-g { background:var(--green-dim); color:var(--green); }
 .chip-r { background:var(--red-dim);   color:var(--red); }
 .chip-o { background:var(--orange-dim);color:var(--orange); }
 
 .mgn-badge {
-  display:inline-block; font-family:var(--mono);
+  display:inline-block; font-family:'Inter',sans-serif;
   font-size:9px; padding:2px 6px; border-radius:4px;
 }
 .mgn-g { background:rgba(90,158,114,0.08);  color:var(--green); }
@@ -1258,7 +1258,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .lf-sub   { font-size:11px; color:var(--t3); margin-bottom:16px; }
 .lf-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
 .lf-field label {
-  display:block; font-family:var(--mono); font-size:8.5px;
+  display:block; font-family:'Inter',sans-serif; font-size:8.5px;
   letter-spacing:0.16em; text-transform:uppercase;
   color:var(--t3); margin-bottom:5px;
 }
@@ -1267,7 +1267,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.09);
   border-radius:var(--r-s); color:var(--t1);
-  font-family:var(--mono); font-size:12px;
+  font-family:'Inter',sans-serif; font-size:12px;
   outline:none; transition:border-color 0.2s;
 }
 .lf-field input:focus { border-color:var(--gold); }
@@ -1289,7 +1289,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 }
 .btn-clr:hover { border-color:rgba(255,255,255,0.25); color:var(--t2); }
 .autofill-tag {
-  font-family:var(--mono); font-size:10px;
+  font-family:'Inter',sans-serif; font-size:10px;
   color:var(--green); background:rgba(90,158,114,0.1);
   border:1px solid rgba(90,158,114,0.22);
   padding:2px 8px; border-radius:4px; letter-spacing:0.03em;
@@ -1405,7 +1405,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.1);
   border-radius:6px; color:var(--t1);
-  font-family:var(--mono); font-size:12px;
+  font-family:'Inter',sans-serif; font-size:12px;
   padding:7px 11px; outline:none;
   transition:border-color 0.2s; width:200px;
 }
@@ -1417,7 +1417,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.1);
   border-radius:6px; color:var(--t1);
-  font-family:var(--mono); font-size:12px;
+  font-family:'Inter',sans-serif; font-size:12px;
   padding:7px 11px; outline:none;
   cursor:pointer; width:160px;
 }
@@ -1443,7 +1443,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
 /* Badge pill */
 .s-badge {
-  font-size:9px; font-family:var(--mono);
+  font-size:9px; font-family:'Inter',sans-serif;
   padding:2px 8px; border-radius:20px;
   letter-spacing:0.06em; font-weight:600;
 }
@@ -1606,7 +1606,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         style="
           width:100%; padding:10px; background:var(--gold);
           color:var(--ink); border:none; border-radius:8px;
-          font-family:'Syne',sans-serif; font-weight:700;
+          font-family:'Inter',sans-serif; font-weight:700;
           font-size:12px; letter-spacing:0.08em;
           cursor:pointer; transition:all 0.2s;
           display:flex; align-items:center; justify-content:center; gap:7px;
@@ -1736,7 +1736,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <div id="syncStatus" style="
       display:none; margin:8px 28px 0;
       padding:8px 14px; border-radius:6px;
-      font-family:var(--mono); font-size:11px;
+      font-family:'Inter',sans-serif; font-size:11px;
       border:1px solid rgba(28,27,24,0.1);
       background:rgba(28,27,24,0.04);
     "></div>
@@ -1801,7 +1801,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
               <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--c3)">
                 <div style="width:8px;height:8px;border-radius:2px;background:var(--ink-4);opacity:.5"></div>Costs
               </div>
-              <div style="margin-left:auto;font-size:10px;color:var(--green);font-family:var(--mono)">● Profit zone</div>
+              <div style="margin-left:auto;font-size:10px;color:var(--green);font-family:'Inter',sans-serif">● Profit zone</div>
             </div>
           </div>
         </div>
@@ -1940,7 +1940,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span style="padding:5px 14px;border-radius:20px;background:rgba(90,158,114,0.12);color:#2d7a50;font-size:12px;font-weight:600">Payment Gateway Fee</span>
       <span style="color:var(--c3);font-size:15px">+</span>
       <span style="padding:5px 14px;border-radius:20px;background:rgba(74,127,193,0.12);color:#2a5e99;font-size:12px;font-weight:600">Shopify 3rd-Party Fee</span>
-      <span style="margin-left:auto;font-size:11px;color:var(--c3);font-family:var(--mono)">Applied to order subtotal (excl. shipping)</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--c3);font-family:'Inter',sans-serif">Applied to order subtotal (excl. shipping)</span>
     </div>
 
     <!-- Fee table card -->
@@ -1953,7 +1953,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Payment Gateway Fee</div>
             <div style="font-size:11px;color:var(--c3);margin-top:3px">Set rate (%) and flat fee per transaction for each payment provider</div>
           </div>
-          <div style="font-size:11px;color:var(--c3);font-family:var(--mono)">Example based on A$100 order</div>
+          <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif">Example based on A$100 order</div>
         </div>
 
         <!-- Column headers -->
@@ -2183,7 +2183,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status bar -->
-    <div id="pa-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    <div id="pa-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div id="pa-kpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2246,7 +2246,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="width:40px;text-align:center">ABC</div>
         </div>
         <div id="pa-product-table" style="max-height:420px;overflow-y:auto">
-          <div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load product data</div>
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load product data</div>
         </div>
       </div>
 
@@ -2257,7 +2257,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">Revenue contribution by grade</div>
         </div>
         <div id="pa-abc-panel" style="padding:16px;flex:1">
-          <div style="color:var(--c3);font-family:var(--mono);font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
         </div>
       </div>
     </div>
@@ -2272,14 +2272,14 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Inventory Health</div>
             <div style="font-size:11px;color:var(--c3);margin-top:2px">Stock levels &amp; sell-through rates</div>
           </div>
-          <div id="pa-inv-legend" style="display:flex;gap:10px;font-size:10px;font-family:var(--mono)">
+          <div id="pa-inv-legend" style="display:flex;gap:10px;font-size:10px;font-family:'Inter',sans-serif">
             <span style="color:var(--red)">🔴 Critical</span>
             <span style="color:#E5A829">🟡 Watch</span>
             <span style="color:var(--green)">🟢 Healthy</span>
           </div>
         </div>
         <div id="pa-inventory-table" style="max-height:280px;overflow-y:auto">
-          <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Refresh to load inventory data</div>
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Refresh to load inventory data</div>
         </div>
       </div>
 
@@ -2290,7 +2290,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">Share of total revenue by product</div>
         </div>
         <div id="pa-revenue-mix" style="padding:16px;max-height:280px;overflow-y:auto">
-          <div style="color:var(--c3);font-family:var(--mono);font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
         </div>
       </div>
     </div>
@@ -2313,7 +2313,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div class="pa-th-num">Margin</div>
         </div>
         <div id="pa-variant-table" style="max-height:320px;overflow-y:auto">
-          <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Refresh to load variant data</div>
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Refresh to load variant data</div>
         </div>
       </div>
     </div>
@@ -2369,7 +2369,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status -->
-    <div id="or-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    <div id="or-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2395,7 +2395,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
               style="border:none;background:transparent;outline:none;font-size:12px;color:var(--ink);width:100%;font-family:var(--sans)">
           </div>
           <!-- Status filter -->
-          <select id="or-status-filter" onchange="orFilterAndRender()" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <select id="or-status-filter" onchange="orFilterAndRender()" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2);cursor:pointer;">
             <option value="all">All Statuses</option>
             <option value="paid">Paid</option>
             <option value="pending">Pending</option>
@@ -2403,11 +2403,11 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <option value="partially_refunded">Partial Refund</option>
           </select>
           <!-- Gateway filter -->
-          <select id="or-gateway-filter" onchange="orFilterAndRender()" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <select id="or-gateway-filter" onchange="orFilterAndRender()" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2);cursor:pointer;">
             <option value="all">All Gateways</option>
           </select>
           <!-- Entries per page -->
-          <select id="or-per-page" onchange="orSetPage(1)" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:var(--mono);font-size:12px;color:var(--c2);cursor:pointer;">
+          <select id="or-per-page" onchange="orSetPage(1)" style="padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,27,24,0.1);background:#fff;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2);cursor:pointer;">
             <option value="20" selected>20 entries</option>
             <option value="50">50 entries</option>
             <option value="100">100 entries</option>
@@ -2419,7 +2419,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div class="card" style="padding:14px 16px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:10px">Cost Breakdown (filtered orders)</div>
         <div id="or-cost-breakdown">
-          <div style="color:var(--c3);font-size:11px;font-family:var(--mono)">Refresh to load</div>
+          <div style="color:var(--c3);font-size:11px;font-family:'Inter',sans-serif">Refresh to load</div>
         </div>
       </div>
     </div>
@@ -2448,24 +2448,24 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="flex:1.2;font-weight:700;font-size:12px;color:var(--ink)" id="or-totals-label">Total from — orders</div>
           <div style="width:100px"></div>
           <div style="width:130px"></div>
-          <div style="width:70px;text-align:center;font-family:var(--mono);font-size:12px;font-weight:700" id="or-totals-items">—</div>
-          <div class="or-num" style="font-weight:700;color:var(--gold);font-family:var(--mono);font-size:12px" id="or-totals-revenue">—</div>
-          <div class="or-num" style="color:var(--red);font-family:var(--mono);font-size:12px" id="or-totals-discounts">—</div>
-          <div class="or-num" style="color:var(--c3);font-family:var(--mono);font-size:12px" id="or-totals-shipping">—</div>
-          <div class="or-num" style="color:#7E6DB5;font-family:var(--mono);font-size:12px" id="or-totals-cogs">—</div>
-          <div class="or-num" style="color:var(--red);font-family:var(--mono);font-size:12px" id="or-totals-fees">—</div>
-          <div class="or-num" style="font-weight:700;font-family:var(--mono);font-size:12px" id="or-totals-profit">—</div>
+          <div style="width:70px;text-align:center;font-family:'Inter',sans-serif;font-size:12px;font-weight:700" id="or-totals-items">—</div>
+          <div class="or-num" style="font-weight:700;color:var(--gold);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-revenue">—</div>
+          <div class="or-num" style="color:var(--red);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-discounts">—</div>
+          <div class="or-num" style="color:var(--c3);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-shipping">—</div>
+          <div class="or-num" style="color:#7E6DB5;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-cogs">—</div>
+          <div class="or-num" style="color:var(--red);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-fees">—</div>
+          <div class="or-num" style="font-weight:700;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-profit">—</div>
           <div style="width:90px"></div>
         </div>
         <!-- Body -->
         <div id="or-table-body" style="max-height:520px;overflow-y:auto">
-          <div style="padding:50px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load order data</div>
+          <div style="padding:50px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load order data</div>
         </div>
         <!-- Pagination -->
         <div id="or-pagination" style="display:none;padding:12px 16px;border-top:1px solid rgba(28,27,24,0.06);display:flex;align-items:center;gap:12px">
           <button onclick="orSetPage(orPage-1)" id="or-prev-btn" class="or-page-btn">‹ Prev</button>
           <button onclick="orSetPage(orPage+1)" id="or-next-btn" class="or-page-btn">Next ›</button>
-          <span id="or-page-info" style="font-size:11px;color:var(--c3);font-family:var(--mono)"></span>
+          <span id="or-page-info" style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif"></span>
         </div>
       </div>
     </div>
@@ -2530,7 +2530,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status -->
-    <div id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    <div id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2576,7 +2576,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">From gross revenue to net profit — step by step</div>
         </div>
         <div id="pl-waterfall" style="padding:20px 24px">
-          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:30px 0">Click REFRESH to load</div>
+          <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:30px 0">Click REFRESH to load</div>
         </div>
       </div>
 
@@ -2589,7 +2589,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
         </div>
         <div id="pl-comparison" style="padding:0">
-          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:40px 0">Click REFRESH to load</div>
+          <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:40px 0">Click REFRESH to load</div>
         </div>
       </div>
     </div>
@@ -2602,7 +2602,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Profit Trend</div>
             <div style="font-size:11px;color:var(--c3);margin-top:2px">Revenue · Gross Profit · Net Profit over time</div>
           </div>
-          <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono)">
+          <div style="display:flex;gap:14px;font-size:11px;font-family:'Inter',sans-serif">
             <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:var(--gold);display:inline-block;border-radius:2px"></span>Revenue</span>
             <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#4A7FC1;display:inline-block;border-radius:2px"></span>Gross Profit</span>
             <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:var(--green);display:inline-block;border-radius:2px"></span>Net Profit</span>
@@ -2610,7 +2610,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div style="padding:20px 24px 16px">
           <div id="pl-trend-chart" style="height:140px;position:relative">
-            <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:50px 0">Click REFRESH to load</div>
+            <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:50px 0">Click REFRESH to load</div>
           </div>
         </div>
       </div>
@@ -2626,7 +2626,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">Full P&amp;L — all line items with % of revenue</div>
         </div>
         <div id="pl-income-statement" style="padding:0">
-          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:40px 0">Click REFRESH to load</div>
+          <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:40px 0">Click REFRESH to load</div>
         </div>
       </div>
 
@@ -2637,16 +2637,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">Each cost as % of net revenue</div>
         </div>
         <div id="pl-cost-breakdown" style="padding:20px 16px">
-          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:30px 0">Click REFRESH to load</div>
+          <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:30px 0">Click REFRESH to load</div>
         </div>
 
         <!-- Benchmark section -->
         <div style="border-top:1px solid rgba(28,27,24,0.06);padding:14px 16px">
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:10px">Industry Benchmarks (DTC 2025)</div>
-          <div class="pl-bench-row"><span>Gross Margin</span><span style="color:var(--c2);font-family:var(--mono)">51–55%</span></div>
-          <div class="pl-bench-row"><span>Contribution Margin</span><span style="color:var(--c2);font-family:var(--mono)">~25%</span></div>
-          <div class="pl-bench-row"><span>Ad Spend % of Revenue</span><span style="color:var(--c2);font-family:var(--mono)">10–20%</span></div>
-          <div class="pl-bench-row"><span>EBITDA / Net Margin</span><span style="color:var(--c2);font-family:var(--mono)">5–9%</span></div>
+          <div class="pl-bench-row"><span>Gross Margin</span><span style="color:var(--c2);font-family:'Inter',sans-serif">51–55%</span></div>
+          <div class="pl-bench-row"><span>Contribution Margin</span><span style="color:var(--c2);font-family:'Inter',sans-serif">~25%</span></div>
+          <div class="pl-bench-row"><span>Ad Spend % of Revenue</span><span style="color:var(--c2);font-family:'Inter',sans-serif">10–20%</span></div>
+          <div class="pl-bench-row"><span>EBITDA / Net Margin</span><span style="color:var(--c2);font-family:'Inter',sans-serif">5–9%</span></div>
         </div>
       </div>
     </div>
@@ -2660,7 +2660,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div style="overflow-x:auto">
           <div id="pl-period-table">
-            <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load data</div>
+            <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load data</div>
           </div>
         </div>
       </div>
@@ -2719,7 +2719,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status -->
-    <div id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    <div id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -2763,7 +2763,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Channel Comparison</div>
             <div style="font-size:11px;color:var(--c3);margin-top:2px">Platform-reported metrics side by side</div>
           </div>
-          <div style="display:flex;gap:8px;font-size:11px;font-family:var(--mono)">
+          <div style="display:flex;gap:8px;font-size:11px;font-family:'Inter',sans-serif">
             <span style="padding:3px 8px;background:rgba(24,119,242,.1);color:#1877F2;border-radius:4px;font-weight:700">● Meta</span>
             <span style="padding:3px 8px;background:rgba(66,133,244,.1);color:#4285F4;border-radius:4px;font-weight:700">● Google</span>
             <span style="padding:3px 8px;background:rgba(0,114,206,.1);color:#0072CE;border-radius:4px;font-weight:700">● Microsoft</span>
@@ -2836,14 +2836,14 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Spend vs Store Revenue</div>
             <div style="font-size:11px;color:var(--c3);margin-top:2px">Daily — the gap is your profit zone</div>
           </div>
-          <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono)">
+          <div style="display:flex;gap:14px;font-size:11px;font-family:'Inter',sans-serif">
             <span><span style="display:inline-block;width:16px;height:3px;background:var(--gold);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Revenue</span>
             <span><span style="display:inline-block;width:16px;height:3px;background:var(--red);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Ad Spend</span>
           </div>
         </div>
         <div style="padding:20px 24px 12px">
           <div id="ma-trend-chart" style="height:150px;position:relative">
-            <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:55px 0">Click REFRESH to load</div>
+            <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:55px 0">Click REFRESH to load</div>
           </div>
         </div>
       </div>
@@ -2855,14 +2855,14 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">Share of total spend by channel</div>
         </div>
         <div id="ma-allocation" style="padding:16px">
-          <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:20px 0">Click REFRESH to load</div>
+          <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:20px 0">Click REFRESH to load</div>
         </div>
         <!-- MER Gauge -->
         <div style="border-top:1px solid rgba(28,27,24,0.06);padding:14px 16px">
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:8px">MER Health</div>
           <div id="ma-mer-gauge" style="text-align:center;padding:8px 0">
-            <div style="font-size:28px;font-weight:800;font-family:'Syne',sans-serif" id="ma-mer-big">—</div>
-            <div style="font-size:10px;color:var(--c3);font-family:var(--mono);margin-top:2px">Good MER ≥ 3.0 (industry benchmark)</div>
+            <div style="font-size:28px;font-weight:800;font-family:'Inter',sans-serif" id="ma-mer-big">—</div>
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;margin-top:2px">Good MER ≥ 3.0 (industry benchmark)</div>
             <div id="ma-mer-bar-wrap" style="height:6px;background:rgba(28,27,24,0.08);border-radius:3px;margin-top:8px;overflow:hidden">
               <div id="ma-mer-bar" style="height:100%;width:0%;background:var(--green);border-radius:3px;transition:width .5s ease"></div>
             </div>
@@ -2896,7 +2896,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div class="ma-camp-num">CTR</div>
         </div>
         <div id="ma-campaign-table" style="max-height:360px;overflow-y:auto">
-          <div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load campaign data</div>
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load campaign data</div>
         </div>
       </div>
     </div>
@@ -2912,7 +2912,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div style="overflow-x:auto">
           <div id="ma-daily-table" style="max-height:320px;overflow-y:auto;min-width:600px">
-            <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load</div>
+            <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load</div>
           </div>
         </div>
       </div>
@@ -2925,17 +2925,17 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div style="padding:16px">
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:8px">META ADS</div>
-          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:var(--mono);font-weight:600">1.86×</span></div>
-          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:var(--mono)">$38.19</span></div>
-          <div class="ma-bench-row"><span>Avg CPM</span><span style="color:var(--c2);font-family:var(--mono)">$20.48</span></div>
+          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">1.86×</span></div>
+          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$38.19</span></div>
+          <div class="ma-bench-row"><span>Avg CPM</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$20.48</span></div>
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin:14px 0 8px">GOOGLE ADS</div>
-          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:var(--mono);font-weight:600">3.68×</span></div>
-          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:var(--mono)">$23.74</span></div>
-          <div class="ma-bench-row"><span>Search ROAS</span><span style="color:var(--c2);font-family:var(--mono)">5.17×</span></div>
+          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">3.68×</span></div>
+          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$23.74</span></div>
+          <div class="ma-bench-row"><span>Search ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif">5.17×</span></div>
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin:14px 0 8px">BLENDED</div>
-          <div class="ma-bench-row"><span>Avg eComm ROAS</span><span style="color:var(--c2);font-family:var(--mono);font-weight:600">2.87×</span></div>
-          <div class="ma-bench-row"><span>Good MER target</span><span style="color:var(--green);font-family:var(--mono);font-weight:600">≥ 3.0</span></div>
-          <div class="ma-bench-row"><span>LTV:CAC target</span><span style="color:var(--c2);font-family:var(--mono)">3:1</span></div>
+          <div class="ma-bench-row"><span>Avg eComm ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">2.87×</span></div>
+          <div class="ma-bench-row"><span>Good MER target</span><span style="color:var(--green);font-family:'Inter',sans-serif;font-weight:600">≥ 3.0</span></div>
+          <div class="ma-bench-row"><span>LTV:CAC target</span><span style="color:var(--c2);font-family:'Inter',sans-serif">3:1</span></div>
           <div style="margin-top:14px;padding:10px 12px;background:var(--gold-bg);border-radius:8px;border-left:3px solid var(--gold)">
             <div style="font-size:10px;font-weight:700;color:var(--gold);margin-bottom:4px">ROAS CONTEXT</div>
             <div style="font-size:11px;color:var(--c2);line-height:1.5">ROAS alone doesn't show profitability. A 1.86× Meta ROAS can be profitable at 70% gross margin but loss-making at 30% margin. Always pair with MER and contribution margin.</div>
@@ -2995,7 +2995,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status -->
-    <div id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:var(--mono);font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
+    <div id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
@@ -3040,11 +3040,11 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="width:10px;height:10px;border-radius:50%;background:#4A7FC1;flex-shrink:0"></div>
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2)">New Customers</div>
         </div>
-        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ink)" id="clv-new-count">—</div>
-        <div style="font-size:11px;color:var(--c3);font-family:var(--mono);margin:4px 0 12px">unique customers</div>
+        <div style="font-family:'Inter',sans-serif;x0;color:var(--ink)" id="clv-new-count">—</div>
+        <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;margin:4px 0 12px">unique customers</div>
         <div style="display:flex;gap:20px">
-          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:var(--mono)" id="clv-new-rev">—</div></div>
-          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">AOV</div><div style="font-size:14px;font-weight:700;color:#4A7FC1;font-family:var(--mono)" id="clv-new-aov">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:'Inter',sans-serif" id="clv-new-rev">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">AOV</div><div style="font-size:14px;font-weight:700;color:#4A7FC1;font-family:'Inter',sans-serif" id="clv-new-aov">—</div></div>
         </div>
       </div>
 
@@ -3055,12 +3055,12 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2)">Returning Customers</div>
           <div style="margin-left:auto;font-size:10px;color:var(--green);background:var(--green-dim);padding:2px 7px;border-radius:4px;font-weight:700">67% more spend</div>
         </div>
-        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ink)" id="clv-ret-count">—</div>
-        <div style="font-size:11px;color:var(--c3);font-family:var(--mono);margin:4px 0 12px">2+ orders placed</div>
+        <div style="font-family:'Inter',sans-serif;x0;color:var(--ink)" id="clv-ret-count">—</div>
+        <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;margin:4px 0 12px">2+ orders placed</div>
         <div style="display:flex;gap:20px">
-          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:var(--mono)" id="clv-ret-rev">—</div></div>
-          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">AOV</div><div style="font-size:14px;font-weight:700;color:var(--green);font-family:var(--mono)" id="clv-ret-aov">—</div></div>
-          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Avg Orders</div><div style="font-size:14px;font-weight:700;color:#7E6DB5;font-family:var(--mono)" id="clv-ret-orders">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:'Inter',sans-serif" id="clv-ret-rev">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">AOV</div><div style="font-size:14px;font-weight:700;color:var(--green);font-family:'Inter',sans-serif" id="clv-ret-aov">—</div></div>
+          <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Avg Orders</div><div style="font-size:14px;font-weight:700;color:#7E6DB5;font-family:'Inter',sans-serif" id="clv-ret-orders">—</div></div>
         </div>
       </div>
 
@@ -3068,7 +3068,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div class="card" style="padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2);margin-bottom:12px">Revenue Split</div>
         <canvas id="clv-split-canvas" width="120" height="120"></canvas>
-        <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;font-family:var(--mono)">
+        <div style="display:flex;gap:14px;margin-top:10px;font-size:11px;font-family:'Inter',sans-serif">
           <span><span style="display:inline-block;width:8px;height:8px;background:#4A7FC1;border-radius:50%;margin-right:4px;vertical-align:middle"></span>New <span id="clv-new-pct" style="font-weight:700">—</span></span>
           <span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:4px;vertical-align:middle"></span>Return <span id="clv-ret-pct" style="font-weight:700">—</span></span>
         </div>
@@ -3083,7 +3083,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Cohort Retention Heatmap</div>
             <div style="font-size:11px;color:var(--c3);margin-top:2px">Customers grouped by first purchase month — % who returned in subsequent months</div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--c3);font-family:var(--mono)">
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--c3);font-family:'Inter',sans-serif">
             <div style="display:flex;gap:3px;align-items:center">
               <div style="width:12px;height:12px;background:rgba(200,169,110,0.1);border-radius:2px"></div>
               <span>0%</span>
@@ -3100,7 +3100,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
         <div style="overflow-x:auto;padding:16px 20px">
           <div id="clv-cohort-heatmap">
-            <div style="text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px;padding:30px 0">Click REFRESH to load cohort data</div>
+            <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:30px 0">Click REFRESH to load cohort data</div>
           </div>
         </div>
       </div>
@@ -3116,7 +3116,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:11px;color:var(--c3);margin-top:2px">Recency · Frequency · Monetary — auto-classified from order data</div>
         </div>
         <div id="clv-rfm-table">
-          <div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load</div>
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load</div>
         </div>
       </div>
 
@@ -3127,20 +3127,20 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <div class="card" style="padding:16px">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2);margin-bottom:12px">Re-Order Window</div>
           <div style="text-align:center;padding:8px 0">
-            <div style="font-size:36px;font-weight:800;font-family:'Syne',sans-serif;color:var(--ink)" id="clv-dbo-big">—</div>
-            <div style="font-size:11px;color:var(--c3);font-family:var(--mono);margin-top:2px">avg days between orders</div>
+            <div style="font-size:36px;font-weight:800;font-family:'Inter',sans-serif;color:var(--ink)" id="clv-dbo-big">—</div>
+            <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;margin-top:2px">avg days between orders</div>
           </div>
           <div style="border-top:1px solid rgba(28,27,24,0.06);padding-top:10px;margin-top:8px">
             <div style="font-size:10px;color:var(--c3);margin-bottom:6px">Customer status thresholds</div>
             <div style="display:flex;flex-direction:column;gap:4px" id="clv-churn-thresholds">
               <div style="display:flex;justify-content:space-between;font-size:11px">
-                <span style="color:var(--green)">🟢 Active</span><span style="color:var(--c3);font-family:var(--mono)">< avg interval</span>
+                <span style="color:var(--green)">🟢 Active</span><span style="color:var(--c3);font-family:'Inter',sans-serif">< avg interval</span>
               </div>
               <div style="display:flex;justify-content:space-between;font-size:11px">
-                <span style="color:#E5A829">🟡 At-Risk</span><span style="color:var(--c3);font-family:var(--mono)">1–3× interval</span>
+                <span style="color:#E5A829">🟡 At-Risk</span><span style="color:var(--c3);font-family:'Inter',sans-serif">1–3× interval</span>
               </div>
               <div style="display:flex;justify-content:space-between;font-size:11px">
-                <span style="color:var(--red)">🔴 Churned</span><span style="color:var(--c3);font-family:var(--mono)">> 3× interval</span>
+                <span style="color:var(--red)">🔴 Churned</span><span style="color:var(--c3);font-family:'Inter',sans-serif">> 3× interval</span>
               </div>
             </div>
           </div>
@@ -3149,13 +3149,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <!-- Benchmarks -->
         <div class="card" style="padding:16px;flex:1">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:10px">Industry Benchmarks 2025</div>
-          <div class="clv-bench-row"><span>CLV:CAC target</span><span style="color:var(--gold);font-weight:700;font-family:var(--mono)">≥ 3:1</span></div>
-          <div class="clv-bench-row"><span>Repeat purchase rate</span><span style="color:var(--c2);font-family:var(--mono)">20–35%</span></div>
-          <div class="clv-bench-row"><span>Subscription retention</span><span style="color:var(--c2);font-family:var(--mono)">60–85%</span></div>
-          <div class="clv-bench-row"><span>Avg CLV (general retail)</span><span style="color:var(--c2);font-family:var(--mono)">$168</span></div>
-          <div class="clv-bench-row"><span>Avg CLV (electronics)</span><span style="color:var(--c2);font-family:var(--mono)">$290–$520</span></div>
-          <div class="clv-bench-row"><span>Returning vs new spend</span><span style="color:var(--green);font-family:var(--mono)">+67%</span></div>
-          <div class="clv-bench-row"><span>Retention improves profit</span><span style="color:var(--green);font-family:var(--mono)">+25–95%</span></div>
+          <div class="clv-bench-row"><span>CLV:CAC target</span><span style="color:var(--gold);font-weight:700;font-family:'Inter',sans-serif">≥ 3:1</span></div>
+          <div class="clv-bench-row"><span>Repeat purchase rate</span><span style="color:var(--c2);font-family:'Inter',sans-serif">20–35%</span></div>
+          <div class="clv-bench-row"><span>Subscription retention</span><span style="color:var(--c2);font-family:'Inter',sans-serif">60–85%</span></div>
+          <div class="clv-bench-row"><span>Avg CLV (general retail)</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$168</span></div>
+          <div class="clv-bench-row"><span>Avg CLV (electronics)</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$290–$520</span></div>
+          <div class="clv-bench-row"><span>Returning vs new spend</span><span style="color:var(--green);font-family:'Inter',sans-serif">+67%</span></div>
+          <div class="clv-bench-row"><span>Retention improves profit</span><span style="color:var(--green);font-family:'Inter',sans-serif">+25–95%</span></div>
           <div style="margin-top:10px;padding:8px 10px;background:var(--gold-bg);border-radius:6px;border-left:3px solid var(--gold)">
             <div style="font-size:10px;color:var(--gold);font-weight:700">5% MORE RETENTION</div>
             <div style="font-size:10px;color:var(--c2);margin-top:2px;line-height:1.5">Can increase profits by 25–95% (Bain & Co)</div>
@@ -3183,7 +3183,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="width:80px;text-align:center">RFM Tier</div>
         </div>
         <div id="clv-top-table" style="max-height:380px;overflow-y:auto">
-          <div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">Click REFRESH to load customer data</div>
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load customer data</div>
         </div>
       </div>
     </div>
@@ -3725,7 +3725,7 @@ function renderChart() {
   if (!rows.length || rows.every(r => !r.revenue)) {
     container.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px">
       <div style="font-size:22px;opacity:0.2">📊</div>
-      <div style="font-size:11px;color:var(--c3);font-family:var(--mono)">No data for this period</div>
+      <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif">No data for this period</div>
     </div>`;
     return;
   }
@@ -3754,7 +3754,7 @@ function renderChart() {
           <div style="height:${cstH}px;background:${c.profit>0?'var(--ink-4)':'var(--red)'};border-radius:3px 3px 0 0;opacity:.55"></div>
         </div>
       </div>
-      <div style="font-size:9px;color:var(--c3);font-family:var(--mono);margin-top:6px">${lbl}</div>`;
+      <div style="font-size:9px;color:var(--c3);font-family:'Inter',sans-serif;margin-top:6px">${lbl}</div>`;
     container.appendChild(div);
   });
 }
@@ -3769,7 +3769,7 @@ function renderBreakdown() {
   if (!rows.length && t.rev === 0) {
     el.innerHTML = `<div style="padding:40px;text-align:center">
       <div style="font-size:36px;opacity:0.15">🍩</div>
-      <div style="font-size:12px;color:var(--c3);margin-top:8px;font-family:var(--mono)">No data for this period</div>
+      <div style="font-size:12px;color:var(--c3);margin-top:8px;font-family:'Inter',sans-serif">No data for this period</div>
     </div>`;
     return;
   }
@@ -4642,7 +4642,7 @@ doSync();
               <div class="s-row-label">App Version</div>
               <div class="s-row-desc">FoldifyCase Operation Management Dashboard</div>
             </div>
-            <span style="font-family:var(--mono);font-size:12px;color:var(--t3)">v1.0.0 — Apr 2026</span>
+            <span style="font-family:'Inter',sans-serif;font-size:12px;color:var(--t3)">v1.0.0 — Apr 2026</span>
           </div>
           <div class="s-row">
             <div class="s-row-left">
@@ -4889,7 +4889,7 @@ function orRenderTable() {
   const el = document.getElementById('or-table-body');
   if (!el) return;
   if (!orFiltered.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">No orders match the current filters</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">No orders match the current filters</div>';
     return;
   }
   const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
@@ -4907,11 +4907,11 @@ function orRenderTable() {
     return `<div class="or-row">
       <div style="width:24px"><input type="checkbox" ${checked} onchange="orToggleOrder(${o.id},this)" style="cursor:pointer"></div>
       <div class="or-cell" style="flex:1.2;min-width:0">
-        <a href="https://admin.shopify.com/store/${(typeof PROXY!='undefined'?'':'')}orders/${o.id}" target="_blank" style="color:var(--gold);font-weight:700;font-family:var(--mono);font-size:12px;text-decoration:none">${o.name}</a>
+        <a href="https://admin.shopify.com/store/${(typeof PROXY!='undefined'?'':'')}orders/${o.id}" target="_blank" style="color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;font-size:12px;text-decoration:none">${o.name}</a>
       </div>
-      <div class="or-cell" style="width:100px;color:var(--c3);font-family:var(--mono);font-size:11px">${o.date}</div>
+      <div class="or-cell" style="width:100px;color:var(--c3);font-family:'Inter',sans-serif;font-size:11px">${o.date}</div>
       <div class="or-cell" style="width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--c2)" title="${o.customer}">${o.customer}</div>
-      <div class="or-cell" style="width:70px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--c2)">${o.items} item${o.items!==1?'s':''}</div>
+      <div class="or-cell" style="width:70px;text-align:center;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2)">${o.items} item${o.items!==1?'s':''}</div>
       <div class="or-cell-num" style="color:var(--gold);font-weight:600">${orFmt$(o.revenue)}</div>
       <div class="or-cell-num" style="color:var(--red)">${o.discounts>0?`(${orFmt$(o.discounts)})`:'—'}</div>
       <div class="or-cell-num" style="color:var(--c3)">${o.shipping>0?`(${orFmt$(o.shipping)})`:'(A$0.00)'}</div>
@@ -5116,28 +5116,28 @@ function clvRenderCohort() {
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:0;overflow-x:auto">
       <div style="flex-shrink:0">
-        <div style="height:28px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;padding-bottom:4px;white-space:nowrap;padding-right:8px">Cohort</div>
-        ${cohorts.map(c => `<div style="height:36px;display:flex;align-items:center;font-size:10px;color:var(--c3);font-family:var(--mono);white-space:nowrap;padding-right:8px">${c.month}</div>`).join('')}
+        <div style="height:28px;font-size:9px;color:var(--c3);font-family:'Inter',sans-serif;display:flex;align-items:flex-end;padding-bottom:4px;white-space:nowrap;padding-right:8px">Cohort</div>
+        ${cohorts.map(c => `<div style="height:36px;display:flex;align-items:center;font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;white-space:nowrap;padding-right:8px">${c.month}</div>`).join('')}
       </div>
       <div style="flex-shrink:0">
-        <div style="height:28px;width:70px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">New Custs</div>
-        ${cohorts.map(c => `<div style="height:36px;width:70px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--c2);font-family:var(--mono);font-weight:600">${c.total}</div>`).join('')}
+        <div style="height:28px;width:70px;font-size:9px;color:var(--c3);font-family:'Inter',sans-serif;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">New Custs</div>
+        ${cohorts.map(c => `<div style="height:36px;width:70px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">${c.total}</div>`).join('')}
       </div>
       <div style="flex-shrink:0">
-        <div style="height:28px;width:80px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">Returned</div>
+        <div style="height:28px;width:80px;font-size:9px;color:var(--c3);font-family:'Inter',sans-serif;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">Returned</div>
         ${cohorts.map(c => `<div style="height:36px;width:80px;display:flex;align-items:center;justify-content:center">
-          <div style="width:64px;height:28px;border-radius:4px;background:${heatColor(c.retRate)};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono);color:${textColor(c.retRate)};transition:transform .1s" title="${c.returners} of ${c.total} returned">
+          <div style="width:64px;height:28px;border-radius:4px;background:${heatColor(c.retRate)};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;color:${textColor(c.retRate)};transition:transform .1s" title="${c.returners} of ${c.total} returned">
             ${c.retRate.toFixed(0)}%
           </div>
         </div>`).join('')}
       </div>
       <div style="flex:1;min-width:120px">
-        <div style="height:28px;font-size:9px;color:var(--c3);font-family:var(--mono);display:flex;align-items:flex-end;padding-bottom:4px;padding-left:12px">Retention Rate Bar</div>
+        <div style="height:28px;font-size:9px;color:var(--c3);font-family:'Inter',sans-serif;display:flex;align-items:flex-end;padding-bottom:4px;padding-left:12px">Retention Rate Bar</div>
         ${cohorts.map(c => `<div style="height:36px;display:flex;align-items:center;padding-left:12px">
           <div style="flex:1;background:rgba(28,27,24,0.06);border-radius:3px;height:8px;overflow:hidden">
             <div style="width:${Math.min(c.retRate*2,100)}%;height:100%;border-radius:3px;background:${heatColor(c.retRate)};border:1px solid rgba(200,169,110,0.4)"></div>
           </div>
-          <span style="font-size:10px;color:var(--c3);font-family:var(--mono);margin-left:8px;width:30px">${c.total > 0 ? c.retRate.toFixed(0)+'%' : '—'}</span>
+          <span style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;margin-left:8px;width:30px">${c.total > 0 ? c.retRate.toFixed(0)+'%' : '—'}</span>
         </div>`).join('')}
       </div>
     </div>`;
@@ -5200,7 +5200,7 @@ function clvRenderTopCustomers() {
     return `<div class="clv-top-row">
       <div style="flex:3;min-width:0">
         <div style="font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name || c.email}</div>
-        <div style="font-size:10px;color:var(--c3);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.email}</div>
+        <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.email}</div>
       </div>
       <div class="clv-top-num">${c.ordersCount}</div>
       <div class="clv-top-num" style="color:var(--gold);font-weight:600">${clvFmt$(c.totalSpent)}</div>
@@ -5586,7 +5586,7 @@ function maRenderCampaigns() {
   const camps = [...(maData.meta.campaigns || [])].sort((a,b) => (a[maSortKey]-b[maSortKey]) * maSortDir);
 
   if (!camps.length) {
-    el.innerHTML = `<div style="padding:30px;text-align:center;color:var(--c3);font-family:var(--mono);font-size:12px">
+    el.innerHTML = `<div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">
       No campaign data — Meta Ads API may need campaign-level access or the account has no active campaigns in this period.
     </div>`;
     return;
@@ -5783,7 +5783,7 @@ function plRenderComparison() {
     const pct = ((c-p)/Math.abs(p)*100).toFixed(1);
     const col = c >= p ? 'var(--green)' : 'var(--red)';
     const arrow = c >= p ? '▲' : '▼';
-    return `<span style="color:${col};font-family:var(--mono);font-size:11px">${arrow} ${Math.abs(pct)}%</span>`;
+    return `<span style="color:${col};font-family:'Inter',sans-serif;font-size:11px">${arrow} ${Math.abs(pct)}%</span>`;
   };
   const prevLabel = prev.length ? `${prev[0].date} – ${prev[prev.length-1].date}` : 'Prev';
   const currLabel = curr.length ? `${curr[0].date} – ${curr[curr.length-1].date}` : 'Curr';
@@ -5810,9 +5810,9 @@ function plRenderComparison() {
       ${r.section ? `<div class="pl-comp-section">${r.section}</div>` : ''}
       <div class="pl-comp-row${r.bold?' pl-comp-subtotal':''}">
         <div style="color:var(--c2)">${r.label}</div>
-        <div class="pl-comp-num" style="color:${r.neg?'var(--red)':'var(--c1)'};font-family:var(--mono)">${plFmt$(r.c)}</div>
-        <div class="pl-comp-num" style="color:var(--c3);font-family:var(--mono)">${plFmt$(r.p)}</div>
-        <div class="pl-comp-num" style="font-family:var(--mono);color:${r.c>=r.p?'var(--green)':'var(--red)'}">${plFmt$(r.c - r.p)}</div>
+        <div class="pl-comp-num" style="color:${r.neg?'var(--red)':'var(--c1)'};font-family:'Inter',sans-serif">${plFmt$(r.c)}</div>
+        <div class="pl-comp-num" style="color:var(--c3);font-family:'Inter',sans-serif">${plFmt$(r.p)}</div>
+        <div class="pl-comp-num" style="font-family:'Inter',sans-serif;color:${r.c>=r.p?'var(--green)':'var(--red)'}">${plFmt$(r.c - r.p)}</div>
         <div class="pl-comp-num">${chg(r.c, r.p)}</div>
       </div>`).join('')}`;
 }
@@ -6139,8 +6139,8 @@ function paRenderABC() {
           </div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:12px;font-weight:700;color:${color};font-family:var(--mono)">${rev}</div>
-          <div style="font-size:10px;color:var(--c3);font-family:var(--mono)">${pct}% of rev</div>
+          <div style="font-size:12px;font-weight:700;color:${color};font-family:'Inter',sans-serif">${rev}</div>
+          <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif">${pct}% of rev</div>
         </div>
       </div>`).join('')}`;
 }
@@ -6150,7 +6150,7 @@ function paRenderInventory() {
   if (!el || !paData) return;
   const items = paData.inventoryHealth.filter(i => i.totalStock !== null);
   if (!items.length) {
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px;font-family:var(--mono)">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px;font-family:'Inter',sans-serif">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
     return;
   }
   const sorted = [...items].sort((a,b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
@@ -6159,9 +6159,9 @@ function paRenderInventory() {
     + sorted.map(i => `
     <div class="pa-inv-row">
       <div style="font-size:11px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${i.title}">${i.title}</div>
-      <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--c2)">${paFmtN(i.totalStock)}</div>
-      <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--c3)">${i.dailySales.toFixed(1)}/day</div>
-      <div style="text-align:right;font-family:var(--mono);font-size:11px;font-weight:600;color:${i.status==='critical'?'var(--red)':i.status==='watch'?'#E5A829':'var(--green)'}">${i.daysLeft !== null ? i.daysLeft+'d' : '—'}</div>
+      <div style="text-align:right;font-family:'Inter',sans-serif;font-size:11px;color:var(--c2)">${paFmtN(i.totalStock)}</div>
+      <div style="text-align:right;font-family:'Inter',sans-serif;font-size:11px;color:var(--c3)">${i.dailySales.toFixed(1)}/day</div>
+      <div style="text-align:right;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:${i.status==='critical'?'var(--red)':i.status==='watch'?'#E5A829':'var(--green)'}">${i.daysLeft !== null ? i.daysLeft+'d' : '—'}</div>
       <div style="text-align:right;font-size:13px">${statusIcon(i.status)}</div>
     </div>`).join('');
 }
