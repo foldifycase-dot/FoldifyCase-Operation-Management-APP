@@ -108,7 +108,7 @@ async function handleShopify(req, res) {
     });
   }
 
-  const base   = `https://${ENV.shopifyStore}/admin/api/2026-01`;
+  const base   = `https://${ENV.shopifyStore}/admin/api/2024-10`;
   const headers = {
     "X-Shopify-Access-Token": ENV.shopifyToken,
     "Content-Type": "application/json",
@@ -175,7 +175,18 @@ async function handleShopify(req, res) {
     let nextUrl   = `${base}/orders.json?${baseParams}`;
 
     while (nextUrl) {
-      const r     = await fetch(nextUrl, { headers });
+      const r    = await fetch(nextUrl, { headers });
+      if (!r.ok) {
+        const errBody = await r.text();
+        console.error(`[Shopify] Orders fetch failed: HTTP ${r.status}`, errBody);
+        return res.status(502).json({
+          error: `Shopify API error: HTTP ${r.status}`,
+          details: errBody.slice(0, 500),
+          hint: r.status === 401 ? 'Check SHOPIFY_TOKEN is correct'
+              : r.status === 404 ? 'Check SHOPIFY_STORE domain is correct'
+              : 'Check Vercel runtime logs for details'
+        });
+      }
       const data  = await r.json();
       const batch = data.orders || [];
       allOrders.push(...batch);
