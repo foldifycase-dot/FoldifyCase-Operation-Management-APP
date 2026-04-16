@@ -410,6 +410,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .or-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .or-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .or-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.or-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Table header */
 .or-tbl-head {
@@ -489,6 +490,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .clv-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .clv-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .clv-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.clv-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Cohort heatmap */
 .clv-cohort-grid { display:grid;border-collapse:collapse; }
@@ -565,6 +567,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .ma-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .ma-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .ma-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.ma-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Channel cards */
 .ma-ch-card { padding:0; }
@@ -644,6 +647,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .pl-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .pl-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .pl-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.pl-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Granularity toggle */
 .pl-gran-btn {
@@ -1078,7 +1082,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   font-weight:500;
   min-height:28px;
 }
-.kpi-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.kpi-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:1px; }
 .kpi-val {
   font-family:'Inter', sans-serif;
   font-weight:700;
@@ -2391,12 +2395,12 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
-      <div class="or-kpi"><div class="or-kpi-lbl">🧾 Total Orders</div><div class="or-kpi-val" id="or-total-orders">—</div><div class="or-kpi-sub" id="or-orders-sub">in period</div></div>
-      <div class="or-kpi" style="border-top:3px solid var(--gold)"><div class="or-kpi-lbl">💰 Total Revenue</div><div class="or-kpi-val" id="or-total-revenue" style="color:var(--gold)">—</div><div class="or-kpi-sub" id="or-revenue-sub">gross sales</div></div>
-      <div class="or-kpi" style="border-top:3px solid #4A7FC1"><div class="or-kpi-lbl">🛒 Avg Order Value</div><div class="or-kpi-val" id="or-aov" style="color:#4A7FC1">—</div><div class="or-kpi-sub">per order</div></div>
-      <div class="or-kpi" style="border-top:3px solid #7E6DB5"><div class="or-kpi-lbl">📦 Total COGS</div><div class="or-kpi-val" id="or-total-cogs" style="color:#7E6DB5">—</div><div class="or-kpi-sub" id="or-cogs-sub">product cost</div></div>
-      <div class="or-kpi" style="border-top:3px solid var(--red)"><div class="or-kpi-lbl">💳 Transaction Fees</div><div class="or-kpi-val" id="or-total-fees" style="color:var(--red)">—</div><div class="or-kpi-sub" id="or-fees-sub">gateway costs</div></div>
-      <div class="or-kpi" style="border-top:3px solid var(--green)"><div class="or-kpi-lbl">✅ Net Profit</div><div class="or-kpi-val" id="or-net-profit" style="color:var(--green)">—</div><div class="or-kpi-sub" id="or-margin-sub">—% margin</div></div>
+      <div class="or-kpi"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:rgba(28,27,24,0.3)"></span>Orders</div><div class="or-kpi-val" id="or-total-orders">—</div><div class="or-kpi-sub" id="or-orders-sub">in period</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--gold)"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:var(--gold)"></span>Revenue</div><div class="or-kpi-val" id="or-total-revenue" style="color:var(--gold)">—</div><div class="or-kpi-sub" id="or-revenue-sub">gross sales</div></div>
+      <div class="or-kpi" style="border-top:3px solid #4A7FC1"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:#4A7FC1"></span>Value</div><div class="or-kpi-val" id="or-aov" style="color:#4A7FC1">—</div><div class="or-kpi-sub">per order</div></div>
+      <div class="or-kpi" style="border-top:3px solid #7E6DB5"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:#7E6DB5"></span>COGS</div><div class="or-kpi-val" id="or-total-cogs" style="color:#7E6DB5">—</div><div class="or-kpi-sub" id="or-cogs-sub">product cost</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--red)"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:var(--red)"></span>Fees</div><div class="or-kpi-val" id="or-total-fees" style="color:var(--red)">—</div><div class="or-kpi-sub" id="or-fees-sub">gateway costs</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--green)"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:var(--green)"></span>Profit</div><div class="or-kpi-val" id="or-net-profit" style="color:var(--green)">—</div><div class="or-kpi-sub" id="or-margin-sub">—% margin</div></div>
     </div>
 
     <!-- ── SECTION 2: Controls + Cost Breakdown ────────────────────────── -->
@@ -2556,32 +2560,32 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="pl-kpi">
-        <div class="pl-kpi-lbl">💰 Gross Revenue</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--gold)"></span>Gross Revenue</div>
         <div class="pl-kpi-val" id="pl-gross-rev">—</div>
         <div class="pl-kpi-sub" id="pl-gross-rev-sub">total sales</div>
       </div>
       <div class="pl-kpi">
-        <div class="pl-kpi-lbl">🏷️ Net Revenue</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:#4A7FC1"></span>Net Revenue</div>
         <div class="pl-kpi-val" id="pl-net-rev">—</div>
         <div class="pl-kpi-sub" id="pl-net-rev-sub">after discounts & refunds</div>
       </div>
       <div class="pl-kpi" style="border-top:3px solid #4A7FC1">
-        <div class="pl-kpi-lbl">📦 Gross Profit</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:#4A7FC1"></span>Gross Profit</div>
         <div class="pl-kpi-val" id="pl-gross-profit" style="color:#4A7FC1">—</div>
         <div class="pl-kpi-sub" id="pl-gross-margin">—% gross margin</div>
       </div>
       <div class="pl-kpi" style="border-top:3px solid var(--green)">
-        <div class="pl-kpi-lbl">⚡ Contribution Margin</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--green)"></span>Contribution Margin</div>
         <div class="pl-kpi-val" id="pl-contrib" style="color:var(--green)">—</div>
         <div class="pl-kpi-sub" id="pl-contrib-pct">—% of revenue</div>
       </div>
       <div class="pl-kpi" style="border-top:3px solid var(--gold)">
-        <div class="pl-kpi-lbl">🏆 Net Profit</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--gold)"></span>Net Profit</div>
         <div class="pl-kpi-val" id="pl-net-profit" style="color:var(--gold)">—</div>
         <div class="pl-kpi-sub" id="pl-net-margin">—% net margin</div>
       </div>
       <div class="pl-kpi">
-        <div class="pl-kpi-lbl">📉 Total Costs</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--red)"></span>Total Costs</div>
         <div class="pl-kpi-val" id="pl-total-costs" style="color:var(--red)">—</div>
         <div class="pl-kpi-sub" id="pl-cost-pct">—% of revenue</div>
       </div>
@@ -2748,32 +2752,32 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="ma-kpi" style="border-top:3px solid var(--gold)">
-        <div class="ma-kpi-lbl">💸 Total Ad Spend</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--red)"></span>Total Ad Spend</div>
         <div class="ma-kpi-val" id="ma-spend">—</div>
         <div class="ma-kpi-sub" id="ma-spend-sub">all channels</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid var(--green)">
-        <div class="ma-kpi-lbl">📈 Attributed Revenue</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--green)"></span>Attributed Revenue</div>
         <div class="ma-kpi-val" id="ma-revenue" style="color:var(--green)">—</div>
         <div class="ma-kpi-sub" id="ma-revenue-sub">platform-reported</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid #4A7FC1">
-        <div class="ma-kpi-lbl">🎯 Blended ROAS</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--gold)"></span>Blended ROAS</div>
         <div class="ma-kpi-val" id="ma-roas" style="color:#4A7FC1">—</div>
         <div class="ma-kpi-sub">revenue ÷ spend</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid #7E6DB5">
-        <div class="ma-kpi-lbl">⚡ MER</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#4A7FC1"></span>MER</div>
         <div class="ma-kpi-val" id="ma-mer" style="color:#7E6DB5">—</div>
         <div class="ma-kpi-sub">store rev ÷ ad spend</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid var(--red)">
-        <div class="ma-kpi-lbl">🎟️ Blended CPA</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#7E6DB5"></span>Blended CPA</div>
         <div class="ma-kpi-val" id="ma-cpa" style="color:var(--red)">—</div>
         <div class="ma-kpi-sub" id="ma-cpa-sub">per conversion</div>
       </div>
       <div class="ma-kpi">
-        <div class="ma-kpi-lbl">🔢 Total Conversions</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--green)"></span>Total Conversions</div>
         <div class="ma-kpi-val" id="ma-conv">—</div>
         <div class="ma-kpi-sub" id="ma-conv-sub">across all channels</div>
       </div>
@@ -3029,32 +3033,32 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="clv-kpi" style="border-top:3px solid var(--gold)">
-        <div class="clv-kpi-lbl">💰 Avg Customer LTV</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:var(--gold)"></span>Avg Customer LTV</div>
         <div class="clv-kpi-val" id="clv-ltv" style="color:var(--gold)">—</div>
         <div class="clv-kpi-sub">AOV × Freq × Lifespan</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid #4A7FC1">
-        <div class="clv-kpi-lbl">🛒 Avg Order Value</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:#4A7FC1"></span>Avg Order Value</div>
         <div class="clv-kpi-val" id="clv-aov" style="color:#4A7FC1">—</div>
         <div class="clv-kpi-sub" id="clv-aov-sub">per order</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid var(--green)">
-        <div class="clv-kpi-lbl">🔁 Repeat Purchase Rate</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:var(--green)"></span>Repeat Purchase Rate</div>
         <div class="clv-kpi-val" id="clv-rpr" style="color:var(--green)">—</div>
         <div class="clv-kpi-sub" id="clv-rpr-sub">bought 2+ times</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid #7E6DB5">
-        <div class="clv-kpi-lbl">📅 Purchase Frequency</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:#7E6DB5"></span>Purchase Frequency</div>
         <div class="clv-kpi-val" id="clv-freq" style="color:#7E6DB5">—</div>
         <div class="clv-kpi-sub">orders per customer</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid var(--red)">
-        <div class="clv-kpi-lbl">⏱️ Avg Days Between Orders</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:var(--red)"></span>Avg Days Between Orders</div>
         <div class="clv-kpi-val" id="clv-dbo" style="color:var(--red)">—</div>
         <div class="clv-kpi-sub">re-order interval</div>
       </div>
       <div class="clv-kpi">
-        <div class="clv-kpi-lbl">⚖️ LTV:CAC Ratio</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:#C8A96E"></span>LTV:CAC Ratio</div>
         <div class="clv-kpi-val" id="clv-ltvcac">—</div>
         <div class="clv-kpi-sub">target ≥ 3:1</div>
       </div>
