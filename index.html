@@ -1818,7 +1818,8 @@ function renderSidebar() {
   document.getElementById('sb-rev').textContent     = f$(t.rev);
   document.getElementById('sb-spend').textContent   = f$(t.ad);
   document.getElementById('sb-margin').textContent  = fPct(margin);
-  document.getElementById('nb-entries').textContent = rows.length;
+  const nb = document.getElementById('nb-entries');
+  if (nb) nb.textContent = rows.length;
 }
 
 function renderChart() {
@@ -1971,54 +1972,6 @@ function renderBreakdown() {
       </div>
       <div class="bd-legend">${legendHTML}</div>
     </div>`;
-}
-
-function renderTable() {
-  const tb = document.getElementById('tableBody');
-  tb.innerHTML = '';
-  rows.forEach(r => {
-    const c       = calc(r);
-    const mgCls   = parseFloat(c.margin)>=20?'mgn-g':parseFloat(c.margin)>=10?'mgn-w':'mgn-r';
-    const chipCls = c.profit>=0?'chip-g':'chip-r';
-    const sign    = c.profit<0?'−':'';
-    const tr      = document.createElement('tr');
-    tr.innerHTML  = `
-      <td class="mono" style="color:var(--c2);font-size:12px">${r.date}</td>
-      <td class="r mono">${f$(r.revenue)}</td>
-      <td class="r mono" style="color:var(--c3)">${r.orders}</td>
-      <td class="r mono" style="color:var(--c2)">${f$(c.aov)}</td>
-      <td class="r mono" style="color:var(--purple)">${f$(r.cogs)}</td>
-      <td class="r mono" style="color:var(--red)">${f$(c.ad)}</td>
-      <td class="r mono" style="color:var(--blue)">${f$(r.ship)}</td>
-      <td class="r"><span class="chip ${chipCls}">${sign}${f$(c.profit)}</span></td>
-      <td class="r"><span class="mgn-badge ${mgCls}">${c.margin}%</span></td>`;
-    tb.appendChild(tr);
-  });
-  document.getElementById('tblCount').textContent = rows.length + (isLiveData?' live entries':' sample entries');
-}
-
-/* ══════════════════════════════════════════
-   MANUAL ENTRY
-══════════════════════════════════════════ */
-function addEntry() {
-  const rev    = parseFloat(document.getElementById('eRev').value)||0;
-  const orders = parseInt(document.getElementById('eOrd').value)||0;
-  const unit   = parseFloat(document.getElementById('eCOGS').value)||0;
-  const google = parseFloat(document.getElementById('eGoogle').value)||0;
-  const meta   = parseFloat(document.getElementById('eMeta').value)||0;
-  const ms     = parseFloat(document.getElementById('eMs').value)||0;
-  const ship   = parseFloat(document.getElementById('eShip').value)||0;
-  if (!rev) { toast('Please enter a revenue figure','err'); return; }
-  const d     = new Date(document.getElementById('eDate').value);
-  const label = d.toLocaleDateString('en-AU',{month:'short',day:'2-digit'});
-  rows.unshift({date:label, orders, revenue:rev, cogs:unit*orders, google, meta, ms, ship});
-  clearForm();
-  renderAll();
-  toast(`Entry for ${label} added`,'ok');
-}
-
-function clearForm() {
-  ['eRev','eOrd','eCOGS','eGoogle','eMeta','eMs','eShip'].forEach(id => document.getElementById(id).value='');
 }
 
 /* ══════════════════════════════════════════
@@ -2247,7 +2200,8 @@ function exportCSV() {
   let csv = 'Date,Orders,Revenue,AOV,COGS,Google Ads,Meta Ads,Microsoft Ads,Shipping,Ad Spend,Net Profit,Margin\n';
   rows.forEach(r => {
     const c = calc(r);
-    csv += `${r.date},${r.orders},${r.revenue},${c.aov},${r.cogs},${r.google},${r.meta},${r.ms},${r.ship},${c.ad},${c.profit},${c.margin}%\n`;
+    const d = r.displayDate || r.date;
+    csv += `${d},${r.orders},${r.revenue},${c.aov},${r.cogs||0},${r.google||0},${r.meta||0},${r.ms||0},${r.ship||0},${c.ad},${c.profit},${c.margin}%\n`;
   });
   const a   = document.createElement('a');
   a.href    = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
