@@ -354,7 +354,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .sb-stat-val {
   font-family:'Inter', sans-serif;
   font-weight:700;
-  font-size:17px;
+  font-size:13px;
   line-height:1;
   display:block;
 }
@@ -1031,19 +1031,19 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <div class="sb-label">Stats</div>
     <div class="sb-stats">
       <div class="sb-stat">
-        <div class="sb-stat-val sv-green" id="sb-profit">$4,218</div>
+        <div class="sb-stat-val sv-green" id="sb-profit">—</div>
         <div class="sb-stat-label">Net Profit</div>
       </div>
       <div class="sb-stat">
-        <div class="sb-stat-val sv-gold" id="sb-rev">$18.5k</div>
+        <div class="sb-stat-val sv-gold" id="sb-rev">—</div>
         <div class="sb-stat-label">Revenue</div>
       </div>
       <div class="sb-stat">
-        <div class="sb-stat-val sv-red" id="sb-spend">$6,210</div>
+        <div class="sb-stat-val sv-red" id="sb-spend">—</div>
         <div class="sb-stat-label">Ad Spend</div>
       </div>
       <div class="sb-stat">
-        <div class="sb-stat-val sv-cream" id="sb-margin">22.7%</div>
+        <div class="sb-stat-val sv-cream" id="sb-margin">—</div>
         <div class="sb-stat-label">Margin</div>
       </div>
     </div>
@@ -1802,7 +1802,7 @@ function renderSidebar() {
   const t      = totals();
   const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(1) : '0.0';
   document.getElementById('sb-profit').textContent  = f$(t.profit);
-  document.getElementById('sb-rev').textContent     = '$'+(t.rev/1000).toFixed(1)+'k';
+  document.getElementById('sb-rev').textContent     = f$(t.rev);
   document.getElementById('sb-spend').textContent   = f$(t.ad);
   document.getElementById('sb-margin').textContent  = fPct(margin);
   document.getElementById('nb-entries').textContent = rows.length;
