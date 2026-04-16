@@ -1886,8 +1886,9 @@ function renderBreakdown() {
   const cogs  = t.cogs  > 0 ? t.cogs  : 0;
   const ad    = t.ad    > 0 ? t.ad    : 0;
 
-  const totalCosts = +(cogs + ad + ship + txFee + gwFee).toFixed(2);
-  const profit     = +(t.rev - totalCosts).toFixed(2);
+  // totalCosts derived from revenue - profit so it exactly matches Stats card
+  const profit     = t.profit;
+  const totalCosts = +(t.rev - profit).toFixed(2);
 
   // Cost segments for donut
   const items = [
