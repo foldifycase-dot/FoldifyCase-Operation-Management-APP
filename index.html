@@ -3450,15 +3450,13 @@ async function doSync() {
     } else {
       console.warn('[Sync] No Shopify data — falling back to sample');
       setStatus(`⚠ No live data — check env vars SHOPIFY_STORE + SHOPIFY_TOKEN in Vercel Settings`, true);
-      toast('Showing sample data — Shopify not connected', 'err');
-      loadSampleData();
+      toast('Shopify not connected — check Vercel Settings', 'err');
     }
 
   } catch (err) {
     console.error('[Sync] Unexpected error:', err);
     setStatus(`✗ Error: ${err.message}`, true);
-    toast('Sync error — using sample data', 'err');
-    loadSampleData();
+    toast('Sync error — check console for details', 'err');
   }
 
   if (btn) { btn.innerHTML = '<span>⟳</span> REFRESH DATA'; btn.style.opacity='1'; btn.disabled=false; }
@@ -3493,7 +3491,7 @@ function updateAdCard(platform, data) {
   }
 }
 
-/* ── Sample data fallback ── */
+/* ── Sample data — used only by Reset button ── */
 function loadSampleData() {
   rows = [
     {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225,google:0,meta:310,ms:0,ship:96, ship_label:0,txFee:122.89},
@@ -3724,7 +3722,7 @@ function renderKPIs() {
   document.getElementById('kpi-spend').textContent  = f$(t.ad);
   // Live indicator
   const badge = document.getElementById('liveBadge');
-  if (badge) badge.textContent = isLiveData ? '🟢 LIVE' : '⚪ SAMPLE';
+  if (badge) badge.textContent = isLiveData ? '🟢 LIVE' : '';
 }
 
 function renderSidebar() {
@@ -4191,15 +4189,11 @@ function applyPreset(key) {
   dpCustomFrom = null;
   dpCustomTo   = null;
 
-  // Update trigger label
-  document.getElementById('dpTriggerText').textContent = p.label;
-
-  // Show that month in calendar
+  // Show selected range in calendar and update trigger label preview
   dpViewLeft = new Date(p.from.getFullYear(), p.from.getMonth(), 1);
   renderCals();
-
-  // Auto-apply and close
-  applyAndSync(p.label);
+  document.getElementById('dpTriggerText').textContent = p.label;
+  // Picker stays open — user must click Done to apply
 }
 
 function applyCustomRange() {
@@ -4262,9 +4256,9 @@ function toast(msg, type='ok') {
 }
 
 /* ══════════════════════════════════════════
-   INIT — load sample data then sync live
+   INIT — auto-sync live data on startup
 ══════════════════════════════════════════ */
-loadSampleData();
+rows = [];
 renderAll();
 loadFeeRates();
 (function(){var r=getRange(activeRange);window.GLOBAL_FROM=r.from;window.GLOBAL_TO=r.to;})();
@@ -4808,7 +4802,7 @@ async function testConnection(platform) {
 }
 
 function clearAllData() {
-  if (!confirm('Reset all manual entries and reload sample data?')) return;
+  if (!confirm('Reset to sample/demo data?')) return;
   loadSampleData();
   renderAll();
   closeSettings();
@@ -5372,9 +5366,9 @@ function clvExportCSV() {
       s.viewLeft=new Date(res.from.getFullYear(),res.from.getMonth(),1);
       document.querySelectorAll(`#${pid}DpPanel .dp-preset`).forEach(b=>b.classList.remove('active'));
       if(event?.target) event.target.classList.add('active');
+      // Update label preview but do NOT close — wait for Done button
       const tx=document.getElementById(`${pid}DpText`); if(tx) tx.textContent=res.label;
-      render(pid); window[`${pid}DpClose`]();
-      broadcastToReports(s.fromISO,s.toISO,res.label,pid);
+      render(pid);
     };
     window[`${pid}DpDone`]=function(){
       init(pid); const s=STATE[pid];
