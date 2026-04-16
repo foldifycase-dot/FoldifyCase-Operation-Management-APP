@@ -4009,6 +4009,7 @@ function getDefaultFlat(k) { return {shopify:0.30,stripe:0.30,paypal:0.30,klarna
    DATE PICKER
 ══════════════════════════════════════════ */
 let dpOpen      = false;
+let _dpClickGuard = false; // prevents outside-click close after day selection
 let dpSelStart  = null;
 let dpSelEnd    = null;
 let dpHover     = null;
@@ -4041,6 +4042,9 @@ function closeDatePicker() {
 
 // Close if click outside
 document.addEventListener('click', e => {
+  // If a calendar day was just clicked, the re-render destroys the target element
+  // making contains() return false — use guard flag to prevent false close
+  if (_dpClickGuard) { _dpClickGuard = false; return; }
   const panel = document.getElementById('dpPanel');
   const trigger = document.getElementById('dpTrigger');
   if (dpOpen && !panel.contains(e.target) && !trigger.contains(e.target)) {
@@ -4145,11 +4149,9 @@ function dpClickDay(iso) {
   clicked.setHours(0,0,0,0);
 
   if (!dpSelStart || (dpSelStart && dpSelEnd)) {
-    // Start new selection
     dpSelStart = clicked;
     dpSelEnd   = null;
   } else {
-    // Complete selection
     if (clicked < dpSelStart) {
       dpSelEnd   = dpSelStart;
       dpSelStart = clicked;
@@ -4157,6 +4159,10 @@ function dpClickDay(iso) {
       dpSelEnd = clicked;
     }
   }
+  // Guard: prevent the document click handler from closing the picker
+  // because renderCals() destroys the clicked element from the DOM,
+  // making panel.contains(e.target) return false (stale reference)
+  _dpClickGuard = true;
   renderCals();
 }
 
@@ -5356,6 +5362,8 @@ function clvExportCSV() {
       init(pid); const s=STATE[pid]; const clicked=new Date(iso); clicked.setHours(0,0,0,0);
       if(!s.selStart||(s.selStart&&s.selEnd)){s.selStart=clicked;s.selEnd=null;}
       else{if(clicked<s.selStart){s.selEnd=s.selStart;s.selStart=clicked;}else{s.selEnd=clicked;}}
+      // Guard: render() destroys clicked element — prevent outside-click handler from closing
+      window._iifeDpClickGuard=true;
       render(pid);
     };
     window[`${pid}ApplyPreset`]=function(key){
@@ -5398,6 +5406,8 @@ function clvExportCSV() {
   register('pa',  (f,t)=>paSyncWithRange(f,t));
 
   document.addEventListener('click',e=>{
+    // Guard: if a calendar day was just clicked, ignore this event
+    if(window._iifeDpClickGuard){window._iifeDpClickGuard=false;return;}
     ['or','pl','ma','clv','pa'].forEach(pid=>{
       if(!STATE[pid]?.open) return;
       const p=document.getElementById(`${pid}DpPanel`),t=document.getElementById(`${pid}DpTrigger`);
