@@ -247,22 +247,78 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 .ctrl-right { margin-left:auto; display:flex; gap:8px; }
 
-/* ════════════════════════  DONUT CHART  */
-.donut-grid {
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:14px; padding:16px 18px;
+/* ════════════════════════  COST BREAKDOWN — single donut  */
+.breakdown-wrap {
+  display:flex; align-items:center; gap:28px;
+  padding:18px 20px;
 }
-.donut-item { display:flex; flex-direction:column; align-items:center; gap:8px; }
-.donut-svg-wrap { position:relative; width:86px; height:86px; flex-shrink:0; }
-.donut-svg-wrap svg { width:86px; height:86px; transform:rotate(-90deg); }
-.donut-center {
+
+/* Big donut */
+.bd-donut-wrap {
+  position:relative; flex-shrink:0;
+  width:180px; height:180px;
+}
+.bd-donut-wrap svg {
+  width:180px; height:180px;
+  transform:rotate(-90deg);
+}
+.bd-donut-center {
   position:absolute; inset:0;
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
+  pointer-events:none;
 }
-.donut-pct { font-family:var(--dis); font-weight:700; font-size:14px; line-height:1; color:var(--c1); }
-.donut-name { font-size:10px; color:var(--c3); font-family:var(--mono); text-align:center; line-height:1.3; margin-top:2px; }
-.donut-amt { font-family:var(--mono); font-size:12px; font-weight:500; color:var(--c2); }
+.bd-center-label {
+  font-family:'Inter',sans-serif; font-size:10px;
+  font-weight:600; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--c3);
+  margin-bottom:4px;
+}
+.bd-center-total {
+  font-family:'Inter',sans-serif; font-weight:700;
+  font-size:20px; color:var(--c1); line-height:1;
+  margin-bottom:4px;
+}
+.bd-center-pct {
+  font-family:'Inter',sans-serif; font-size:12px;
+  font-weight:600; color:var(--green);
+}
+.bd-center-pct.loss { color:var(--red); }
+
+/* Pct labels on ring — positioned absolutely */
+.bd-pct-label {
+  position:absolute; font-family:'Inter',sans-serif;
+  font-size:10px; font-weight:600; color:var(--c2);
+  white-space:nowrap; pointer-events:none;
+}
+
+/* Legend grid */
+.bd-legend {
+  flex:1; display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 20px;
+}
+.bd-legend-item {
+  display:flex; align-items:flex-start; gap:9px;
+  cursor:default;
+}
+.bd-legend-dot {
+  width:12px; height:12px; border-radius:3px;
+  flex-shrink:0; margin-top:2px;
+}
+.bd-legend-text { flex:1; }
+.bd-legend-name {
+  font-family:'Inter',sans-serif; font-size:12px;
+  font-weight:500; color:var(--c2); margin-bottom:2px;
+}
+.bd-legend-amt {
+  font-family:'Inter',sans-serif; font-size:13px;
+  font-weight:700; color:var(--c1);
+}
+.bd-legend-pct {
+  font-family:'Inter',sans-serif; font-size:10px;
+  color:var(--c3); margin-top:1px;
+}
 
 /* ════════════════════════  SIDEBAR  */
 .sidebar {
@@ -461,16 +517,21 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .kpi.k-roas::before    { background:var(--orange); }
 
 .kpi-label {
-  font-family:var(--mono); font-size:8.5px;
-  letter-spacing:0.18em; text-transform:uppercase;
-  color:var(--c3); margin-bottom:9px;
+  font-family:'Inter', sans-serif;
+  font-size:10px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:rgba(28,27,24,0.45);
+  margin-bottom:9px;
   display:flex; align-items:center; gap:6px;
+  font-weight:500;
 }
 .kpi-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
 .kpi-val {
-  font-family:var(--dis); font-weight:800;
-  font-size:26px; line-height:1;
-  letter-spacing:-0.02em; color:var(--c1);
+  font-family:'Inter', sans-serif;
+  font-weight:700;
+  font-size:24px; line-height:1;
+  letter-spacing:-0.01em; color:var(--c1);
   margin-bottom:6px;
 }
 .kpi-val.green  { color:var(--green); }
@@ -481,7 +542,8 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .kpi-val.orange { color:var(--orange); }
 
 .kpi-change {
-  font-family:var(--mono); font-size:11px;
+  font-family:'Inter', sans-serif;
+  font-size:11px; font-weight:500;
   display:flex; align-items:center; gap:3px;
 }
 .kpi-change.up   { color:var(--green); }
@@ -872,6 +934,72 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
 .main::-webkit-scrollbar-thumb { background:rgba(28,27,24,0.15); }
+
+/* ════════════════════════  AD SPEND BY CHANNEL  */
+.asc-platform {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid rgba(28,27,24,0.07);
+}
+.asc-platform:last-child { border-bottom:none; }
+.asc-icon {
+  width:36px; height:36px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; flex-shrink:0; font-weight:700;
+}
+.asc-icon.google { background:rgba(66,133,244,0.12); color:#4285F4; }
+.asc-icon.meta   { background:rgba(24,119,242,0.12); color:#1877F2; }
+.asc-icon.ms     { background:rgba(0,164,239,0.12);  color:#00A4EF; }
+.asc-bars { flex:1; }
+.asc-label {
+  font-family:'Inter',sans-serif; font-size:12px;
+  font-weight:600; color:var(--c2); margin-bottom:8px;
+}
+.asc-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.asc-bar-track {
+  flex:1; height:9px; border-radius:5px;
+  background:rgba(28,27,24,0.07); overflow:hidden;
+}
+.asc-bar-fill {
+  height:100%; border-radius:5px;
+  transition:width 0.6s cubic-bezier(.4,0,.2,1);
+}
+.asc-bar-val {
+  font-family:'Inter',sans-serif; font-size:11px;
+  font-weight:600; color:var(--c2); width:64px;
+  text-align:right; flex-shrink:0;
+}
+.asc-roas {
+  font-family:'Inter',sans-serif; font-size:10px;
+  color:var(--c3); margin-top:1px;
+}
+/* Ad Spend Summary rows */
+.ads-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px;
+  border-bottom:1px solid rgba(28,27,24,0.06);
+}
+.ads-row:last-child { border-bottom:none; }
+.ads-row-label {
+  font-family:'Inter',sans-serif; font-size:13px;
+  color:var(--c2); font-weight:500;
+}
+.ads-row-desc {
+  font-family:'Inter',sans-serif; font-size:10px;
+  color:var(--c3); margin-top:1px;
+}
+.ads-row-right { display:flex; align-items:center; gap:12px; }
+.ads-row-val {
+  font-family:'Inter',sans-serif; font-size:15px;
+  font-weight:700; color:var(--c1); text-align:right;
+}
+.ads-row-chg {
+  font-family:'Inter',sans-serif; font-size:11px;
+  font-weight:600; min-width:48px; text-align:right;
+}
+.ads-row-chg.good { color:var(--green); }
+.ads-row-chg.warn { color:var(--orange); }
+.ads-row-chg.bad  { color:var(--red); }
 </style>
 </head>
 <body>
@@ -950,7 +1078,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span class="sb-nav-badge">7D</span>
     </div>
     <div class="sb-nav-item" onclick="setNav(this)">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📅</span>Daily P&amp;L Log</div>
+      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span>Ad Spend</div>
       <span class="sb-nav-badge" id="nb-entries">7</span>
     </div>
     <div class="sb-nav-item" onclick="setNav(this)">
@@ -984,9 +1112,6 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <div class="page-hd">
       <div>
         <div class="page-title"><span style="color:var(--c1)">OPERATION</span> <span class="gold">MANAGEMENT</span></div>
-      </div>
-      <div class="page-hd-btns">
-        <button class="btn-out" onclick="exportCSV()">↓ Export CSV</button>
       </div>
     </div>
 
@@ -1118,7 +1243,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div class="card-title">Cost Breakdown</div>
             <span class="badge gold">7D Total</span>
           </div>
-          <div class="donut-grid" id="costBreakdown"></div>
+          <div id="costBreakdown"></div>
         </div>
 
       </div>
@@ -1186,59 +1311,36 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <!-- ── 4. DAILY P&L TABLE ── -->
+    <!-- ── 4. AD SPEND BY CHANNEL ── -->
     <div class="pad" style="padding-top:0">
-      <div class="sec">Daily P&amp;L Log</div>
-      <div class="card">
-        <div class="card-hd">
-          <div class="card-title">7-Day Profit &amp; Loss</div>
-          <div style="display:flex;gap:6px">
-            <span class="badge green" id="tblCount">7 entries</span>
-            <span class="badge gold">AUD</span>
-          </div>
-        </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th class="r">Revenue</th>
-                <th class="r">Orders</th>
-                <th class="r">AOV</th>
-                <th class="r">COGS</th>
-                <th class="r">Ad Spend</th>
-                <th class="r">Shipping</th>
-                <th class="r">Net Profit</th>
-                <th class="r">Margin</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      <div class="sec">Ad Spend by Channel</div>
+      <div class="two-col">
 
-    <!-- ── 5. ADD ENTRY FORM ── -->
-    <div class="pad" style="padding-top:0" id="logSection">
-      <div class="sec">Add Daily Entry</div>
-      <div class="log-form">
-        <div class="lf-title">Daily Cost Logger</div>
-        <div class="lf-sub">Revenue &amp; orders auto-pulled from Shopify on sync · Enter ad spend per platform manually each day</div>
-        <div class="lf-grid">
-          <div class="lf-field"><label>Date</label><input type="date" id="eDate" value="2026-04-15"></div>
-          <div class="lf-field"><label>Revenue ($)</label><input type="number" id="eRev" placeholder="Auto from Shopify" step="0.01"></div>
-          <div class="lf-field"><label>Orders</label><input type="number" id="eOrd" placeholder="Auto from Shopify"></div>
-          <div class="lf-field"><label>Unit Cost ($)</label><input type="number" id="eCOGS" placeholder="e.g. 12.50" step="0.01"></div>
-          <div class="lf-field"><label>Google Ads ($)</label><input type="number" id="eGoogle" placeholder="0.00" step="0.01"></div>
-          <div class="lf-field"><label>Meta Ads ($)</label><input type="number" id="eMeta" placeholder="0.00" step="0.01"></div>
-          <div class="lf-field"><label>Microsoft Ads ($)</label><input type="number" id="eMs" placeholder="0.00" step="0.01"></div>
-          <div class="lf-field"><label>Shipping Fees ($)</label><input type="number" id="eShip" placeholder="0.00" step="0.01"></div>
+        <!-- Left: horizontal bar chart -->
+        <div class="card" style="flex:1.4">
+          <div class="card-hd">
+            <div class="card-title">Spend vs Revenue by Platform</div>
+            <div style="display:flex;gap:14px;align-items:center">
+              <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--c3)">
+                <span style="width:10px;height:10px;border-radius:2px;background:var(--red);display:inline-block"></span>Ad Spend
+              </span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--c3)">
+                <span style="width:10px;height:10px;border-radius:2px;background:var(--green);display:inline-block"></span>Ad Revenue
+              </span>
+            </div>
+          </div>
+          <div class="card-body" id="adChannelChart" style="padding:8px 20px 20px"></div>
         </div>
-        <div class="lf-actions">
-          <button class="btn-add" onclick="addEntry()">+ ADD ENTRY</button>
-          <button class="btn-clr" onclick="clearForm()">CLEAR</button>
-          <span class="autofill-tag">⟳ Shopify auto-fills on sync</span>
+
+        <!-- Right: Ad Spend Summary -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Ad Spend Summary</div>
+            <span class="badge gold">Period</span>
+          </div>
+          <div class="card-body" id="adSpendSummary" style="padding:4px 0 8px"></div>
         </div>
+
       </div>
     </div>
 
@@ -1496,8 +1598,166 @@ function renderAll() {
   renderSidebar();
   renderChart();
   renderBreakdown();
-  renderTable();
+  renderAdChannel();
+  renderAdSummary();
 }
+
+/* ── Ad Spend by Channel — horizontal bar chart ── */
+function renderAdChannel() {
+  const el = document.getElementById('adChannelChart');
+  if (!el) return;
+
+  const t = totals();
+
+  // Platform data — live from livePlatforms, fallback from rows
+  const platforms = [
+    {
+      key:    'google',
+      label:  'Google Ads',
+      icon:   'G',
+      cls:    'google',
+      spend:  livePlatforms.google?.spend  || rows.reduce((s,r)=>s+r.google,0),
+      rev:    livePlatforms.google?.revenue|| rows.reduce((s,r)=>s+r.google*4.2,0),
+      roas:   livePlatforms.google?.roas   || 4.2,
+      status: livePlatforms.google ? 'live' : 'sample',
+    },
+    {
+      key:    'meta',
+      label:  'Meta Ads',
+      icon:   'f',
+      cls:    'meta',
+      spend:  livePlatforms.meta?.spend  || rows.reduce((s,r)=>s+r.meta,0),
+      rev:    livePlatforms.meta?.revenue|| rows.reduce((s,r)=>s+r.meta*2.6,0),
+      roas:   livePlatforms.meta?.roas   || 2.6,
+      status: livePlatforms.meta ? 'live' : 'sample',
+    },
+    {
+      key:    'ms',
+      label:  'Microsoft Ads',
+      icon:   'M',
+      cls:    'ms',
+      spend:  livePlatforms.ms?.spend  || rows.reduce((s,r)=>s+r.ms,0),
+      rev:    livePlatforms.ms?.revenue|| rows.reduce((s,r)=>s+r.ms*3.8,0),
+      roas:   livePlatforms.ms?.roas   || 3.8,
+      status: 'coming',
+    },
+  ].filter(p => p.spend > 0 || p.key !== 'ms');
+
+  // Max value for bar scaling
+  const maxVal = Math.max(...platforms.flatMap(p => [p.spend, p.rev]), 1);
+
+  el.innerHTML = platforms.map(p => {
+    const spendPct = Math.round((p.spend / maxVal) * 100);
+    const revPct   = Math.round((p.rev   / maxVal) * 100);
+    const roasColor = p.roas >= 3 ? 'var(--green)' : p.roas >= 2 ? 'var(--orange)' : 'var(--red)';
+    const statusTag = p.status === 'coming'
+      ? `<span style="font-size:9px;color:var(--c3);background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:4px;border:1px solid rgba(28,27,24,0.1)">COMING SOON</span>`
+      : p.status === 'live'
+      ? `<span style="font-size:9px;color:var(--green);background:rgba(90,158,114,0.1);padding:1px 6px;border-radius:4px;border:1px solid rgba(90,158,114,0.25)">● LIVE</span>`
+      : `<span style="font-size:9px;color:var(--c3)">SAMPLE</span>`;
+
+    return `
+      <div class="asc-platform">
+        <div class="asc-icon ${p.cls}">${p.icon}</div>
+        <div class="asc-bars">
+          <div class="asc-label" style="display:flex;align-items:center;gap:8px">
+            ${p.label} ${statusTag}
+          </div>
+          <div class="asc-bar-row">
+            <div style="width:10px;height:10px;border-radius:2px;background:var(--red);flex-shrink:0"></div>
+            <div class="asc-bar-track">
+              <div class="asc-bar-fill" style="width:${spendPct}%;background:var(--red);opacity:0.85"></div>
+            </div>
+            <div class="asc-bar-val">${f$(p.spend)}</div>
+          </div>
+          <div class="asc-bar-row">
+            <div style="width:10px;height:10px;border-radius:2px;background:var(--green);flex-shrink:0"></div>
+            <div class="asc-bar-track">
+              <div class="asc-bar-fill" style="width:${revPct}%;background:var(--green);opacity:0.85"></div>
+            </div>
+            <div class="asc-bar-val">${f$(p.rev)}</div>
+          </div>
+          <div class="asc-roas">ROAS: <span style="font-weight:600;color:${roasColor}">${p.roas.toFixed(1)}×</span></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Ad Spend Summary panel ── */
+function renderAdSummary() {
+  const el = document.getElementById('adSpendSummary');
+  if (!el) return;
+
+  const t = totals();
+  const totalSpend   = t.ad;
+  const totalAdRev   = (livePlatforms.meta?.revenue || 0) + (livePlatforms.google?.revenue || 0);
+  const blendedRoas  = totalSpend > 0 ? (totalAdRev / totalSpend) : 0;
+  const poas         = t.rev > 0 ? (totalAdRev / t.rev) : 0; // profit on ad spend proxy
+  const spendPct     = t.rev > 0 ? (totalSpend / t.rev * 100) : 0;
+  const cpa          = livePlatforms.meta?.cpa || 0;
+  const totalConv    = (livePlatforms.meta?.conversions || 0) + (livePlatforms.google?.conversions || 0);
+
+  const roasClass  = blendedRoas >= 3 ? 'good' : blendedRoas >= 2 ? 'warn' : 'bad';
+  const spendClass = spendPct <= 30 ? 'good' : spendPct <= 45 ? 'warn' : 'bad';
+
+  const summaryRows = [
+    {
+      label: 'Total Ad Spend',
+      desc:  'Across all active platforms',
+      val:   f$(totalSpend),
+      chg:   spendPct.toFixed(1) + '% of rev',
+      cls:   spendClass,
+    },
+    {
+      label: 'Blended ROAS',
+      desc:  'Total ad revenue ÷ total spend',
+      val:   blendedRoas > 0 ? blendedRoas.toFixed(2) + '×' : '—',
+      chg:   blendedRoas >= 3 ? '▲ Good' : blendedRoas >= 2 ? '~ Fair' : '▼ Low',
+      cls:   roasClass,
+    },
+    {
+      label: 'Ad Revenue',
+      desc:  'Revenue attributed to ads',
+      val:   f$(totalAdRev),
+      chg:   totalAdRev > 0 ? ((totalAdRev/t.rev)*100).toFixed(1)+'% of rev' : '—',
+      cls:   'good',
+    },
+    {
+      label: 'Total Conversions',
+      desc:  'Orders from ad platforms',
+      val:   totalConv > 0 ? totalConv.toLocaleString() : '—',
+      chg:   '',
+      cls:   'good',
+    },
+    {
+      label: 'Avg CPA',
+      desc:  'Cost per acquisition (Meta)',
+      val:   cpa > 0 ? f$(cpa) : '—',
+      chg:   cpa > 0 && cpa < 30 ? '▲ Good' : cpa > 0 ? '~ Fair' : '',
+      cls:   cpa > 0 && cpa < 30 ? 'good' : 'warn',
+    },
+    {
+      label: 'Spend Efficiency',
+      desc:  'Ad spend as % of total revenue',
+      val:   spendPct.toFixed(1) + '%',
+      chg:   spendPct <= 30 ? '▲ Efficient' : '▼ High',
+      cls:   spendClass,
+    },
+  ];
+
+  el.innerHTML = summaryRows.map(r => `
+    <div class="ads-row">
+      <div>
+        <div class="ads-row-label">${r.label}</div>
+        <div class="ads-row-desc">${r.desc}</div>
+      </div>
+      <div class="ads-row-right">
+        <div class="ads-row-val">${r.val}</div>
+        ${r.chg ? `<div class="ads-row-chg ${r.cls}">${r.chg}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
 
 function renderKPIs() {
   const t      = totals();
@@ -1557,35 +1817,95 @@ function renderChart() {
 }
 
 function renderBreakdown() {
-  const t       = totals();
-  const shopify = Math.round(t.rev * 0.005);
-  const profit  = t.rev - t.cogs - t.ad - t.ship - shopify;
-  const items   = [
-    {name:'COGS',       amt:t.cogs,  pct:+(t.cogs/t.rev*100).toFixed(1),   color:'#7E6DB5', bg:'rgba(126,109,181,0.1)'},
-    {name:'Ad Spend',   amt:t.ad,    pct:+(t.ad/t.rev*100).toFixed(1),     color:'#D95454', bg:'rgba(217,84,84,0.1)'},
-    {name:'Shipping',   amt:t.ship,  pct:+(t.ship/t.rev*100).toFixed(1),   color:'#4A7FC1', bg:'rgba(74,127,193,0.1)'},
-    {name:'Shopify Fee',amt:shopify, pct:+(shopify/t.rev*100).toFixed(1),  color:'#999',    bg:'rgba(0,0,0,0.05)'},
-    {name:'Net Profit', amt:profit,  pct:+(profit/t.rev*100).toFixed(1),   color:'#5A9E72', bg:'rgba(90,158,114,0.1)'},
+  const t      = totals();
+  const txFee  = +(t.rev * 0.005).toFixed(2);
+  const gwFee  = +(t.rev * 0.0175).toFixed(2);
+  const profit = +(t.rev - t.cogs - t.ad - t.ship - txFee - gwFee).toFixed(2);
+  const totalCosts = t.cogs + t.ad + t.ship + txFee + gwFee;
+
+  // Cost items only (not profit — profit shown as centre label)
+  const items = [
+    { name:'Ad Spend',   amt:t.ad,    color:'#D95454' },
+    { name:'COGS',       amt:t.cogs,  color:'#7E6DB5' },
+    { name:'Shipping',   amt:t.ship,  color:'#4A7FC1' },
+    { name:'Shopify Fee',amt:txFee,   color:'#C8A96E' },
+    { name:'Gateway Fee',amt:gwFee,   color:'#5A9E72' },
+  ].filter(i => i.amt > 0);
+
+  // SVG donut — single ring, segments per cost item
+  const cx = 90, cy = 90, R = 72, strokeW = 18;
+  const circ = 2 * Math.PI * R;
+  const gap  = 2; // gap between segments in px
+
+  // Calculate proportions from total costs
+  let cumPct = 0;
+  const segments = items.map(item => {
+    const pct    = totalCosts > 0 ? item.amt / totalCosts : 0;
+    const start  = cumPct;
+    cumPct      += pct;
+    return { ...item, pct, start };
+  });
+
+  // Build SVG segments
+  let svgSegs = '';
+  segments.forEach(seg => {
+    if (seg.pct <= 0) return;
+    const dashLen  = Math.max(0, seg.pct * circ - gap);
+    const dashGap  = circ - dashLen;
+    const offset   = circ * (1 - seg.start) + (circ * 0); // rotate-90 handled by CSS
+    svgSegs += `<circle
+      cx="${cx}" cy="${cy}" r="${R}"
+      fill="none" stroke="${seg.color}" stroke-width="${strokeW}"
+      stroke-dasharray="${dashLen.toFixed(2)} ${dashGap.toFixed(2)}"
+      stroke-dashoffset="${(circ - seg.start * circ).toFixed(2)}"
+      stroke-linecap="butt"/>`;
+  });
+
+  // Track ring background
+  const trackRing = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none"
+    stroke="rgba(28,27,24,0.06)" stroke-width="${strokeW}"/>`;
+
+  // Centre label values
+  const profitPct  = t.rev > 0 ? ((profit/t.rev)*100).toFixed(1) : '0.0';
+  const profitSign = profit >= 0 ? '▲' : '▼';
+  const profitCls  = profit >= 0 ? '' : 'loss';
+
+  // Legend items — include all 5 cost items
+  const legendItems = [
+    { name:'Ad Spend',    amt:t.ad,    pct: t.rev>0?(t.ad/t.rev*100).toFixed(1):0,    color:'#D95454' },
+    { name:'COGS',        amt:t.cogs,  pct: t.rev>0?(t.cogs/t.rev*100).toFixed(1):0,  color:'#7E6DB5' },
+    { name:'Shipping',    amt:t.ship,  pct: t.rev>0?(t.ship/t.rev*100).toFixed(1):0,  color:'#4A7FC1' },
+    { name:'Shopify Fee', amt:txFee,   pct: t.rev>0?(txFee/t.rev*100).toFixed(1):0,   color:'#C8A96E' },
+    { name:'Gateway Fee', amt:gwFee,   pct: t.rev>0?(gwFee/t.rev*100).toFixed(1):0,   color:'#5A9E72' },
+    { name:'Net Profit',  amt:profit,  pct: profitPct,                                 color: profit>=0?'#5A9E72':'#D95454' },
   ];
-  function donut(pct, color, bg) {
-    const r = 34, circ = 2*Math.PI*r;
-    const filled = (Math.max(0,pct)/100)*circ;
-    return `
-      <circle cx="43" cy="43" r="${r}" fill="none" stroke="${bg}" stroke-width="9"/>
-      <circle cx="43" cy="43" r="${r}" fill="none" stroke="${color}" stroke-width="9"
-        stroke-dasharray="${filled.toFixed(2)} ${(circ-filled).toFixed(2)}" stroke-linecap="round"/>`;
-  }
-  document.getElementById('costBreakdown').innerHTML = items.map(i => `
-    <div class="donut-item">
-      <div class="donut-svg-wrap">
-        <svg viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg">${donut(i.pct,i.color,i.bg)}</svg>
-        <div class="donut-center">
-          <div class="donut-pct" style="color:${i.color}">${i.pct}%</div>
+
+  const legendHTML = legendItems.map(i => `
+    <div class="bd-legend-item">
+      <div class="bd-legend-dot" style="background:${i.color}"></div>
+      <div class="bd-legend-text">
+        <div class="bd-legend-name">${i.name}</div>
+        <div class="bd-legend-amt">${f$(i.amt)}</div>
+        <div class="bd-legend-pct">${i.pct}% of revenue</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('costBreakdown').innerHTML = `
+    <div class="breakdown-wrap">
+      <div class="bd-donut-wrap">
+        <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"
+             style="width:180px;height:180px;transform:rotate(-90deg)">
+          ${trackRing}
+          ${svgSegs}
+        </svg>
+        <div class="bd-donut-center">
+          <div class="bd-center-label">Total Costs</div>
+          <div class="bd-center-total">${f$(totalCosts)}</div>
+          <div class="bd-center-pct ${profitCls}">${profitSign} ${profitPct}% margin</div>
         </div>
       </div>
-      <div class="donut-name">${i.name}</div>
-      <div class="donut-amt">${f$(i.amt)}</div>
-    </div>`).join('');
+      <div class="bd-legend">${legendHTML}</div>
+    </div>`;
 }
 
 function renderTable() {
