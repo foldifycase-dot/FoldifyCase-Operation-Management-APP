@@ -4079,6 +4079,8 @@ function openPage(key) {
   // Hide dashboard main, show selected page
   document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
 
+  // Hide Google Ads page if open
+  var gaP=document.getElementById('pageGoogleAds'); if(gaP) gaP.style.display='none';
   // Hide all other pages first
   Object.values(PAGES).forEach(p => {
     const el = document.getElementById(p.mainId);
@@ -4115,6 +4117,8 @@ function closePage() {
   const navEl = document.getElementById(page.navId);
   if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
 
+  // Hide Google Ads page too (in case it was open alongside)
+  var gaP=document.getElementById('pageGoogleAds'); if(gaP) gaP.style.display='none';
   // Show dashboard
   document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'block';
   activePage = null;
@@ -4491,12 +4495,16 @@ FEE_KEYS.forEach(k => {
 function openGoogleAdsPage() {
   // Hide main dashboard
   document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
-  // Hide all other report pages
-  document.querySelectorAll('.report-main').forEach(el => el.style.display = 'none');
+  // Hide all PAGES report pages and reset their nav highlights
+  Object.values(PAGES).forEach(function(p) {
+    var el = document.getElementById(p.mainId); if (el) el.style.display = 'none';
+    var nav = document.getElementById(p.navId);
+    if (nav) { nav.style.background = ''; nav.style.color = ''; }
+  });
+  activePage = null;
   // Show Google Ads page
-  const gaPage = document.getElementById('pageGoogleAds');
+  var gaPage = document.getElementById('pageGoogleAds');
   if (gaPage) gaPage.style.display = 'block';
-  // Render content
   gaRenderPage();
 }
 
