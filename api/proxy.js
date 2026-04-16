@@ -212,7 +212,7 @@ async function handleShopify(req, res) {
       if (!byDate[localDate]) byDate[localDate] = {
         date: localDate, revenue: 0, orders: 0,
         cogs: 0, shipping_charged: 0, shipping_cost: 0,
-        transaction_fees: 0, gateway_fees: 0,
+        transaction_fees: 0,  // combined: Shopify + PayPal + Afterpay (5.7424% blended)
         has_cogs: false,
       };
       const d = byDate[localDate];
@@ -236,10 +236,8 @@ async function handleShopify(req, res) {
         }
       });
 
-      // Transaction fees from Shopify payment gateway
-      const orderTotal = parseFloat(o.total_price || 0);
-      d.transaction_fees += +(orderTotal * 0.005).toFixed(2);  // ~0.5% Shopify fee
-      d.gateway_fees     += +(orderTotal * 0.0175).toFixed(2); // ~1.75% gateway fee
+      // Combined transaction fee: Shopify + PayPal + Afterpay = 5.7424% blended
+      d.transaction_fees += +(orderTotal * 0.057424).toFixed(2);
     });
 
     // ── Step 7: Build response ───────────────────────────────────────────────────
@@ -252,7 +250,6 @@ async function handleShopify(req, res) {
         shipping_charged: +d.shipping_charged.toFixed(2),
         shipping_cost:    +d.shipping_cost.toFixed(2),
         transaction_fees: +d.transaction_fees.toFixed(2),
-        gateway_fees:     +d.gateway_fees.toFixed(2),
         aov:              d.orders > 0 ? +(d.revenue / d.orders).toFixed(2) : 0,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
@@ -264,8 +261,7 @@ async function handleShopify(req, res) {
       shipping_charged: +(acc.shipping_charged + d.shipping_charged).toFixed(2),
       shipping_cost:    +(acc.shipping_cost + d.shipping_cost).toFixed(2),
       transaction_fees: +(acc.transaction_fees + d.transaction_fees).toFixed(2),
-      gateway_fees:     +(acc.gateway_fees + d.gateway_fees).toFixed(2),
-    }), { revenue:0, orders:0, cogs:0, shipping_charged:0, shipping_cost:0, transaction_fees:0, gateway_fees:0 });
+    }), { revenue:0, orders:0, cogs:0, shipping_charged:0, shipping_cost:0, transaction_fees:0 });
 
     return res.status(200).json({
       daily,
