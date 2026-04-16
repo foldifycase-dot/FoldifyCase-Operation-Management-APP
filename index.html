@@ -1598,25 +1598,22 @@ function loadSampleData() {
    CALC + FORMAT
 ══════════════════════════════════════════ */
 const calc = r => {
-  const ad = (r.google||0) + (r.meta||0) + (r.ms||0);
-
-  // txFee and gwFee: use || only if genuinely missing (not just 0)
-  const txFee = (r.txFee != null && r.txFee > 0) ? r.txFee : +(r.revenue * 0.005).toFixed(2);
-  const gwFee = (r.gwFee != null && r.gwFee > 0) ? r.gwFee : +(r.revenue * 0.0175).toFixed(2);
-
-  // Shipping cost = what YOU pay for labels (ship_label)
-  // shipping_charged = what customer paid — already IN revenue, not a cost
+  const ad     = (r.google||0) + (r.meta||0) + (r.ms||0);
+  const txFee  = (r.txFee != null && r.txFee > 0) ? r.txFee : r.revenue * 0.005;
+  const gwFee  = (r.gwFee != null && r.gwFee > 0) ? r.gwFee : r.revenue * 0.0175;
   const shipCost = r.ship_label || 0;
-
   const total  = (r.cogs||0) + ad + shipCost + txFee + gwFee;
   const profit = r.revenue - total;
-  const margin = r.revenue > 0 ? ((profit/r.revenue)*100).toFixed(1) : '0.0';
+  const margin = r.revenue > 0 ? ((profit/r.revenue)*100).toFixed(2) : '0.00';
   const aov    = r.orders  > 0 ? (r.revenue/r.orders).toFixed(2)    : '0.00';
   return { ad, total, profit, margin, aov, txFee, gwFee, shipCost };
 };
 
-const f$   = n  => '$' + Math.abs(Math.round(n)).toLocaleString();
-const fPct = n  => parseFloat(n).toFixed(1) + '%';
+const f$   = n  => {
+  const abs = Math.abs(parseFloat(n) || 0);
+  return '$' + abs.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+};
+const fPct = n  => parseFloat(n).toFixed(2) + '%';
 
 function totals() {
   return rows.reduce((a,r) => {
@@ -1941,7 +1938,7 @@ function renderBreakdown() {
     stroke="rgba(28,27,24,0.06)" stroke-width="${strokeW}"/>`;
 
   // Centre label values
-  const profitPct  = t.rev > 0 ? ((profit/t.rev)*100).toFixed(1) : '0.0';
+  const profitPct  = t.rev > 0 ? ((profit/t.rev)*100).toFixed(2) : '0.00';
   const profitSign = profit >= 0 ? '▲' : '▼';
   const profitCls  = profit >= 0 ? '' : 'loss';
 
