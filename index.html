@@ -4856,8 +4856,13 @@ function orRenderAll() {
 }
 
 function orRenderKPIs() {
-  // Use filtered set for KPIs
-  const orders = orFiltered;
+  // KPIs use the same filter as main dashboard: exclude cancelled, refunded, voided
+  // (Table still shows all orders for full visibility)
+  const orders = orFiltered.filter(o =>
+    !o.cancelled &&
+    o.status !== 'refunded' &&
+    o.status !== 'voided'
+  );
   const total     = orders.length;
   const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
