@@ -348,6 +348,7 @@ module.exports = async function handler(req, res) {
       }
 
       // Step 5: Fee rates from query params
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const feeRates = {
         "shopify payments": { pct: parseFloat(req.query.fee_shopify_pct  ?? 1.75)/100, flat: parseFloat(req.query.fee_shopify_flat  ?? 0.30) },
         "stripe":           { pct: parseFloat(req.query.fee_stripe_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_stripe_flat   ?? 0.30) },
@@ -358,9 +359,9 @@ module.exports = async function handler(req, res) {
         "other":            { pct: parseFloat(req.query.fee_other_pct    ?? 2.90)/100, flat: parseFloat(req.query.fee_other_flat    ?? 0.30) },
       };
       const getRate = (gateways) => {
-        const gw  = ((gateways && gateways[0]) || "other").toLowerCase();
-        const key = Object.keys(feeRates).find(k => gw.includes(k)) || "other";
-        return feeRates[key];
+        const raw  = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
+        const key  = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
+        return { rate: feeRates[key], key };
       };
 
       const round2 = n => Math.round(n * 100) / 100;
@@ -497,6 +498,7 @@ module.exports = async function handler(req, res) {
       }
 
       // Fee rates
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const feeRates = {
         "shopify payments": { pct: parseFloat(req.query.fee_shopify_pct  ?? 1.75)/100, flat: parseFloat(req.query.fee_shopify_flat  ?? 0.30) },
         "stripe":           { pct: parseFloat(req.query.fee_stripe_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_stripe_flat   ?? 0.30) },
@@ -507,9 +509,9 @@ module.exports = async function handler(req, res) {
         "other":            { pct: parseFloat(req.query.fee_other_pct    ?? 2.90)/100, flat: parseFloat(req.query.fee_other_flat    ?? 0.30) },
       };
       const getRate = (gateways) => {
-        const gw  = ((gateways && gateways[0]) || "other").toLowerCase();
-        const key = Object.keys(feeRates).find(k => gw.includes(k)) || "other";
-        return feeRates[key];
+        const raw  = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
+        const key  = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
+        return { rate: feeRates[key], key };
       };
 
       const round2 = n => Math.round(n * 100) / 100;
@@ -531,8 +533,9 @@ module.exports = async function handler(req, res) {
         const subtotal  = parseFloat(o.subtotal_price || 0);
         const discounts = parseFloat(o.total_discounts || 0);
         const shipping  = parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
-        const rate      = getRate(o.payment_gateway_names);
-        const txFee     = round2(subtotal * rate.pct + rate.flat);
+        const {rate: _orRate, key: _orKey} = getRate(o.payment_gateway_names);
+        const _orShopify3rd = (_orKey === 'shopify payments' || _orKey === 'manual') ? 0 : (subtotal * shopify3rdPct);
+        const txFee     = round2(subtotal * _orRate.pct + _orRate.flat + _orShopify3rd);
         let cogs = 0;
         const items = (o.line_items || []).length;
         (o.line_items || []).forEach(li => {
@@ -564,6 +567,7 @@ module.exports = async function handler(req, res) {
           margin,
           status:      o.financial_status,
           gateway:     (o.payment_gateway_names && o.payment_gateway_names[0]) || 'unknown',
+          gatewayKey:  (() => { const {key} = getRate(o.payment_gateway_names); return key; })(),
           cancelled:   !!o.cancelled_at,
           fulfillment: o.fulfillment_status || 'unfulfilled',
           hasCogs:     cogs > 0,
