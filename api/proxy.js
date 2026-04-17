@@ -125,7 +125,7 @@ module.exports = async function handler(req, res) {
         created_at_min:   fromUTC,
         created_at_max:   toUTC,
         limit:            "250",
-        fields:           "id,created_at,total_price,subtotal_price,payment_gateway_names,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at",
+        fields:           "id,created_at,total_price,subtotal_price,payment_gateway_names,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,transactions",
       });
 
       let allOrders = [];
@@ -221,7 +221,21 @@ module.exports = async function handler(req, res) {
 
         // Transaction fee: calculated per order using payment gateway + configured rates
         // Fee is on subtotal (excluding shipping) — gateways don't charge on shipping
-        d.transaction_fees += calcTxFee(o.payment_gateway_names, subTotal);
+        // Use actual Shopify transaction fee if available, else calculate
+        let _actualFee = 0;
+        if (o.transactions && o.transactions.length > 0) {
+          o.transactions.forEach(t => {
+            if (t.kind === 'sale' || t.kind === 'capture' || t.kind === 'authorization') {
+              const charge = t.receipt?.charges?.data?.[0];
+              if (charge?.balance_transaction?.fee != null) {
+                _actualFee += charge.balance_transaction.fee / 100;
+              } else if (t.payment_fee_amount != null) {
+                _actualFee += parseFloat(t.payment_fee_amount || 0);
+              }
+            }
+          });
+        }
+        d.transaction_fees += _actualFee > 0 ? round2(_actualFee) : calcTxFee(o.payment_gateway_names, subTotal);
 
         // COGS
         (o.line_items || []).forEach(li => {
@@ -465,7 +479,7 @@ module.exports = async function handler(req, res) {
       const params = new URLSearchParams({
         status: "any", financial_status: "any",
         created_at_min: fromUTC, created_at_max: toUTC, limit: "250",
-        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status",
+        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status,transactions",
       });
       let allOrders = [];
       let url = `${REST}/orders.json?${params}`;
@@ -535,7 +549,26 @@ module.exports = async function handler(req, res) {
         const shipping  = parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
         const {rate: _orRate, key: _orKey} = getRate(o.payment_gateway_names);
         const _orShopify3rd = (_orKey === 'shopify payments' || _orKey === 'manual') ? 0 : (subtotal * shopify3rdPct);
-        const txFee     = round2(subtotal * _orRate.pct + _orRate.flat + _orShopify3rd);
+        const _calcFee = round2(subtotal * _orRate.pct + _orRate.flat + _orShopify3rd);
+        // Use actual transaction fee from Shopify if available (most accurate)
+        let txFee = _calcFee;
+        if (o.transactions && o.transactions.length > 0) {
+          let actualFee = 0;
+          o.transactions.forEach(t => {
+            if (t.kind === 'sale' || t.kind === 'capture' || t.kind === 'authorization') {
+              // Shopify Payments: fee in receipt.charges.data[0].balance_transaction.fee (cents)
+              const charge = t.receipt?.charges?.data?.[0];
+              if (charge?.balance_transaction?.fee != null) {
+                actualFee += charge.balance_transaction.fee / 100; // convert cents to dollars
+              }
+              // Also check payment_fee_amount (some gateways use this)
+              else if (t.payment_fee_amount != null) {
+                actualFee += parseFloat(t.payment_fee_amount || 0);
+              }
+            }
+          });
+          if (actualFee > 0) txFee = round2(actualFee);
+        }
         let cogs = 0;
         const items = (o.line_items || []).length;
         (o.line_items || []).forEach(li => {
