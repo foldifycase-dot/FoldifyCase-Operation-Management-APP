@@ -3913,7 +3913,9 @@ async function doSync() {
   const btn = document.getElementById('syncBtn');
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
-  const { from, to } = getRange(activeRange);
+  // Always use GLOBAL date range — keeps doSync in sync with all pickers
+  const from = window.GLOBAL_FROM;
+  const to   = window.GLOBAL_TO;
   const feeParams = getFeeParams(); // configured gateway rates
 
   const setStatus = (msg, isError=false) => { /* status bar removed */ };
@@ -5476,7 +5478,36 @@ function gaRenderPage() {
   }
 }
 
-doSync();
+// ── Auto-sync on load: fetch Shopify data AND broadcast date to all pickers
+(function() {
+  var f = window.GLOBAL_FROM;
+  var t = window.GLOBAL_TO;
+  var lbl = window.GLOBAL_LABEL || 'Last 7 Days';
+  // Seed ALL picker labels with the global date immediately
+  ['or','pl','ma','clv','pa','ga','meta','ms'].forEach(function(pid) {
+    var el = document.getElementById(pid + 'DpText');
+    if (el) el.textContent = lbl;
+    // Seed ad picker ISO vars directly
+    if (pid === 'ga')   { _gaFromISO   = f; _gaToISO   = t; }
+    if (pid === 'meta') { _metaFromISO = f; _metaToISO = t; }
+    if (pid === 'ms')   { _msFromISO   = f; _msToISO   = t; }
+  });
+  // Also seed main dashboard picker label
+  var mainLbl = document.getElementById('dpTriggerText');
+  if (mainLbl) mainLbl.textContent = lbl;
+  // Show loading toast so user knows sync is happening
+  setTimeout(function() { toast('⟳ Loading Shopify data...', 'ok'); }, 100);
+  // Seed IIFE STATE after it initialises (slight delay)
+  setTimeout(function() {
+    if (window._setDpState) {
+      ['or','pl','ma','clv','pa'].forEach(function(pid) {
+        window._setDpState(pid, f, t);
+      });
+    }
+  }, 50);
+  // Auto-fetch on load
+  doSync();
+})();
 </script>
 <!-- ══════════  SETTINGS MODAL  -->
 <div class="settings-overlay" id="settingsOverlay" onclick="handleOverlayClick(event)">
