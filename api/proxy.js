@@ -47,10 +47,14 @@ module.exports = async function handler(req, res) {
 
       // --- Fee rates from query params (sent by dashboard from localStorage) ---
       // Each rate: pct = percentage (e.g. 2.9 means 2.9%), flat = flat fee per txn (e.g. 0.30)
+      // Shopify 3rd-party transaction fee (only on non-Shopify-Payments gateways)
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
+
       const feeRates = {
         "shopify payments": {
           pct:  parseFloat(req.query.fee_shopify_pct  ?? 1.75) / 100,
           flat: parseFloat(req.query.fee_shopify_flat ?? 0.30),
+          shopify3rd: false,  // NO 3rd-party fee on Shopify Payments
         },
         "stripe": {
           pct:  parseFloat(req.query.fee_stripe_pct   ?? 2.90) / 100,
@@ -68,7 +72,7 @@ module.exports = async function handler(req, res) {
           pct:  parseFloat(req.query.fee_afterpay_pct  ?? 0.00) / 100,
           flat: parseFloat(req.query.fee_afterpay_flat ?? 0.00),
         },
-        "manual": { pct: 0, flat: 0 },
+        "manual": { pct: 0, flat: 0, shopify3rd: false },
         "other": {
           pct:  parseFloat(req.query.fee_other_pct   ?? 2.90) / 100,
           flat: parseFloat(req.query.fee_other_flat  ?? 0.30),
@@ -81,7 +85,12 @@ module.exports = async function handler(req, res) {
         // Try exact match first, then partial match
         const key = Object.keys(feeRates).find(k => gateway.includes(k)) || "other";
         const rate = feeRates[key];
-        return (subtotal * rate.pct) + rate.flat;
+        // Gateway fee
+        const gatewayFee = (subtotal * rate.pct) + rate.flat;
+        // Shopify 3rd-party fee: applied to ALL gateways EXCEPT Shopify Payments and Manual
+        const noShopify3rd = key === "shopify payments" || key === "manual";
+        const shopify3rdFee = noShopify3rd ? 0 : (subtotal * shopify3rdPct);
+        return gatewayFee + shopify3rdFee;
       };
 
       // Step 1: Store timezone
@@ -260,7 +269,7 @@ module.exports = async function handler(req, res) {
         daily, totals,
         has_cogs:     daily.some(d => d.has_cogs),
         total_orders: orders.length,
-        fee_rates:    feeRates, // echo back so dashboard can verify
+        fee_rates:    { ...feeRates, shopify3rd_pct: shopify3rdPct * 100 }, // echo back so dashboard can verify
         debug: {
           store_timezone:  tz,
           utc_offset_hrs:  offsetMs / 3600000,
