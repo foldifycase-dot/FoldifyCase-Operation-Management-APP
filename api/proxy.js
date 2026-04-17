@@ -197,6 +197,49 @@ module.exports = async function handler(req, res) {
       }
       console.log(`[proxy] COGS: ${Object.keys(costMap).length}/${variantIds.length} variants mapped`);
 
+
+      // ── Fetch ACTUAL transaction fees via GraphQL for daily-sales ──
+      const dsFeeMap = {}; // orderId -> actual fee in dollars
+      try {
+        const dsGqlQuery = `{
+          orders(first: 250, query: "created_at:>='${fromUTC}' AND created_at:<='${toUTC}'") {
+            edges {
+              node {
+                legacyResourceId
+                transactions(first: 10) {
+                  kind
+                  status
+                  fees {
+                    amount { amount }
+                  }
+                }
+              }
+            }
+          }
+        }`;
+        const dsGqlRes = await fetch(GQL, {
+          method: 'POST',
+          headers: { ...HEADERS, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: dsGqlQuery })
+        });
+        const dsGqlJson = await dsGqlRes.json();
+        const dsEdges = dsGqlJson?.data?.orders?.edges || [];
+        dsEdges.forEach(({ node }) => {
+          const oid = node.legacyResourceId;
+          let totalFee = 0;
+          (node.transactions || []).forEach(tx => {
+            if ((tx.kind === 'sale' || tx.kind === 'capture') && tx.status === 'success') {
+              (tx.fees || []).forEach(f => {
+                totalFee += parseFloat(f.amount?.amount || 0);
+              });
+            }
+          });
+          if (totalFee > 0) dsFeeMap[oid] = Math.round(totalFee * 100) / 100;
+        });
+      } catch(e) {
+        console.log('[DS GraphQL fees] failed:', e.message);
+      }
+
       // Step 6: Group by store-local date
       const byDate = {};
       const round2 = n => Math.round(n * 100) / 100;
