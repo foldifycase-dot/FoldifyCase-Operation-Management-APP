@@ -1721,7 +1721,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="dpTrigger" onclick="toggleDatePicker()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="dpTriggerText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="dpTriggerText">Today</span>
           <span class="dp-trigger-arrow" id="dpArrow">▼</span>
         </div>
 
@@ -1729,10 +1729,10 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <div class="dp-panel" id="dpPanel">
           <!-- Left: presets -->
           <div class="dp-presets">
-            <button class="dp-preset" onclick="applyPreset('today')">Today</button>
+            <button class="dp-preset active" onclick="applyPreset('today')">Today</button>
             <button class="dp-preset" onclick="applyPreset('yesterday')">Yesterday</button>
             <button class="dp-preset" onclick="applyPreset('7d')">Last 7 days</button>
-            <button class="dp-preset active" onclick="applyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="applyPreset('30d')">Last 30 days</button>
             <button class="dp-preset" onclick="applyPreset('thismonth')">This month</button>
             <button class="dp-preset" onclick="applyPreset('lastmonth')">Last month</button>
             <button class="dp-preset" onclick="applyPreset('90d')">Last 90 days</button>
@@ -2168,7 +2168,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="paDpTrigger" onclick="paDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="paDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="paDpText">Today</span>
           <span class="dp-trigger-arrow" id="paDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="paDpPanel">
@@ -2367,7 +2367,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="orDpTrigger" onclick="orDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="orDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="orDpText">Today</span>
           <span class="dp-trigger-arrow" id="orDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="orDpPanel">
@@ -2527,7 +2527,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
           <div class="dp-trigger" id="plDpTrigger" onclick="plDpToggle()">
             <span class="dp-trigger-icon">📅</span>
-            <span class="dp-trigger-text" id="plDpText">Last 30 Days</span>
+            <span class="dp-trigger-text" id="plDpText">Today</span>
             <span class="dp-trigger-arrow" id="plDpArrow">▼</span>
           </div>
           <div class="dp-panel" id="plDpPanel">
@@ -2719,7 +2719,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
           <div class="dp-trigger" id="maDpTrigger" onclick="maDpToggle()">
             <span class="dp-trigger-icon">📅</span>
-            <span class="dp-trigger-text" id="maDpText">Last 30 Days</span>
+            <span class="dp-trigger-text" id="maDpText">Today</span>
             <span class="dp-trigger-arrow" id="maDpArrow">▼</span>
           </div>
           <div class="dp-panel" id="maDpPanel">
@@ -3250,7 +3250,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="gaDpTrigger" onclick="gaDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="gaDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="gaDpText">Today</span>
           <span class="dp-trigger-arrow" id="gaDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="gaDpPanel">
@@ -3439,7 +3439,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="metaDpTrigger" onclick="metaDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="metaDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="metaDpText">Today</span>
           <span class="dp-trigger-arrow" id="metaDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="metaDpPanel">
@@ -3636,7 +3636,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="msDpTrigger" onclick="msDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="msDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="msDpText">Today</span>
           <span class="dp-trigger-arrow" id="msDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="msDpPanel">
@@ -3844,10 +3844,10 @@ const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy'
 let rows         = [];          // live data merged from Shopify + ad platforms
 let activeRange  = '7d';
 const _gN=new Date();_gN.setHours(0,0,0,0);
-const _gF=new Date(_gN.getTime()-29*86400000);
+const _gF=new Date(_gN.getTime());
 window.GLOBAL_FROM=_gF.toISOString().slice(0,10);
 window.GLOBAL_TO=_gN.toISOString().slice(0,10);
-window.GLOBAL_LABEL='Last 30 Days';
+window.GLOBAL_LABEL='Today';
 let activeMkt    = 'all';
 let isLiveData   = false;
 
@@ -4817,7 +4817,8 @@ function applyPreset(key) {
 function applyCustomRange() {
   if (!dpSelStart) { closeDatePicker(); return; }
   const end = dpSelEnd || dpSelStart;
-  const label = fmtDisplay(dpSelStart) + ' – ' + fmtDisplay(end);
+  const _fromISO2=fmtISO(dpSelStart), _toISO2=fmtISO(end||dpSelStart);
+  const label = _smartLabel(_fromISO2, _toISO2);
   document.getElementById('dpTriggerText').textContent = label;
   dpCustomFrom=fmtISO(dpSelStart);dpCustomTo=fmtISO(end);
   window.GLOBAL_FROM=dpCustomFrom;window.GLOBAL_TO=dpCustomTo;window.GLOBAL_LABEL=label;
@@ -4880,6 +4881,23 @@ rows = [];
 renderAll();
 loadFeeRates();
 (function(){var r=getRange(activeRange);window.GLOBAL_FROM=r.from;window.GLOBAL_TO=r.to;})();
+
+
+// ── Smart date label: shows "Today" or "Yesterday" when applicable ────────
+function _smartLabel(fromISO, toISO) {
+  var now = new Date(); now.setHours(0,0,0,0);
+  var todayISO = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  var yest = new Date(now.getTime()-86400000);
+  var yestISO = yest.getFullYear()+'-'+String(yest.getMonth()+1).padStart(2,'0')+'-'+String(yest.getDate()).padStart(2,'0');
+  if (fromISO === todayISO && toISO === todayISO) return 'Today';
+  if (fromISO === yestISO  && toISO === yestISO)  return 'Yesterday';
+  // Otherwise format as date range
+  function fmtD(iso) {
+    var p=iso.split('-').map(Number);
+    return new Date(p[0],p[1]-1,p[2]).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+  }
+  return fromISO === toISO ? fmtD(fromISO) : fmtD(fromISO)+' – '+fmtD(toISO);
+}
 
 function broadcastToReports(from,to,label,sourcePid){
   window.GLOBAL_FROM=from;window.GLOBAL_TO=to;window.GLOBAL_LABEL=label||window.GLOBAL_LABEL;
@@ -4965,7 +4983,7 @@ function metaDpClose(){_metaDpOpen=false;document.getElementById('metaDpPanel').
 function metaDpDone(){
   if(_metaDpSelStart&&_metaDpSelEnd){
     _metaFromISO=_metaFmtISO(_metaDpSelStart);_metaToISO=_metaFmtISO(_metaDpSelEnd);
-    var lbl=_metaFmtDisp(_metaDpSelStart)+' – '+_metaFmtDisp(_metaDpSelEnd);
+    var lbl=_smartLabel(_metaFromISO,_metaToISO);
     document.getElementById('metaDpText').textContent=lbl;
     document.getElementById('metaDpFrom').value=_metaFromISO;document.getElementById('metaDpTo').value=_metaToISO;
     metaDpClose();
@@ -5034,7 +5052,7 @@ function msDpClose(){_msDpOpen=false;document.getElementById('msDpPanel').style.
 function msDpDone(){
   if(_msDpSelStart&&_msDpSelEnd){
     _msFromISO=_msFmtISO(_msDpSelStart);_msToISO=_msFmtISO(_msDpSelEnd);
-    var lbl=_msFmtDisp(_msDpSelStart)+' – '+_msFmtDisp(_msDpSelEnd);
+    var lbl=_smartLabel(_msFromISO,_msToISO);
     document.getElementById('msDpText').textContent=lbl;
     document.getElementById('msDpFrom').value=_msFromISO;document.getElementById('msDpTo').value=_msToISO;
     msDpClose();
@@ -5349,7 +5367,7 @@ function gaDpClose() {
 function gaDpDone() {
   if(_gaDpSelStart && _gaDpSelEnd) {
     _gaFromISO=_gaFmtISO(_gaDpSelStart); _gaToISO=_gaFmtISO(_gaDpSelEnd);
-    var lbl=_gaFmtDisp(_gaDpSelStart)+' – '+_gaFmtDisp(_gaDpSelEnd);
+    var lbl=_smartLabel(_gaFromISO,_gaToISO);
     document.getElementById('gaDpText').textContent=lbl;
     document.getElementById('gaDpFrom').value=_gaFromISO;
     document.getElementById('gaDpTo').value=_gaToISO;
@@ -5482,7 +5500,7 @@ function gaRenderPage() {
 (function() {
   var f = window.GLOBAL_FROM;
   var t = window.GLOBAL_TO;
-  var lbl = window.GLOBAL_LABEL || 'Last 30 Days';
+  var lbl = window.GLOBAL_LABEL || 'Today';
   // Seed ALL picker labels with the global date immediately
   ['or','pl','ma','clv','pa','ga','meta','ms'].forEach(function(pid) {
     var el = document.getElementById(pid + 'DpText');
@@ -6585,7 +6603,7 @@ function clvExportCSV() {
       const end=s.selEnd||s.selStart;
       s.fromISO=_fmtISO(s.selStart); s.toISO=_fmtISO(end);
       const same=end.getTime()===s.selStart.getTime();
-      const _lbl=same?_fmtDisp(s.selStart):_fmtDisp(s.selStart)+' – '+_fmtDisp(end);
+      const _lbl=_smartLabel(s.fromISO, s.toISO);
       const tx=document.getElementById(`${pid}DpText`);
       if(tx) tx.textContent=_lbl;
       window[`${pid}DpClose`]();
