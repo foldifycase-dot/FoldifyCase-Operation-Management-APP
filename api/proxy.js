@@ -47,14 +47,10 @@ module.exports = async function handler(req, res) {
 
       // --- Fee rates from query params (sent by dashboard from localStorage) ---
       // Each rate: pct = percentage (e.g. 2.9 means 2.9%), flat = flat fee per txn (e.g. 0.30)
-      // Shopify 3rd-party transaction fee (only on non-Shopify-Payments gateways)
-      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
-
       const feeRates = {
         "shopify payments": {
           pct:  parseFloat(req.query.fee_shopify_pct  ?? 1.75) / 100,
           flat: parseFloat(req.query.fee_shopify_flat ?? 0.30),
-          shopify3rd: false,  // NO 3rd-party fee on Shopify Payments
         },
         "stripe": {
           pct:  parseFloat(req.query.fee_stripe_pct   ?? 2.90) / 100,
@@ -72,28 +68,21 @@ module.exports = async function handler(req, res) {
           pct:  parseFloat(req.query.fee_afterpay_pct  ?? 0.00) / 100,
           flat: parseFloat(req.query.fee_afterpay_flat ?? 0.00),
         },
-        "manual": { pct: 0, flat: 0, shopify3rd: false },
+        "manual": { pct: 0, flat: 0 },
         "other": {
           pct:  parseFloat(req.query.fee_other_pct   ?? 2.90) / 100,
           flat: parseFloat(req.query.fee_other_flat  ?? 0.30),
         },
       };
 
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const calcTxFee = (gateways, subtotal) => {
-        // gateways is an array from payment_gateway_names
-        // Normalise: lowercase, replace underscores/hyphens with spaces
-        const rawGateway = (gateways && gateways[0] || "other").toLowerCase();
-        const gateway = rawGateway.replace(/_/g, ' ').replace(/-/g, ' ').trim();
-        // Try partial match against normalised keys
-        const key = Object.keys(feeRates).find(k => gateway.includes(k) || k.includes(gateway)) || "other";
+        const raw = (gateways && gateways[0] || "other").toLowerCase().replace(/_/g," ").replace(/-/g," ").trim();
+        const key = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
         const rate = feeRates[key];
-        // Gateway fee (on subtotal)
-        const gatewayFee = (subtotal * rate.pct) + rate.flat;
-        // Shopify 3rd-party fee: NOT applied to Shopify Payments or Manual orders
+        const gwFee = (subtotal * rate.pct) + rate.flat;
         const noShopify3rd = key === "shopify payments" || key === "manual";
-        const shopify3rdFee = noShopify3rd ? 0 : (subtotal * shopify3rdPct);
-        console.log('[Fee] raw='+rawGateway+' norm='+gateway+' key='+key+' gwFee='+gatewayFee.toFixed(2)+' 3rd='+shopify3rdFee.toFixed(2));
-        return gatewayFee + shopify3rdFee;
+        return gwFee + (noShopify3rd ? 0 : subtotal * shopify3rdPct);
       };
 
       // Step 1: Store timezone
@@ -197,48 +186,19 @@ module.exports = async function handler(req, res) {
       }
       console.log(`[proxy] COGS: ${Object.keys(costMap).length}/${variantIds.length} variants mapped`);
 
-
-      // ── Fetch ACTUAL transaction fees via GraphQL for daily-sales ──
-      const dsFeeMap = {}; // orderId -> actual fee in dollars
+      // ── Fetch ACTUAL fees from Shopify Payments Balance Transactions ─────────
+      const dsActualFeeMap = {};
       try {
-        const dsGqlQuery = `{
-          orders(first: 250, query: "created_at:>='${fromUTC}' AND created_at:<='${toUTC}'") {
-            edges {
-              node {
-                legacyResourceId
-                transactions(first: 10) {
-                  kind
-                  status
-                  fees {
-                    amount { amount }
-                  }
-                }
-              }
-            }
-          }
-        }`;
-        const dsGqlRes = await fetch(GQL, {
-          method: 'POST',
-          headers: { ...HEADERS, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: dsGqlQuery })
-        });
-        const dsGqlJson = await dsGqlRes.json();
-        const dsEdges = dsGqlJson?.data?.orders?.edges || [];
-        dsEdges.forEach(({ node }) => {
-          const oid = node.legacyResourceId;
-          let totalFee = 0;
-          (node.transactions || []).forEach(tx => {
-            if ((tx.kind === 'sale' || tx.kind === 'capture') && tx.status === 'success') {
-              (tx.fees || []).forEach(f => {
-                totalFee += parseFloat(f.amount?.amount || 0);
-              });
-            }
+        const btRes = await fetch(`${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`, { headers: HEADERS });
+        if (btRes.ok) {
+          const btJson = await btRes.json();
+          (btJson.transactions || []).forEach(t => {
+            if (t.source_type === 'charge' && t.fee != null)
+              dsActualFeeMap[String(t.source_id)] = Math.abs(parseFloat(t.fee));
           });
-          if (totalFee > 0) dsFeeMap[oid] = Math.round(totalFee * 100) / 100;
-        });
-      } catch(e) {
-        console.log('[DS GraphQL fees] failed:', e.message);
-      }
+          console.log('[proxy] balance txns:', Object.keys(dsActualFeeMap).length);
+        }
+      } catch(e) { console.log('[proxy] balance txns unavailable:', e.message); }
 
       // Step 6: Group by store-local date
       const byDate = {};
@@ -264,21 +224,8 @@ module.exports = async function handler(req, res) {
 
         // Transaction fee: calculated per order using payment gateway + configured rates
         // Fee is on subtotal (excluding shipping) — gateways don't charge on shipping
-        // Use actual Shopify transaction fee if available, else calculate
-        let _actualFee = 0;
-        if (o.transactions && o.transactions.length > 0) {
-          o.transactions.forEach(t => {
-            if (t.kind === 'sale' || t.kind === 'capture' || t.kind === 'authorization') {
-              const charge = t.receipt?.charges?.data?.[0];
-              if (charge?.balance_transaction?.fee != null) {
-                _actualFee += charge.balance_transaction.fee / 100;
-              } else if (t.payment_fee_amount != null) {
-                _actualFee += parseFloat(t.payment_fee_amount || 0);
-              }
-            }
-          });
-        }
-        d.transaction_fees += _actualFee > 0 ? round2(_actualFee) : calcTxFee(o.payment_gateway_names, subTotal);
+        const _dsTxnId = o.transactions && o.transactions[0] ? String(o.transactions[0].id) : null;
+        d.transaction_fees += (_dsTxnId && dsActualFeeMap[_dsTxnId] != null) ? dsActualFeeMap[_dsTxnId] : calcTxFee(o.payment_gateway_names, subTotal);
 
         // COGS
         (o.line_items || []).forEach(li => {
@@ -329,7 +276,7 @@ module.exports = async function handler(req, res) {
         daily, totals,
         has_cogs:     daily.some(d => d.has_cogs),
         total_orders: orders.length,
-        fee_rates:    { ...feeRates, shopify3rd_pct: shopify3rdPct * 100 }, // echo back so dashboard can verify
+        fee_rates:    feeRates, // echo back so dashboard can verify
         debug: {
           store_timezone:  tz,
           utc_offset_hrs:  offsetMs / 3600000,
@@ -384,7 +331,7 @@ module.exports = async function handler(req, res) {
       }
 
       // Separate active vs refunded/cancelled
-      const orders   = allOrders.filter(o => !o.cancelled_at && o.financial_status !== "refunded" && o.financial_status !== "voided");
+      const orders   = allOrders.filter(o => !o.cancelled_at && o.financial_status !== "voided");
       const refunded = allOrders.filter(o => o.financial_status === "refunded" || o.financial_status === "partially_refunded");
 
       // Step 4: COGS via GraphQL
@@ -405,7 +352,6 @@ module.exports = async function handler(req, res) {
       }
 
       // Step 5: Fee rates from query params
-      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const feeRates = {
         "shopify payments": { pct: parseFloat(req.query.fee_shopify_pct  ?? 1.75)/100, flat: parseFloat(req.query.fee_shopify_flat  ?? 0.30) },
         "stripe":           { pct: parseFloat(req.query.fee_stripe_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_stripe_flat   ?? 0.30) },
@@ -415,9 +361,10 @@ module.exports = async function handler(req, res) {
         "manual":           { pct: 0, flat: 0 },
         "other":            { pct: parseFloat(req.query.fee_other_pct    ?? 2.90)/100, flat: parseFloat(req.query.fee_other_flat    ?? 0.30) },
       };
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const getRate = (gateways) => {
-        const raw  = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
-        const key  = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
+        const raw = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g," ").replace(/-/g," ").trim();
+        const key = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
         return { rate: feeRates[key], key };
       };
 
@@ -430,11 +377,12 @@ module.exports = async function handler(req, res) {
         if (!byDate[localDate]) byDate[localDate] = { date:localDate, grossSales:0, discounts:0, refundAmt:0, orders:0, cogs:0, adSpend:0, txFee:0, shippingCharged:0, shippingCost:0 };
         const d = byDate[localDate];
         const sub = parseFloat(o.subtotal_price||0);
-        const rate = getRate(o.payment_gateway_names);
+        const {rate, key: _gwKey} = getRate(o.payment_gateway_names);
+        const _s3 = (_gwKey === "shopify payments" || _gwKey === "manual") ? 0 : sub * shopify3rdPct;
         d.grossSales += parseFloat(o.total_price||0);
         d.discounts  += parseFloat(o.total_discounts||0);
         d.orders     += 1;
-        d.txFee      += sub * rate.pct + rate.flat;
+        d.txFee      += sub * rate.pct + rate.flat + _s3;
         (o.line_items||[]).forEach(li => { d.cogs += (costMap[li.variant_id]||0) * (parseInt(li.quantity)||1); });
         d.shippingCharged += parseFloat(o.total_shipping_price_set?.shop_money?.amount||0);
         // refunds on this order
@@ -555,19 +503,19 @@ module.exports = async function handler(req, res) {
       }
 
       // Fee rates
-      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const feeRates = {
         "shopify payments": { pct: parseFloat(req.query.fee_shopify_pct  ?? 1.75)/100, flat: parseFloat(req.query.fee_shopify_flat  ?? 0.30) },
         "stripe":           { pct: parseFloat(req.query.fee_stripe_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_stripe_flat   ?? 0.30) },
         "paypal":           { pct: parseFloat(req.query.fee_paypal_pct   ?? 4.40)/100, flat: parseFloat(req.query.fee_paypal_flat   ?? 0.30) },
         "klarna":           { pct: parseFloat(req.query.fee_klarna_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_klarna_flat   ?? 0.30) },
-        "afterpay":         { pct: parseFloat(req.query.fee_afterpay_pct ?? 0.00)/100, flat: parseFloat(req.query.fee_afterpay_flat ?? 0.00) },
+        "afterpay":         { pct: parseFloat(req.query.fee_afterpay_pct ?? 6.00)/100, flat: parseFloat(req.query.fee_afterpay_flat ?? 0.30) },
         "manual":           { pct: 0, flat: 0 },
         "other":            { pct: parseFloat(req.query.fee_other_pct    ?? 2.90)/100, flat: parseFloat(req.query.fee_other_flat    ?? 0.30) },
       };
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const getRate = (gateways) => {
-        const raw  = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
-        const key  = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
+        const raw = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g," ").replace(/-/g," ").trim();
+        const key = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
         return { rate: feeRates[key], key };
       };
 
@@ -576,42 +524,30 @@ module.exports = async function handler(req, res) {
         timeZone: tz, year:"numeric", month:"2-digit", day:"2-digit"
       }).format(new Date(iso));
 
+      // ── Fetch ACTUAL fees from Shopify Payments Balance Transactions ─────────
+      const actualFeeMap = {};
+      try {
+        const orBtRes = await fetch(`${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`, { headers: HEADERS });
+        if (orBtRes.ok) {
+          const orBtJson = await orBtRes.json();
+          (orBtJson.transactions || []).forEach(t => {
+            if (t.source_type === 'charge' && t.fee != null)
+              actualFeeMap[String(t.source_id)] = Math.abs(parseFloat(t.fee));
+          });
+        }
+      } catch(e) { console.log('[proxy] order-report balance txns unavailable:', e.message); }
+
       // Build order rows
-      // Apply same filter as main dashboard: exclude cancelled, refunded, voided
-      const filteredOrders = allOrders.filter(o =>
-        !o.cancelled_at &&
-        o.financial_status !== "refunded" &&
-        o.financial_status !== "voided"
-      );
-      // Also keep refunded/cancelled for the table (user sees full picture)
-      // but tag them so frontend can show correct KPIs
       const orders = allOrders.map(o => {
         const revenue   = parseFloat(o.total_price || 0);
         const subtotal  = parseFloat(o.subtotal_price || 0);
         const discounts = parseFloat(o.total_discounts || 0);
         const shipping  = parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
-        const {rate: _orRate, key: _orKey} = getRate(o.payment_gateway_names);
-        const _orShopify3rd = (_orKey === 'shopify payments' || _orKey === 'manual') ? 0 : (subtotal * shopify3rdPct);
-        const _calcFee = round2(subtotal * _orRate.pct + _orRate.flat + _orShopify3rd);
-        // Use actual transaction fee from Shopify if available (most accurate)
-        let txFee = _calcFee;
-        if (o.transactions && o.transactions.length > 0) {
-          let actualFee = 0;
-          o.transactions.forEach(t => {
-            if (t.kind === 'sale' || t.kind === 'capture' || t.kind === 'authorization') {
-              // Shopify Payments: fee in receipt.charges.data[0].balance_transaction.fee (cents)
-              const charge = t.receipt?.charges?.data?.[0];
-              if (charge?.balance_transaction?.fee != null) {
-                actualFee += charge.balance_transaction.fee / 100; // convert cents to dollars
-              }
-              // Also check payment_fee_amount (some gateways use this)
-              else if (t.payment_fee_amount != null) {
-                actualFee += parseFloat(t.payment_fee_amount || 0);
-              }
-            }
-          });
-          if (actualFee > 0) txFee = round2(actualFee);
-        }
+        const {rate, key: _gwKey} = getRate(o.payment_gateway_names);
+        const _s3 = (_gwKey === "shopify payments" || _gwKey === "manual") ? 0 : subtotal * shopify3rdPct;
+        const _calcFee = round2(subtotal * rate.pct + rate.flat + _s3);
+        const _orTxnId = o.transactions && o.transactions[0] ? String(o.transactions[0].id) : null;
+        const txFee = (_orTxnId && actualFeeMap[_orTxnId] != null) ? actualFeeMap[_orTxnId] : _calcFee;
         let cogs = 0;
         const items = (o.line_items || []).length;
         (o.line_items || []).forEach(li => {
@@ -624,8 +560,6 @@ module.exports = async function handler(req, res) {
           ? `${o.customer.first_name||''} ${o.customer.last_name||''}`.trim() || o.customer.email || 'Guest'
           : 'Guest';
 
-        const grossProfit = round2(revenue - discounts - cogs);
-        const grossMargin = revenue > 0 ? round2(grossProfit / revenue * 100) : 0;
         return {
           id:          o.id,
           name:        o.name,
@@ -633,18 +567,14 @@ module.exports = async function handler(req, res) {
           customer:    custName,
           items,
           revenue,
-          subtotal,
           discounts,
           shipping,
           cogs,
           txFee,
-          grossProfit,
-          grossMargin,
           profit,
           margin,
           status:      o.financial_status,
           gateway:     (o.payment_gateway_names && o.payment_gateway_names[0]) || 'unknown',
-          gatewayKey:  (() => { const {key} = getRate(o.payment_gateway_names); return key; })(),
           cancelled:   !!o.cancelled_at,
           fulfillment: o.fulfillment_status || 'unfulfilled',
           hasCogs:     cogs > 0,
@@ -653,8 +583,6 @@ module.exports = async function handler(req, res) {
 
       return res.status(200).json({
         orders,
-        kpi_orders: filteredOrders.length,
-        kpi_revenue: Math.round(filteredOrders.reduce((s,o)=>s+parseFloat(o.total_price||0),0)*100)/100,
         total_count: orders.length,
         debug: { store_timezone: tz, utc_window: { from: fromUTC, to: toUTC }, variants_with_cost: Object.keys(costMap).length },
       });
@@ -1060,81 +988,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // ── TX-FEES: Actual fees from Shopify GraphQL ───────────────────────────
-    } else if (action === 'tx-fees') {
-      if (!from || !to) return res.status(400).json({ error: 'from and to required' });
-      let tz = 'Australia/Melbourne';
-      try {
-        const sz = await fetch(`${REST}/shop.json?fields=iana_timezone`, { headers: HEADERS });
-        const jz = await sz.json();
-        if (jz.shop?.iana_timezone) tz = jz.shop.iana_timezone;
-      } catch(e) {}
-      const getOff = (d) => {
-        const probe = new Date(d + 'T12:00:00Z');
-        const lh = parseInt(new Intl.DateTimeFormat('en-CA',{timeZone:tz,hour:'2-digit',hour12:false}).format(probe));
-        return (lh - 12) * 3600000;
-      };
-      const offMs  = getOff(from);
-      const fUTC   = new Date(new Date(from+'T00:00:00Z').getTime()-offMs).toISOString();
-      const tUTC   = new Date(new Date(to  +'T00:00:00Z').getTime()-offMs+86399999).toISOString();
-      const gql = `{orders(first:250,query:"created_at:>='${fUTC}' AND created_at:<='${tUTC}'"){edges{node{legacyResourceId name transactions(first:10){kind status fees{amount{amount}}}}}}}`;
-      const gr = await fetch(GQL,{method:'POST',headers:{...HEADERS,'Content-Type':'application/json'},body:JSON.stringify({query:gql})});
-      if (!gr.ok) return res.status(502).json({ error: `GQL ${gr.status}` });
-      const gj = await gr.json();
-      if (gj.errors) return res.status(200).json({ fees:{}, errors: gj.errors });
-      const fees = {};
-      (gj?.data?.orders?.edges||[]).forEach(({node}) => {
-        let total = 0, has = false;
-        (node.transactions||[]).forEach(tx => {
-          if ((tx.kind==='sale'||tx.kind==='capture') && tx.status==='success') {
-            (tx.fees||[]).forEach(f => { const a=parseFloat(f.amount?.amount||0); total+=a; if(a>0)has=true; });
-          }
-        });
-        fees[node.legacyResourceId] = has ? Math.round(total*100)/100 : null;
-      });
-      return res.status(200).json({ fees, count: (gj?.data?.orders?.edges||[]).length });
-
     return res.status(400).json({ error: "Unknown shopify action", received: action });
   }
-
-    // ── FEE DEBUG ─────────────────────────────────────────────────────────────
-    if (action === 'fee-debug') {
-      const date = req.query.date || new Date().toISOString().slice(0,10);
-      const result = { date, tests: {} };
-
-      // Test 1: Balance Transactions (needs shopify_payments scope)
-      try {
-        const r1 = await fetch(`${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=5`, { headers: HEADERS });
-        const j1 = await r1.json();
-        result.tests.balance_transactions = { status: r1.status,
-          count: j1.transactions?.length ?? 0,
-          sample: (j1.transactions||[]).slice(0,3).map(t=>({ id:t.id, source_id:t.source_id, amount:t.amount, fee:t.fee, net:t.net })),
-          error: j1.error || j1.errors || null };
-      } catch(e) { result.tests.balance_transactions = { error: e.message }; }
-
-      // Test 2: GraphQL transaction fees
-      try {
-        const q2 = `{ orders(first:4, query:"created_at:>=${date}T00:00:00") { edges { node { name legacyResourceId transactions(first:5) { kind status fees { amount{amount} } } } } } }`;
-        const r2 = await fetch(GQL, { method:'POST', headers:HEADERS, body:JSON.stringify({query:q2}) });
-        const j2 = await r2.json();
-        result.tests.graphql_fees = { status: r2.status, errors: j2.errors||null,
-          orders: (j2.data?.orders?.edges||[]).map(e=>({ name:e.node.name,
-            txns: (e.node.transactions||[]).map(t=>({ kind:t.kind, status:t.status, fees:t.fees })) })) };
-      } catch(e) { result.tests.graphql_fees = { error: e.message }; }
-
-      // Test 3: REST order transactions
-      try {
-        const r3 = await fetch(`${REST}/orders.json?created_at_min=${date}T00:00:00%2B10:00&fields=id,name,payment_gateway_names,transactions&limit=4`, { headers: HEADERS });
-        const j3 = await r3.json();
-        result.tests.rest_transactions = { status: r3.status,
-          orders: (j3.orders||[]).map(o=>({ name:o.name, gateway:o.payment_gateway_names,
-            txns:(o.transactions||[]).map(t=>({ kind:t.kind, gateway:t.gateway, amount:t.amount,
-              payment_fee_amount:t.payment_fee_amount, receipt_keys:Object.keys(t.receipt||{}) })) })) };
-      } catch(e) { result.tests.rest_transactions = { error: e.message }; }
-
-      return res.status(200).json(result);
-    }
-
 
   // ── META ADS ─────────────────────────────────────────────────────────────────
   if (service === "meta-ads") {
