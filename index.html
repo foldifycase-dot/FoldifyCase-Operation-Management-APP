@@ -2147,6 +2147,61 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div><!-- /card -->
     </div>
 
+    <!-- ══ Shopify Fee for 3rd-Party Payments ══════════════════════════ -->
+    <div style="margin:20px 28px 28px">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:700;color:var(--ink)">Shopify Fee for 3rd-Party Payments</div>
+        <a href="https://help.shopify.com/en/manual/payments/shopify-payments/third-party-payment-providers"
+           target="_blank" style="font-size:12px;color:var(--gold);font-weight:600;text-decoration:none">Learn more ↗</a>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+
+        <!-- Main row -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px;gap:16px">
+          <div style="display:flex;align-items:flex-start;gap:14px;flex:1">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(92,106,196,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">🛍️</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px">Third-party transaction fee</div>
+              <div style="font-size:12px;color:var(--c3);line-height:1.6;max-width:540px">
+                Based on your Shopify plan. <strong style="color:var(--c2)">Not applied</strong> to orders using
+                <strong style="color:var(--c2)">Shopify Payments</strong> or <strong style="color:var(--c2)">manual payment methods</strong>
+                in Shopify settings. Applied on top of the gateway fee for all other providers.
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;font-family:'Inter',sans-serif">
+                <span style="font-size:11px;padding:3px 10px;background:rgba(200,169,110,0.12);border-radius:12px;color:var(--gold);font-weight:600">Basic: 2%</span>
+                <span style="font-size:11px;padding:3px 10px;background:rgba(28,27,24,0.06);border-radius:12px;color:var(--c2)">Shopify: 1%</span>
+                <span style="font-size:11px;padding:3px 10px;background:rgba(28,27,24,0.06);border-radius:12px;color:var(--c2)">Advanced: 0.5%</span>
+                <span style="font-size:11px;padding:3px 10px;background:rgba(28,27,24,0.06);border-radius:12px;color:var(--c2)">Plus: 0.15%</span>
+              </div>
+            </div>
+          </div>
+          <!-- Rate input -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;min-width:80px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);font-family:'Inter',sans-serif">Your Rate</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <input class="txfee-inp" id="fee_shopify3rd_pct" type="number" step="0.01" min="0" max="10" value="2.00"
+                style="width:56px;font-size:18px;font-weight:700;text-align:center;padding:6px 4px">
+              <span style="font-size:16px;font-weight:700;color:var(--ink)">%</span>
+            </div>
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;text-align:center" id="ex_shopify3rd_label">A$2.00 on $100</div>
+          </div>
+        </div>
+
+        <!-- Footer note -->
+        <div style="border-top:1px solid rgba(28,27,24,0.07);padding:12px 20px;background:rgba(92,106,196,0.04);display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:#5C6AC4;font-weight:700;flex-shrink:0">ℹ</span>
+          <span style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;line-height:1.5">
+            Included in your <strong style="color:var(--c2)">Tx Fees</strong> column across Order Report and P&amp;L.
+            Set your plan rate above, then save to recalculate all figures.
+          </span>
+          <button onclick="saveFeeRates()" style="margin-left:auto;padding:7px 18px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Save &amp; Refresh Data</button>
+        </div>
+
+      </div>
+    </div>
+
   </main><!-- /txfee-main -->
 
   <!-- ══════════  REPORT PAGES  ══════════ -->
@@ -4576,14 +4631,11 @@ function updateFeeExamples() {
   });
   // Shopify 3rd-party fee example (on non-Shopify-Payments $100 order)
   const s3El = document.getElementById('fee_shopify3rd_pct');
-  const s3Ex = document.getElementById('ex_shopify3rd');
-  if (s3El && s3Ex) {
+  if (s3El) {
     const s3fee = ORDER * (parseFloat(s3El.value || 0) / 100);
-    s3Ex.textContent = `A$${s3fee.toFixed(2)}`;
+    const s3Lbl = document.getElementById('ex_shopify3rd_label');
+    if (s3Lbl) s3Lbl.textContent = 'A$' + s3fee.toFixed(2) + ' on a $100 order';
   }
-  // Update formula label
-  const fLabel = document.getElementById('formula-shopify3rd');
-  if (fLabel && s3El) fLabel.textContent = `(${parseFloat(s3El.value||0).toFixed(0)}%)`;
 }
 
 function loadFeeRates() {
