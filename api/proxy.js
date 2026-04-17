@@ -81,15 +81,18 @@ module.exports = async function handler(req, res) {
 
       const calcTxFee = (gateways, subtotal) => {
         // gateways is an array from payment_gateway_names
-        const gateway = (gateways && gateways[0] || "other").toLowerCase();
-        // Try exact match first, then partial match
-        const key = Object.keys(feeRates).find(k => gateway.includes(k)) || "other";
+        // Normalise: lowercase, replace underscores/hyphens with spaces
+        const rawGateway = (gateways && gateways[0] || "other").toLowerCase();
+        const gateway = rawGateway.replace(/_/g, ' ').replace(/-/g, ' ').trim();
+        // Try partial match against normalised keys
+        const key = Object.keys(feeRates).find(k => gateway.includes(k) || k.includes(gateway)) || "other";
         const rate = feeRates[key];
-        // Gateway fee
+        // Gateway fee (on subtotal)
         const gatewayFee = (subtotal * rate.pct) + rate.flat;
-        // Shopify 3rd-party fee: applied to ALL gateways EXCEPT Shopify Payments and Manual
+        // Shopify 3rd-party fee: NOT applied to Shopify Payments or Manual orders
         const noShopify3rd = key === "shopify payments" || key === "manual";
         const shopify3rdFee = noShopify3rd ? 0 : (subtotal * shopify3rdPct);
+        console.log('[Fee] raw='+rawGateway+' norm='+gateway+' key='+key+' gwFee='+gatewayFee.toFixed(2)+' 3rd='+shopify3rdFee.toFixed(2));
         return gatewayFee + shopify3rdFee;
       };
 
