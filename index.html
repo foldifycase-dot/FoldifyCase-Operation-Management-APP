@@ -1658,8 +1658,8 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">G</span>Google Ads</div>
       <span class="sb-nav-badge" id="ga-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
     </div>
-    <div class="sb-nav-item" onclick="void(0)">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">●</span>Meta Ads</div>
+    <div class="sb-nav-item" onclick="openMetaAdsPage()" style="cursor:pointer">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">f</span>Meta Ads</div>
       <span class="sb-nav-badge" id="meta-roas-badge" style="background:var(--orange-dim);color:var(--orange)">—</span>
     </div>
     <div class="sb-nav-item" onclick="void(0)">
@@ -3388,6 +3388,170 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
   </main><!-- /pageGoogleAds -->
 
+  <!-- ══ META ADS PAGE ════════════════════════════════════════════════════ -->
+  <main class="main report-main" id="pageMetaAds" style="display:none">
+
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="closeMetaAdsPage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">META</span> <span class="gold">ADS</span></div>
+      </div>
+    </div>
+
+    <div class="main-controls" style="margin-top:0">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:6px;background:rgba(24,119,242,0.08);border:1px solid rgba(24,119,242,0.2)">
+        <span style="font-size:11px;color:#1877F2;font-weight:600" id="meta-page-status">● Meta Ads</span>
+        <span style="font-size:10px;color:var(--c3)" id="meta-page-subtitle">Refresh dashboard to load latest data</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="metaPageSync()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+      </div>
+    </div>
+
+    <!-- ── KPI Strip ── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:12px 28px 20px">
+      <div class="ga-kpi" style="border-top:3px solid #1877F2">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#1877F2"></span>Total Spend</div>
+        <div class="ga-kpi-val" id="mp-spend">—</div>
+        <div class="ga-kpi-sub" id="mp-spend-sub">this period</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--green)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--green)"></span>Conv. Value</div>
+        <div class="ga-kpi-val" id="mp-revenue" style="color:var(--green)">—</div>
+        <div class="ga-kpi-sub" id="mp-revenue-sub">attributed revenue</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--gold)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--gold)"></span>ROAS</div>
+        <div class="ga-kpi-val" id="mp-roas" style="color:var(--gold)">—</div>
+        <div class="ga-kpi-sub">conv. value ÷ spend</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#7E6DB5"></span>CPA</div>
+        <div class="ga-kpi-val" id="mp-cpa">—</div>
+        <div class="ga-kpi-sub">cost per purchase</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4A7FC1"></span>Purchases</div>
+        <div class="ga-kpi-val" id="mp-conv">—</div>
+        <div class="ga-kpi-sub" id="mp-conv-sub">conversions</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--red)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--red)"></span>CTR</div>
+        <div class="ga-kpi-val" id="mp-ctr">—</div>
+        <div class="ga-kpi-sub" id="mp-cpc-sub">CPC: —</div>
+      </div>
+    </div>
+
+    <!-- ── Row 2: Campaign table + Right panels ── -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
+
+      <!-- Campaign Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Purchases · CPA · CTR by campaign</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 64px 64px 76px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+          <div>Campaign</div>
+          <div style="text-align:right">Spend</div>
+          <div style="text-align:right">ROAS</div>
+          <div style="text-align:right">Conv.</div>
+          <div style="text-align:right">CPA</div>
+          <div style="text-align:right">CTR</div>
+        </div>
+        <div id="mp-campaign-table" style="max-height:340px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load campaign data</div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Performance Scorecard -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Performance Score</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ga-score-row"><span class="ga-score-label">ROAS vs Target (3.5×)</span><span class="ga-score-badge" id="mp-roas-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CTR Benchmark (&gt;1.5%)</span><span class="ga-score-badge" id="mp-ctr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPA vs AOV</span><span class="ga-score-badge" id="mp-cpa-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Frequency &lt; 3.0</span><span class="ga-score-badge" id="mp-freq-score">—</span></div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif">2026 ecommerce benchmarks: ROAS 2.79–3.61× · CTR 1.49% avg · CPA $23–38</div>
+          </div>
+        </div>
+
+        <!-- Efficiency Metrics -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Efficiency</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="ga-score-row"><span class="ga-score-label">Impressions</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-impressions">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Clicks</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-clicks">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPM</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-cpm">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-cvr">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Break-even ROAS</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--gold)" id="mp-breakeven">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Row 3: Daily Trend + Attribution Note + Spend Share ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
+
+      <!-- Daily Spend & ROAS Trend -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Daily Trend</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:2px">Spend vs conversions by day</div>
+        </div>
+        <div id="mp-daily-chart" style="padding:14px 16px;max-height:220px;overflow-y:auto">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        </div>
+      </div>
+
+      <!-- Attribution & Learning -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">Attribution & Health</div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-family:'Inter',sans-serif">
+          <div style="background:rgba(24,119,242,0.06);border:1px solid rgba(24,119,242,0.15);border-radius:6px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:#1877F2;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px">Attribution Window</div>
+            <div style="font-size:11px;color:var(--c2)">7-day click · 1-day view</div>
+            <div style="font-size:10px;color:var(--c3);margin-top:3px">Default since Jan 2026</div>
+          </div>
+          <div style="background:rgba(212,135,74,0.06);border:1px solid rgba(212,135,74,0.2);border-radius:6px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px">⚠ ROAS Tip</div>
+            <div style="font-size:10px;color:var(--c2);line-height:1.5">Post-iOS 14, Meta ROAS is underreported by 20–40%. Track blended MER alongside reported ROAS.</div>
+          </div>
+          <div style="background:rgba(90,158,114,0.06);border:1px solid rgba(90,158,114,0.2);border-radius:6px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px">Learning Phase</div>
+            <div style="font-size:10px;color:var(--c2);line-height:1.5">Needs 50 purchases/week to exit. Below target = Learning Limited.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2026 Benchmarks Reference -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">2026 Benchmarks</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-family:'Inter',sans-serif">
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Ecomm. avg ROAS</span><span style="font-size:11px;font-weight:600;color:var(--gold)">2.79–3.61×</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">ASC avg ROAS</span><span style="font-size:11px;font-weight:600;color:var(--gold)">4.52×</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CTR</span><span style="font-size:11px;font-weight:600;color:var(--ink)">1.49%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CPA</span><span style="font-size:11px;font-weight:600;color:var(--ink)">$23–38</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">IG Stories CTR</span><span style="font-size:11px;font-weight:600;color:var(--ink)">1.34%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Reels CPA advantage</span><span style="font-size:11px;font-weight:600;color:var(--green)">-18%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Creative fatigue (freq)</span><span style="font-size:11px;font-weight:600;color:var(--red)">&gt; 3.0</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">UGC vs brand CTR</span><span style="font-size:11px;font-weight:600;color:var(--green)">+48%</span></div>
+          <div style="margin-top:6px;padding-top:8px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3)">Source: 27five / AdAmigo / MHI 2026 data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageMetaAds -->
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -3545,6 +3709,8 @@ async function doSync() {
           console.error('[Meta] API error:', d.error);
         } else if (d.total) {
           livePlatforms.meta = d.total;
+          livePlatforms.meta.campaigns = d.campaigns || [];
+          livePlatforms.meta.daily = d.daily || [];
           // Update sidebar ROAS badge
           const roas = d.total.roas || 0;
           const roasBadge = document.getElementById('meta-roas-badge');
@@ -4081,6 +4247,7 @@ function openPage(key) {
 
   // Hide Google Ads page if open
   var gaP=document.getElementById('pageGoogleAds'); if(gaP) gaP.style.display='none';
+  var maP=document.getElementById('pageMetaAds'); if(maP) maP.style.display='none';
   // Hide all other pages first
   Object.values(PAGES).forEach(p => {
     const el = document.getElementById(p.mainId);
@@ -4117,8 +4284,8 @@ function closePage() {
   const navEl = document.getElementById(page.navId);
   if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
 
-  // Hide Google Ads page too (in case it was open alongside)
   var gaP=document.getElementById('pageGoogleAds'); if(gaP) gaP.style.display='none';
+  var maP=document.getElementById('pageMetaAds'); if(maP) maP.style.display='none';
   // Show dashboard
   document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'block';
   activePage = null;
@@ -4512,6 +4679,141 @@ function closeGoogleAdsPage() {
   const gaPage = document.getElementById('pageGoogleAds');
   if (gaPage) gaPage.style.display = 'none';
   document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
+}
+
+function openMetaAdsPage() {
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
+  Object.values(PAGES).forEach(function(p) {
+    var el = document.getElementById(p.mainId); if (el) el.style.display = 'none';
+    var nav = document.getElementById(p.navId); if (nav) { nav.style.background=''; nav.style.color=''; }
+  });
+  var gaPage = document.getElementById('pageGoogleAds'); if (gaPage) gaPage.style.display = 'none';
+  activePage = null;
+  var maPage = document.getElementById('pageMetaAds');
+  if (maPage) maPage.style.display = 'block';
+  metaPageRender();
+}
+
+function closeMetaAdsPage() {
+  var maPage = document.getElementById('pageMetaAds');
+  if (maPage) maPage.style.display = 'none';
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
+}
+
+function metaPageSync() {
+  // Trigger main dashboard sync which fetches Meta data, then re-render this page
+  doSync();
+  setTimeout(metaPageRender, 3000);
+}
+
+function metaPageRender() {
+  var d = window.livePlatforms && window.livePlatforms.meta;
+  var spend   = d && d.spend       ? d.spend       : 0;
+  var rev     = d && d.revenue     ? d.revenue     : 0;
+  var conv    = d && d.conversions ? d.conversions : 0;
+  var clicks  = d && d.clicks      ? d.clicks      : 0;
+  var impr    = d && d.impressions ? d.impressions : 0;
+  var roas    = spend > 0 ? rev     / spend : 0;
+  var cpa     = conv  > 0 ? spend   / conv  : 0;
+  var ctr     = impr  > 0 ? clicks  / impr * 100 : 0;
+  var cpc     = clicks> 0 ? spend   / clicks : 0;
+  var cpm     = impr  > 0 ? spend   / impr * 1000 : 0;
+  var cvr     = clicks> 0 ? conv    / clicks * 100 : 0;
+  var breakeven = 0.40 > 0 ? (1/0.40) : 0; // 40% margin → 2.5× breakeven
+
+  function mFmt(n) { if (!n) return '—'; var v=Math.abs(parseFloat(n)||0); return '$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function mPct(n) { return n > 0 ? n.toFixed(2)+'%' : '—'; }
+  function mX(n)   { return n > 0 ? n.toFixed(2)+'×' : '—'; }
+  function mEl(id, val) { var e=document.getElementById(id); if(e) e.textContent=val; }
+
+  // Update status bar
+  if (spend > 0) {
+    mEl('meta-page-status', '● LIVE — Meta Ads');
+    mEl('meta-page-subtitle', 'spend: '+mFmt(spend)+' · '+conv+' purchases · ROAS '+mX(roas));
+  }
+
+  // KPI strip
+  mEl('mp-spend',    mFmt(spend));
+  mEl('mp-spend-sub', spend > 0 ? 'this period' : 'awaiting data');
+  mEl('mp-revenue',  mFmt(rev));
+  mEl('mp-revenue-sub', rev > 0 ? 'attributed revenue' : 'awaiting data');
+  mEl('mp-roas',     mX(roas));
+  mEl('mp-cpa',      mFmt(cpa));
+  mEl('mp-conv',     conv > 0 ? conv.toLocaleString() : '—');
+  mEl('mp-conv-sub', conv > 0 ? 'purchases' : 'awaiting data');
+  mEl('mp-ctr',      mPct(ctr));
+  mEl('mp-cpc-sub',  'CPC: '+mFmt(cpc));
+
+  // Efficiency panel
+  mEl('mp-impressions', impr > 0 ? impr.toLocaleString() : '—');
+  mEl('mp-clicks',      clicks > 0 ? clicks.toLocaleString() : '—');
+  mEl('mp-cpm',         mFmt(cpm));
+  mEl('mp-cvr',         mPct(cvr));
+  mEl('mp-breakeven',   breakeven.toFixed(1)+'× (40% margin)');
+
+  // Performance scorecard
+  function mScore(id, good, warn, label) {
+    var e=document.getElementById(id); if(!e) return;
+    e.textContent=label;
+    if(good)      { e.style.background='rgba(90,158,114,0.15)'; e.style.color='var(--green)'; }
+    else if(warn) { e.style.background='rgba(212,135,74,0.15)'; e.style.color='var(--orange)'; }
+    else          { e.style.background='rgba(28,27,24,0.06)';   e.style.color='var(--c3)'; }
+  }
+  mScore('mp-roas-score', roas>=3.5, roas>=2.5, roas>0?(roas>=3.5?'✅ '+mX(roas):'⚠ '+mX(roas)):'—');
+  mScore('mp-ctr-score',  ctr>=1.5,  ctr>=0.9,  ctr>0?(ctr>=1.5?'✅ '+mPct(ctr):'⚠ '+mPct(ctr)):'—');
+  mScore('mp-cpa-score',  cpa>0&&cpa<38, cpa>0&&cpa<80, cpa>0?(cpa<38?'✅ '+mFmt(cpa):'⚠ '+mFmt(cpa)):'—');
+  // Frequency - would need separate API call; show placeholder
+  mScore('mp-freq-score', false, false, 'Check Ads Manager');
+
+  // Campaign table
+  var campaigns = (d && d.campaigns) || (window.livePlatforms && window.livePlatforms.metaCampaigns) || [];
+  var tbl = document.getElementById('mp-campaign-table');
+  if (tbl) {
+    if (campaigns.length > 0) {
+      tbl.innerHTML = campaigns.map(function(c) {
+        var cr = c.spend>0 ? (c.revenue/c.spend).toFixed(1)+'×' : '—';
+        var cc = c.conversions>0 ? mFmt(c.spend/c.conversions) : '—';
+        var ct = c.impressions>0 ? mPct(c.clicks/c.impressions*100) : '—';
+        var roasColor = c.spend>0&&(c.revenue/c.spend)>=3.5?'var(--green)':c.spend>0?'var(--gold)':'var(--c3)';
+        return '<div style="display:grid;grid-template-columns:1fr 80px 64px 64px 76px 60px;padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
+          '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:var(--ink)" title="'+c.name+'">'+c.name+'</div>' +
+          '<div style="text-align:right;color:#1877F2;font-weight:600">'+mFmt(c.spend)+'</div>' +
+          '<div style="text-align:right;font-weight:600;color:'+roasColor+'">'+cr+'</div>' +
+          '<div style="text-align:right;color:var(--ink)">'+( c.conversions||'—')+'</div>' +
+          '<div style="text-align:right;color:var(--c2)">'+cc+'</div>' +
+          '<div style="text-align:right;color:var(--c3)">'+ct+'</div>' +
+          '</div>';
+      }).join('');
+    } else {
+      tbl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:Inter,sans-serif;font-size:12px">'+(spend>0?'No campaign breakdown available':'Click REFRESH to load data')+'</div>';
+    }
+  }
+
+  // Daily trend chart
+  var daily = (d && d.daily) || [];
+  var chartEl = document.getElementById('mp-daily-chart');
+  if (chartEl) {
+    if (daily.length > 0) {
+      var maxSpend = Math.max.apply(null, daily.map(function(x){return x.spend||0;}));
+      var maxConv  = Math.max.apply(null, daily.map(function(x){return x.conversions||0;}));
+      chartEl.innerHTML = daily.map(function(day) {
+        var spendPct = maxSpend > 0 ? (day.spend/maxSpend*100) : 0;
+        var convPct  = maxConv  > 0 ? (day.conversions/maxConv*100) : 0;
+        var roasDay  = day.spend > 0 ? (day.revenue/day.spend).toFixed(1) : '—';
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-family:Inter,sans-serif">' +
+          '<div style="font-size:9px;color:var(--c3);width:42px;flex-shrink:0">'+day.date.slice(5)+'</div>' +
+          '<div style="flex:1;position:relative">' +
+          '<div style="height:4px;background:rgba(24,119,242,0.15);border-radius:2px"><div style="height:4px;width:'+spendPct+'%;background:#1877F2;border-radius:2px"></div></div>' +
+          '</div>' +
+          '<div style="font-size:9px;color:#1877F2;width:40px;text-align:right">'+mFmt(day.spend)+'</div>' +
+          '<div style="font-size:9px;color:var(--green);width:28px;text-align:right">'+( day.conversions||0)+'</div>' +
+          '<div style="font-size:9px;color:var(--gold);width:32px;text-align:right">'+roasDay+'×</div>' +
+          '</div>';
+      }).join('');
+    } else {
+      chartEl.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No daily data yet</div>';
+    }
+  }
 }
 
 function gaRenderPage() {
