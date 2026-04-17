@@ -1652,8 +1652,12 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <div class="sb-div"></div>
-    <div class="sb-label" style="padding-top:4px">Platform ROAS</div>
+    <div class="sb-label" style="padding-top:4px">Platform Performance</div>
 
+    <div class="sb-nav-item" id="navMarketing" onclick="openPage('marketing')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span><span>Marketing Attribution</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
     <div class="sb-nav-item" onclick="openGoogleAdsPage()" style="cursor:pointer">
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">G</span>Google Ads</div>
       <span class="sb-nav-badge" id="ga-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
@@ -1662,9 +1666,9 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">f</span>Meta Ads</div>
       <span class="sb-nav-badge" id="meta-roas-badge" style="background:var(--orange-dim);color:var(--orange)">—</span>
     </div>
-    <div class="sb-nav-item" onclick="void(0)">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">●</span>Microsoft Ads</div>
-      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">—</span>
+    <div class="sb-nav-item" onclick="openMsAdsPage()" style="cursor:pointer">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">M</span>Microsoft Ads</div>
+      <span class="sb-nav-badge" id="ms-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
     </div>
 
     <!-- ── REPORTS ── -->
@@ -1679,13 +1683,10 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
     <div class="sb-nav-item" id="navPnL" onclick="openPage('pnl')" style="cursor:pointer;">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span><span>P&amp;L Report</span></div>
+      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span><span>Profit &amp; Loss Report</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
-    <div class="sb-nav-item" id="navMarketing" onclick="openPage('marketing')" style="cursor:pointer;">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span><span>Marketing Attribution</span></div>
-      <span style="font-size:10px;color:var(--c3)">→</span>
-    </div>
+
     <div class="sb-nav-item" id="navCLV" onclick="openPage('clv')" style="cursor:pointer;">
       <div class="sb-nav-left"><span class="sb-nav-icon">👥</span><span>Customer Lifetime Value</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
@@ -3246,14 +3247,50 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <div class="main-controls" style="margin-top:0">
-      <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:6px;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.2)">
-        <span style="font-size:11px;color:#4285F4;font-weight:600">⚠ Google Ads API</span>
-        <span style="font-size:10px;color:var(--c3)">Connect your account to load live data</span>
+      <div style="position:relative">
+        <div class="dp-trigger" id="gaDpTrigger" onclick="gaDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="gaDpText">Last 30 Days</span>
+          <span class="dp-trigger-arrow" id="gaDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="gaDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="gaApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="gaApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="gaApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="gaApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="gaApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="gaApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="gaApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="gaApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="gaApplyPreset('lastyear')">Last year</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="gaDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="gaDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="gaCalL"></div>
+                <div class="dp-month" id="gaCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="gaDpClose()">Cancel</button>
+              <button class="dp-done" onclick="gaDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="gaRenderPage()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
       </div>
     </div>
 
     <!-- ── KPI Strip ── -->
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:12px 28px 20px">
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="ga-kpi" style="border-top:3px solid #4285F4">
         <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4285F4"></span>Total Spend</div>
         <div class="ga-kpi-val" id="ga-spend">—</div>
@@ -3399,9 +3436,42 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <div class="main-controls" style="margin-top:0">
-      <div style="display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:6px;background:rgba(24,119,242,0.08);border:1px solid rgba(24,119,242,0.2)">
-        <span style="font-size:11px;color:#1877F2;font-weight:600" id="meta-page-status">● Meta Ads</span>
-        <span style="font-size:10px;color:var(--c3)" id="meta-page-subtitle">Refresh dashboard to load latest data</span>
+      <div style="position:relative">
+        <div class="dp-trigger" id="metaDpTrigger" onclick="metaDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="metaDpText">Last 30 Days</span>
+          <span class="dp-trigger-arrow" id="metaDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="metaDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="metaApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="metaApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="metaApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="metaApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="metaApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="metaApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="metaApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="metaApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="metaApplyPreset('lastyear')">Last year</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="metaDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="metaDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="metaCalL"></div>
+                <div class="dp-month" id="metaCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="metaDpClose()">Cancel</button>
+              <button class="dp-done" onclick="metaDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="metaPageSync()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
@@ -3409,7 +3479,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- ── KPI Strip ── -->
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:12px 28px 20px">
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="ga-kpi" style="border-top:3px solid #1877F2">
         <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#1877F2"></span>Total Spend</div>
         <div class="ga-kpi-val" id="mp-spend">—</div>
@@ -3551,6 +3621,208 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
   </main><!-- /pageMetaAds -->
+
+  <!-- ══ MICROSOFT ADS PAGE ═══════════════════════════════════════════════ -->
+  <main class="main report-main" id="pageMsAds" style="display:none">
+
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="closeMsAdsPage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">MICROSOFT</span> <span class="gold">ADS</span></div>
+      </div>
+    </div>
+
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
+        <div class="dp-trigger" id="msDpTrigger" onclick="msDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="msDpText">Last 30 Days</span>
+          <span class="dp-trigger-arrow" id="msDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="msDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="msApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="msApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="msApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="msApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="msApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="msApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="msApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="msApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="msApplyPreset('lastyear')">Last year</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="msDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="msDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="msCalL"></div>
+                <div class="dp-month" id="msCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="msDpClose()">Cancel</button>
+              <button class="dp-done" onclick="msDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="msRenderPage()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+      </div>
+    </div>
+
+    <!-- ── KPI Strip ── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="ga-kpi" style="border-top:3px solid #00A4EF">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#00A4EF"></span>Total Spend</div>
+        <div class="ga-kpi-val" id="ms-spend">—</div>
+        <div class="ga-kpi-sub" id="ms-spend-sub">this period</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--green)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--green)"></span>Conv. Value</div>
+        <div class="ga-kpi-val" id="ms-revenue" style="color:var(--green)">—</div>
+        <div class="ga-kpi-sub">attributed revenue</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--gold)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--gold)"></span>ROAS</div>
+        <div class="ga-kpi-val" id="ms-roas" style="color:var(--gold)">—</div>
+        <div class="ga-kpi-sub">conv. value ÷ spend</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#7E6DB5"></span>CPA</div>
+        <div class="ga-kpi-val" id="ms-cpa">—</div>
+        <div class="ga-kpi-sub">cost per conversion</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4A7FC1"></span>Conversions</div>
+        <div class="ga-kpi-val" id="ms-conv">—</div>
+        <div class="ga-kpi-sub" id="ms-conv-sub">purchases</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--red)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--red)"></span>Avg CPC</div>
+        <div class="ga-kpi-val" id="ms-cpc">—</div>
+        <div class="ga-kpi-sub" id="ms-ctr-sub">CTR: —</div>
+      </div>
+    </div>
+
+    <!-- ── Row 2: Campaign table + Right panel ── -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
+
+      <!-- Campaign Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA · CTR by campaign</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 64px 64px 80px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+          <div>Campaign</div>
+          <div style="text-align:right">Spend</div>
+          <div style="text-align:right">ROAS</div>
+          <div style="text-align:right">Conv.</div>
+          <div style="text-align:right">CPA</div>
+          <div style="text-align:right">CTR</div>
+        </div>
+        <div id="ms-campaign-table" style="max-height:340px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Connect Microsoft Ads API to view campaign data</div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Performance Scorecard -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Performance Score</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ga-score-row"><span class="ga-score-label">ROAS vs Target (3×)</span><span class="ga-score-badge" id="ms-roas-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CTR Benchmark (&gt;2.83%)</span><span class="ga-score-badge" id="ms-ctr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPA vs Google (&lt;$41)</span><span class="ga-score-badge" id="ms-cpa-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate (&gt;2.94%)</span><span class="ga-score-badge" id="ms-cvr-score">—</span></div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif">2026: avg CTR 2.83% · avg CPA $41.44 · avg CPC $1.54</div>
+          </div>
+        </div>
+
+        <!-- Efficiency Metrics -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Efficiency</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="ga-score-row"><span class="ga-score-label">Impressions</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="ms-impressions">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Clicks</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="ms-clicks">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="ms-cvr">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">vs Google CPC</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--green)" id="ms-vs-google">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Row 3: Platform advantages + Benchmarks + Setup ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
+
+      <!-- Microsoft Ads Advantages -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">Platform Advantages</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif">
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">↓</span>
+            <span><strong>30–40% lower CPC</strong> than Google Ads — more room to test & scale</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">🎯</span>
+            <span><strong>LinkedIn targeting</strong> — layer job title, industry & company size on search intent</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">🖥</span>
+            <span><strong>Desktop-first audience</strong> — 41% of Bing users earn $100K+, higher AOV</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">🤖</span>
+            <span><strong>Copilot integration</strong> — 73% higher CTR vs standard search in tests</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">📦</span>
+            <span><strong>Network reach</strong> — Bing, Yahoo, AOL, MSN, Xbox, Edge browser</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2026 Benchmarks -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">2026 Benchmarks</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-family:'Inter',sans-serif">
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CTR (all)</span><span style="font-size:11px;font-weight:600;color:var(--ink)">2.83%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Retail CTR</span><span style="font-size:11px;font-weight:600;color:var(--gold)">3.06%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Apparel CTR</span><span style="font-size:11px;font-weight:600;color:var(--gold)">3.33%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CPC</span><span style="font-size:11px;font-weight:600;color:var(--green)">$1.54</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CPA (all)</span><span style="font-size:11px;font-weight:600;color:var(--ink)">$41.44</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg Conv. Rate</span><span style="font-size:11px;font-weight:600;color:var(--ink)">2.94%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">PMax CPA reduction</span><span style="font-size:11px;font-weight:600;color:var(--green)">−32%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">PMax ROAS uplift</span><span style="font-size:11px;font-weight:600;color:var(--green)">3×</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">vs Google CPC</span><span style="font-size:11px;font-weight:600;color:var(--green)">30–40% cheaper</span></div>
+          <div style="margin-top:6px;padding-top:8px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3)">Source: WordStream / LocaliQ / Microsoft 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setup Guide -->
+      <div class="card" style="padding:16px;background:linear-gradient(135deg,rgba(0,164,239,0.04),rgba(0,164,239,0.01))">
+        <div style="font-size:12px;font-weight:700;color:#00A4EF;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">🔌 Connect Microsoft Ads</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">1</div><div class="ga-step-text">Create a Microsoft Ads account at <strong>ads.microsoft.com</strong> — import existing Google campaigns in minutes</div></div>
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">2</div><div class="ga-step-text">Add <code>MS_ADS_CLIENT_ID</code>, <code>MS_ADS_CLIENT_SECRET</code> and <code>MS_ADS_CUSTOMER_ID</code> to Vercel env vars</div></div>
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">3</div><div class="ga-step-text">Install the UET (Universal Event Tracking) tag for conversion tracking and smart bidding</div></div>
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">4</div><div class="ga-step-text">Recommended budget split: 70–80% Google · 20–30% Microsoft for incremental ROAS</div></div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageMsAds -->
 
 </div>
 
@@ -4242,19 +4514,8 @@ function openPage(key) {
   const page = PAGES[key];
   if (!page) return;
 
-  // Hide dashboard main, show selected page
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
-
-  // Hide Google Ads page if open
-  var gaP=document.getElementById('pageGoogleAds'); if(gaP) gaP.style.display='none';
-  var maP=document.getElementById('pageMetaAds'); if(maP) maP.style.display='none';
-  // Hide all other pages first
-  Object.values(PAGES).forEach(p => {
-    const el = document.getElementById(p.mainId);
-    if (el) el.style.display = 'none';
-    const nav = document.getElementById(p.navId);
-    if (nav) { nav.style.background = ''; nav.style.color = ''; }
-  });
+  // Hide everything first (dashboard, all report pages, all ad pages)
+  _hideAllPages();
 
   // Show selected page
   const mainEl = document.getElementById(page.mainId);
@@ -4284,10 +4545,8 @@ function closePage() {
   const navEl = document.getElementById(page.navId);
   if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
 
-  var gaP=document.getElementById('pageGoogleAds'); if(gaP) gaP.style.display='none';
-  var maP=document.getElementById('pageMetaAds'); if(maP) maP.style.display='none';
-  // Show dashboard
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'block';
+  // Restore dashboard (hides all ad pages too)
+  _showMainDashboard();
   activePage = null;
 }
 
@@ -4628,13 +4887,17 @@ function broadcastToReports(from,to,label,sourcePid){
   document.querySelectorAll('#dpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
   doSync();
   // Update all OTHER report picker labels and STATE
-  ['or','pl','ma','clv','pa'].forEach(function(pid){
+  ['or','pl','ma','clv','pa','ga','meta','ms'].forEach(function(pid){
     if(pid===sourcePid)return;
     var el=document.getElementById(pid+'DpText');if(el)el.textContent=label;
     document.querySelectorAll('#'+pid+'DpPanel .dp-preset').forEach(function(b){
       b.classList.toggle('active',b.textContent.trim()===label);
     });
     if(window._setDpState)window._setDpState(pid,from,to);
+    // Also update ga/meta/ms internal ISO vars directly
+    if(pid==='ga'){_gaFromISO=from;_gaToISO=to;}
+    if(pid==='meta'){_metaFromISO=from;_metaToISO=to;}
+    if(pid==='ms'){_msFromISO=from;_msToISO=to;}
   });
   // Only re-fetch the open report if a REPORT picker triggered the change.
   // If sourcePid===null it means the main dashboard date picker changed,
@@ -4647,7 +4910,10 @@ function syncOpenReport(from,to){
    ['pagePnL',function(){plSyncWithRange(f,t);}],
    ['pageMarketing',function(){maSyncWithRange(f,t);}],
    ['pageCLV',function(){clvSyncWithRange(f,t);}],
-   ['pageProductAnalytics',function(){paSyncWithRange(f,t);}]
+   ['pageProductAnalytics',function(){paSyncWithRange(f,t);}],
+   ['pageGoogleAds',function(){_gaFromISO=f;_gaToISO=t;gaRenderPage();}],
+   ['pageMetaAds',function(){_metaFromISO=f;_metaToISO=t;metaPageRender();}],
+   ['pageMsAds',function(){_msFromISO=f;_msToISO=t;msRenderPage();}]
   ].forEach(function(p){var el=document.getElementById(p[0]);if(el&&el.style.display!=='none')p[1]();});
 }
 // Wire up live fee example updates
@@ -4659,52 +4925,150 @@ FEE_KEYS.forEach(k => {
 });
 
 // ── Google Ads Page ─────────────────────────────────────────────────────
-function openGoogleAdsPage() {
-  // Hide main dashboard
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
-  // Hide all PAGES report pages and reset their nav highlights
-  Object.values(PAGES).forEach(function(p) {
-    var el = document.getElementById(p.mainId); if (el) el.style.display = 'none';
-    var nav = document.getElementById(p.navId);
-    if (nav) { nav.style.background = ''; nav.style.color = ''; }
-  });
-  activePage = null;
-  // Show Google Ads page
-  var gaPage = document.getElementById('pageGoogleAds');
-  if (gaPage) gaPage.style.display = 'block';
-  gaRenderPage();
-}
-
-function closeGoogleAdsPage() {
-  const gaPage = document.getElementById('pageGoogleAds');
-  if (gaPage) gaPage.style.display = 'none';
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
-}
-
-function openMetaAdsPage() {
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
-  Object.values(PAGES).forEach(function(p) {
-    var el = document.getElementById(p.mainId); if (el) el.style.display = 'none';
-    var nav = document.getElementById(p.navId); if (nav) { nav.style.background=''; nav.style.color=''; }
-  });
-  var gaPage = document.getElementById('pageGoogleAds'); if (gaPage) gaPage.style.display = 'none';
-  activePage = null;
-  var maPage = document.getElementById('pageMetaAds');
-  if (maPage) maPage.style.display = 'block';
-  metaPageRender();
-}
-
-function closeMetaAdsPage() {
-  var maPage = document.getElementById('pageMetaAds');
-  if (maPage) maPage.style.display = 'none';
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
-}
-
 function metaPageSync() {
   // Trigger main dashboard sync which fetches Meta data, then re-render this page
   doSync();
   setTimeout(metaPageRender, 3000);
 }
+
+
+// ── Meta Ads Date Picker ──────────────────────────────────────────────────
+var _metaDpOpen=false, _metaDpSelStart=null, _metaDpSelEnd=null, _metaViewL=null;
+var _metaFromISO='', _metaToISO='';
+function _metaFmtISO(d){var y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+mo+'-'+dy;}
+function _metaFmtDisp(d){return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});}
+function metaApplyPreset(key){
+  var _presetLabels={today:"Today",yesterday:"Yesterday","7d":"Last 7 days","30d":"Last 30 days",thismonth:"This month",lastmonth:"Last month","90d":"Last 90 days",ytd:"This year",lastyear:"Last year"};
+  var _lbl=_presetLabels[key]||key;
+  var _lt=document.getElementById('metaDpText');if(_lt)_lt.textContent=_lbl;
+  var now=new Date();now.setHours(0,0,0,0);var s,e;
+  if(key==='today'){s=now;e=now;}
+  else if(key==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);s=y;e=y;}
+  else if(key==='7d'){var f=new Date(now);f.setDate(f.getDate()-6);s=f;e=now;}
+  else if(key==='30d'){var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  else if(key==='thismonth'){s=new Date(now.getFullYear(),now.getMonth(),1);e=now;}
+  else if(key==='lastmonth'){s=new Date(now.getFullYear(),now.getMonth()-1,1);e=new Date(now.getFullYear(),now.getMonth(),0);}
+  else if(key==='90d'){var f=new Date(now);f.setDate(f.getDate()-89);s=f;e=now;}
+  else if(key==='ytd'){s=new Date(now.getFullYear(),0,1);e=now;}
+  else if(key==='lastyear'){s=new Date(now.getFullYear()-1,0,1);e=new Date(now.getFullYear()-1,11,31);}
+  else{var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  _metaDpSelStart=s;_metaDpSelEnd=e;_metaFromISO=_metaFmtISO(s);_metaToISO=_metaFmtISO(e);
+  document.querySelectorAll('#metaDpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('#metaDpPanel .dp-preset[onclick*="' + key + '"]');
+  if(btn)btn.classList.add('active');
+  metaDpRenderCals();
+}
+function metaDpToggle(){_metaDpOpen=!_metaDpOpen;document.getElementById('metaDpPanel').style.display=_metaDpOpen?'flex':'none';document.getElementById('metaDpArrow').textContent=_metaDpOpen?'▲':'▼';if(_metaDpOpen&&!_metaDpSelStart)metaApplyPreset('30d');if(_metaDpOpen)metaDpRenderCals();}
+function metaDpClose(){_metaDpOpen=false;document.getElementById('metaDpPanel').style.display='none';document.getElementById('metaDpArrow').textContent='▼';}
+function metaDpDone(){
+  if(_metaDpSelStart&&_metaDpSelEnd){
+    _metaFromISO=_metaFmtISO(_metaDpSelStart);_metaToISO=_metaFmtISO(_metaDpSelEnd);
+    var lbl=_metaFmtDisp(_metaDpSelStart)+' – '+_metaFmtDisp(_metaDpSelEnd);
+    document.getElementById('metaDpText').textContent=lbl;
+    document.getElementById('metaDpFrom').value=_metaFromISO;document.getElementById('metaDpTo').value=_metaToISO;
+    metaDpClose();
+    broadcastToReports(_metaFromISO,_metaToISO,lbl,'meta');
+  } else { metaDpClose(); }
+}
+function metaDpRenderCals(){
+  var now=new Date();now.setHours(0,0,0,0);
+  if(!_metaViewL){_metaViewL=new Date(now.getFullYear(),now.getMonth()-1,1);}
+  var vR=new Date(_metaViewL.getFullYear(),_metaViewL.getMonth()+1,1);
+  metaDpRenderMonth('metaCalL',_metaViewL);metaDpRenderMonth('metaCalR',vR);
+  if(_metaDpSelStart)document.getElementById('metaDpFrom').value=_metaFmtISO(_metaDpSelStart);
+  if(_metaDpSelEnd)document.getElementById('metaDpTo').value=_metaFmtISO(_metaDpSelEnd);
+}
+function metaDpRenderMonth(elId,viewDate){
+  var el=document.getElementById(elId);if(!el)return;
+  var y=viewDate.getFullYear(),m=viewDate.getMonth();
+  var today=new Date();today.setHours(0,0,0,0);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var h='<div class="dp-month-header"><button class="dp-nav-btn" onclick="metaDpNav(-1)">‹</button><span class="dp-month-title">'+months[m]+' '+y+'</span><button class="dp-nav-btn" onclick="metaDpNav(1)">›</button></div>';
+  h+='<div class="dp-grid"><div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>';
+  var first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<first;i++)h+='<div class="dp-day dp-day-empty"></div>';
+  for(var d=1;d<=days;d++){
+    var dt=new Date(y,m,d);dt.setHours(0,0,0,0);var iso=_metaFmtISO(dt);
+    var cls='dp-day';
+    if(dt.getTime()===today.getTime())cls+=' today';
+    if(_metaDpSelStart&&dt.getTime()===_metaDpSelStart.getTime())cls+=' sel-start';
+    if(_metaDpSelEnd&&dt.getTime()===_metaDpSelEnd.getTime())cls+=' sel-end';
+    if(_metaDpSelStart&&_metaDpSelEnd&&dt>_metaDpSelStart&&dt<_metaDpSelEnd)cls+=' in-range';
+    h+='<div class="'+cls+'" onclick="metaDpClickDay(\'' + iso + '\')" >'+d+'</div>';
+  }
+  h+='</div>';el.innerHTML=h;
+}
+function metaDpNav(dir){_metaViewL=new Date(_metaViewL.getFullYear(),_metaViewL.getMonth()+dir,1);metaDpRenderCals();}
+function metaDpClickDay(iso){var p=iso.split('-').map(Number);var c=new Date(p[0],p[1]-1,p[2]);c.setHours(0,0,0,0);if(!_metaDpSelStart||(_metaDpSelStart&&_metaDpSelEnd)){_metaDpSelStart=c;_metaDpSelEnd=null;}else{if(c<_metaDpSelStart){_metaDpSelEnd=_metaDpSelStart;_metaDpSelStart=c;}else{_metaDpSelEnd=c;}}metaDpRenderCals();}
+
+// ── Microsoft Ads Date Picker ─────────────────────────────────────────────
+var _msDpOpen=false,_msDpSelStart=null,_msDpSelEnd=null,_msViewL=null;
+var _msFromISO='',_msToISO='';
+function _msFmtISO(d){var y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+mo+'-'+dy;}
+function _msFmtDisp(d){return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});}
+function msApplyPreset(key){
+  var _presetLabels={today:"Today",yesterday:"Yesterday","7d":"Last 7 days","30d":"Last 30 days",thismonth:"This month",lastmonth:"Last month","90d":"Last 90 days",ytd:"This year",lastyear:"Last year"};
+  var _lbl=_presetLabels[key]||key;
+  var _lt=document.getElementById('msDpText');if(_lt)_lt.textContent=_lbl;
+  var now=new Date();now.setHours(0,0,0,0);var s,e;
+  if(key==='today'){s=now;e=now;}
+  else if(key==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);s=y;e=y;}
+  else if(key==='7d'){var f=new Date(now);f.setDate(f.getDate()-6);s=f;e=now;}
+  else if(key==='30d'){var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  else if(key==='thismonth'){s=new Date(now.getFullYear(),now.getMonth(),1);e=now;}
+  else if(key==='lastmonth'){s=new Date(now.getFullYear(),now.getMonth()-1,1);e=new Date(now.getFullYear(),now.getMonth(),0);}
+  else if(key==='90d'){var f=new Date(now);f.setDate(f.getDate()-89);s=f;e=now;}
+  else if(key==='ytd'){s=new Date(now.getFullYear(),0,1);e=now;}
+  else if(key==='lastyear'){s=new Date(now.getFullYear()-1,0,1);e=new Date(now.getFullYear()-1,11,31);}
+  else{var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  _msDpSelStart=s;_msDpSelEnd=e;_msFromISO=_msFmtISO(s);_msToISO=_msFmtISO(e);
+  document.querySelectorAll('#msDpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('#msDpPanel .dp-preset[onclick*="' + key + '"]');
+  if(btn)btn.classList.add('active');
+  msDpRenderCals();
+}
+function msDpToggle(){_msDpOpen=!_msDpOpen;document.getElementById('msDpPanel').style.display=_msDpOpen?'flex':'none';document.getElementById('msDpArrow').textContent=_msDpOpen?'▲':'▼';if(_msDpOpen&&!_msDpSelStart)msApplyPreset('30d');if(_msDpOpen)msDpRenderCals();}
+function msDpClose(){_msDpOpen=false;document.getElementById('msDpPanel').style.display='none';document.getElementById('msDpArrow').textContent='▼';}
+function msDpDone(){
+  if(_msDpSelStart&&_msDpSelEnd){
+    _msFromISO=_msFmtISO(_msDpSelStart);_msToISO=_msFmtISO(_msDpSelEnd);
+    var lbl=_msFmtDisp(_msDpSelStart)+' – '+_msFmtDisp(_msDpSelEnd);
+    document.getElementById('msDpText').textContent=lbl;
+    document.getElementById('msDpFrom').value=_msFromISO;document.getElementById('msDpTo').value=_msToISO;
+    msDpClose();
+    broadcastToReports(_msFromISO,_msToISO,lbl,'ms');
+  } else { msDpClose(); }
+}
+function msDpRenderCals(){
+  var now=new Date();now.setHours(0,0,0,0);
+  if(!_msViewL){_msViewL=new Date(now.getFullYear(),now.getMonth()-1,1);}
+  var vR=new Date(_msViewL.getFullYear(),_msViewL.getMonth()+1,1);
+  msDpRenderMonth('msCalL',_msViewL);msDpRenderMonth('msCalR',vR);
+  if(_msDpSelStart)document.getElementById('msDpFrom').value=_msFmtISO(_msDpSelStart);
+  if(_msDpSelEnd)document.getElementById('msDpTo').value=_msFmtISO(_msDpSelEnd);
+}
+function msDpRenderMonth(elId,viewDate){
+  var el=document.getElementById(elId);if(!el)return;
+  var y=viewDate.getFullYear(),m=viewDate.getMonth();
+  var today=new Date();today.setHours(0,0,0,0);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var h='<div class="dp-month-header"><button class="dp-nav-btn" onclick="msDpNav(-1)">‹</button><span class="dp-month-title">'+months[m]+' '+y+'</span><button class="dp-nav-btn" onclick="msDpNav(1)">›</button></div>';
+  h+='<div class="dp-grid"><div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>';
+  var first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<first;i++)h+='<div class="dp-day dp-day-empty"></div>';
+  for(var d=1;d<=days;d++){
+    var dt=new Date(y,m,d);dt.setHours(0,0,0,0);var iso=_msFmtISO(dt);
+    var cls='dp-day';
+    if(dt.getTime()===today.getTime())cls+=' today';
+    if(_msDpSelStart&&dt.getTime()===_msDpSelStart.getTime())cls+=' sel-start';
+    if(_msDpSelEnd&&dt.getTime()===_msDpSelEnd.getTime())cls+=' sel-end';
+    if(_msDpSelStart&&_msDpSelEnd&&dt>_msDpSelStart&&dt<_msDpSelEnd)cls+=' in-range';
+    h+='<div class="'+cls+'" onclick="msDpClickDay(\'' + iso + '\')" >'+d+'</div>';
+  }
+  h+='</div>';el.innerHTML=h;
+}
+function msDpNav(dir){_msViewL=new Date(_msViewL.getFullYear(),_msViewL.getMonth()+dir,1);msDpRenderCals();}
+function msDpClickDay(iso){var p=iso.split('-').map(Number);var c=new Date(p[0],p[1]-1,p[2]);c.setHours(0,0,0,0);if(!_msDpSelStart||(_msDpSelStart&&_msDpSelEnd)){_msDpSelStart=c;_msDpSelEnd=null;}else{if(c<_msDpSelStart){_msDpSelEnd=_msDpSelStart;_msDpSelStart=c;}else{_msDpSelEnd=c;}}msDpRenderCals();}
 
 function metaPageRender() {
   var d = window.livePlatforms && window.livePlatforms.meta;
@@ -4814,6 +5178,224 @@ function metaPageRender() {
       chartEl.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No daily data yet</div>';
     }
   }
+}
+
+function msRenderPage() {
+  var d=window.livePlatforms&&window.livePlatforms.ms;
+  var spend=d&&d.spend?d.spend:0, rev=d&&d.revenue?d.revenue:0;
+  var conv=d&&d.conversions?d.conversions:0, clicks=d&&d.clicks?d.clicks:0;
+  var impr=d&&d.impressions?d.impressions:0;
+  var roas=spend>0?rev/spend:0, cpa=conv>0?spend/conv:0;
+  var cpc=clicks>0?spend/clicks:0, ctr=impr>0?clicks/impr*100:0;
+  var cvr=clicks>0?conv/clicks*100:0;
+  function mF(n){if(!n)return '—';var v=Math.abs(parseFloat(n)||0);return '$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function mP(n){return n>0?n.toFixed(2)+'%':'—';}
+  function mX(n){return n>0?n.toFixed(2)+'×':'—';}
+  function mE(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+  mE('ms-spend',    mF(spend));
+  mE('ms-spend-sub',spend>0?'this period':'awaiting API');
+  mE('ms-revenue',  mF(rev));
+  mE('ms-roas',     mX(roas));
+  mE('ms-cpa',      mF(cpa));
+  mE('ms-conv',     conv>0?conv.toLocaleString():'—');
+  mE('ms-conv-sub', conv>0?'purchases':'awaiting API');
+  mE('ms-cpc',      mF(cpc));
+  mE('ms-ctr-sub',  'CTR: '+mP(ctr));
+  mE('ms-impressions',impr>0?impr.toLocaleString():'—');
+  mE('ms-clicks',   clicks>0?clicks.toLocaleString():'—');
+  mE('ms-cvr',      mP(cvr));
+  // vs Google CPC savings
+  var googleCpc=window.livePlatforms&&window.livePlatforms.google&&window.livePlatforms.google.cpc?window.livePlatforms.google.cpc:0;
+  mE('ms-vs-google', googleCpc>0&&cpc>0?((1-cpc/googleCpc)*100).toFixed(0)+'% cheaper than Google':'30–40% cheaper');
+  // Update sidebar badge
+  var badge=document.getElementById('ms-roas-badge');
+  if(badge){badge.textContent=roas>0?mX(roas):'—';}
+  // Scorecard
+  function mSc(id,good,warn,label){
+    var e=document.getElementById(id);if(!e)return;
+    e.textContent=label;
+    if(good){e.style.background='rgba(90,158,114,0.15)';e.style.color='var(--green)';}
+    else if(warn){e.style.background='rgba(212,135,74,0.15)';e.style.color='var(--orange)';}
+    else{e.style.background='rgba(28,27,24,0.06)';e.style.color='var(--c3)';}
+  }
+  mSc('ms-roas-score',roas>=3,   roas>=2,   roas>0?(roas>=3?'✅ '+mX(roas):'⚠ '+mX(roas)):'—');
+  mSc('ms-ctr-score', ctr>=2.83, ctr>=1.5,  ctr>0?(ctr>=2.83?'✅ '+mP(ctr):'⚠ '+mP(ctr)):'—');
+  mSc('ms-cpa-score', cpa>0&&cpa<=41, cpa>0&&cpa<=60, cpa>0?(cpa<=41?'✅ '+mF(cpa):'⚠ '+mF(cpa)):'—');
+  mSc('ms-cvr-score', cvr>=2.94,cvr>=1.5,  cvr>0?(cvr>=2.94?'✅ '+mP(cvr):'⚠ '+mP(cvr)):'—');
+  // Campaign table
+  var tbl=document.getElementById('ms-campaign-table');
+  if(tbl&&d&&d.campaigns&&d.campaigns.length){
+    tbl.innerHTML=d.campaigns.map(function(c){
+      var cr=c.spend>0?(c.revenue/c.spend).toFixed(1)+'×':'—';
+      var cc=c.conversions>0?mF(c.spend/c.conversions):'—';
+      var ct=c.impressions>0?mP(c.clicks/c.impressions*100):'—';
+      var roasC=c.spend>0&&(c.revenue/c.spend)>=3?'var(--green)':c.spend>0?'var(--gold)':'var(--c3)';
+      return '<div style="display:grid;grid-template-columns:1fr 80px 64px 64px 80px 60px;padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">'+
+        '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500" title="'+c.name+'">'+c.name+'</div>'+
+        '<div style="text-align:right;color:#00A4EF;font-weight:600">'+mF(c.spend)+'</div>'+
+        '<div style="text-align:right;font-weight:600;color:'+roasC+'">'+cr+'</div>'+
+        '<div style="text-align:right">'+( c.conversions||'—')+'</div>'+
+        '<div style="text-align:right;color:var(--c2)">'+cc+'</div>'+
+        '<div style="text-align:right;color:var(--c3)">'+ct+'</div>'+
+        '</div>';
+    }).join('');
+  }
+}
+
+function _hideAllPages() {
+  // Hide main dashboard
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
+  // Hide all PAGES report pages + reset nav highlights
+  Object.values(PAGES).forEach(function(p) {
+    var el = document.getElementById(p.mainId); if (el) el.style.display = 'none';
+    var nav = document.getElementById(p.navId); if (nav) { nav.style.background=''; nav.style.color=''; }
+  });
+  // Hide all three ad pages
+  ['pageGoogleAds','pageMetaAds','pageMsAds'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  activePage = null;
+}
+
+function _showMainDashboard() {
+  // Hide all ad pages first
+  ['pageGoogleAds','pageMetaAds','pageMsAds'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
+}
+
+function openGoogleAdsPage() {
+  _hideAllPages();
+  var p = document.getElementById('pageGoogleAds'); if (p) p.style.display = 'block';
+  // Sync picker label with global date
+  if(window.GLOBAL_FROM){_gaFromISO=window.GLOBAL_FROM;_gaToISO=window.GLOBAL_TO;}
+  var lbl=window.GLOBAL_LABEL||'Last 30 Days';
+  var el=document.getElementById('gaDpText');if(el)el.textContent=lbl;
+  gaRenderPage();
+}
+function closeGoogleAdsPage() { _showMainDashboard(); }
+
+function openMetaAdsPage() {
+  _hideAllPages();
+  var p = document.getElementById('pageMetaAds'); if (p) p.style.display = 'block';
+  if(window.GLOBAL_FROM){_metaFromISO=window.GLOBAL_FROM;_metaToISO=window.GLOBAL_TO;}
+  var lbl=window.GLOBAL_LABEL||'Last 30 Days';
+  var el=document.getElementById('metaDpText');if(el)el.textContent=lbl;
+  metaPageRender();
+}
+function closeMetaAdsPage() { _showMainDashboard(); }
+
+function openMsAdsPage() {
+  _hideAllPages();
+  var p = document.getElementById('pageMsAds'); if (p) p.style.display = 'block';
+  if(window.GLOBAL_FROM){_msFromISO=window.GLOBAL_FROM;_msToISO=window.GLOBAL_TO;}
+  var lbl=window.GLOBAL_LABEL||'Last 30 Days';
+  var el=document.getElementById('msDpText');if(el)el.textContent=lbl;
+  msRenderPage();
+}
+function closeMsAdsPage() { _showMainDashboard(); }
+
+
+// ── Google Ads Date Picker ────────────────────────────────────────────────
+var _gaDpOpen = false;
+var _gaDpSelStart = null, _gaDpSelEnd = null;
+var _gaFromISO = '', _gaToISO = '';
+var _gaViewL = null, _gaViewR = null;
+
+function _gaFmtISO(d) {
+  var y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');
+  return y+'-'+mo+'-'+dy;
+}
+function _gaFmtDisp(d) { return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}); }
+
+function gaApplyPreset(key) {
+  var _pLabels={today:"Today",yesterday:"Yesterday","7d":"Last 7 days","30d":"Last 30 days",thismonth:"This month",lastmonth:"Last month","90d":"Last 90 days",ytd:"This year",lastyear:"Last year"};
+  var _lt=document.getElementById('gaDpText');if(_lt)_lt.textContent=_pLabels[key]||key;
+  var now=new Date(); now.setHours(0,0,0,0);
+  var today=_gaFmtISO(now);
+  var s,e;
+  if(key==='today'){s=now;e=now;}
+  else if(key==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);s=y;e=y;}
+  else if(key==='7d'){var f=new Date(now);f.setDate(f.getDate()-6);s=f;e=now;}
+  else if(key==='30d'){var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  else if(key==='thismonth'){s=new Date(now.getFullYear(),now.getMonth(),1);e=now;}
+  else if(key==='lastmonth'){var lm=new Date(now.getFullYear(),now.getMonth()-1,1);s=lm;e=new Date(now.getFullYear(),now.getMonth(),0);}
+  else if(key==='90d'){var f=new Date(now);f.setDate(f.getDate()-89);s=f;e=now;}
+  else if(key==='ytd'){s=new Date(now.getFullYear(),0,1);e=now;}
+  else if(key==='lastyear'){s=new Date(now.getFullYear()-1,0,1);e=new Date(now.getFullYear()-1,11,31);}
+  else {s=new Date(now);s.setDate(s.getDate()-29);e=now;}
+  _gaDpSelStart=s; _gaDpSelEnd=e;
+  _gaFromISO=_gaFmtISO(s); _gaToISO=_gaFmtISO(e);
+  document.querySelectorAll('#gaDpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('#gaDpPanel .dp-preset[onclick*="' + key + '"]');
+  if(btn) btn.classList.add('active');
+  gaDpRenderCals();
+}
+function gaDpToggle() {
+  _gaDpOpen=!_gaDpOpen;
+  document.getElementById('gaDpPanel').style.display=_gaDpOpen?'flex':'none';
+  document.getElementById('gaDpArrow').textContent=_gaDpOpen?'▲':'▼';
+  if(_gaDpOpen && !_gaDpSelStart) gaApplyPreset('30d');
+  if(_gaDpOpen) gaDpRenderCals();
+}
+function gaDpClose() {
+  _gaDpOpen=false;
+  document.getElementById('gaDpPanel').style.display='none';
+  document.getElementById('gaDpArrow').textContent='▼';
+}
+function gaDpDone() {
+  if(_gaDpSelStart && _gaDpSelEnd) {
+    _gaFromISO=_gaFmtISO(_gaDpSelStart); _gaToISO=_gaFmtISO(_gaDpSelEnd);
+    var lbl=_gaFmtDisp(_gaDpSelStart)+' – '+_gaFmtDisp(_gaDpSelEnd);
+    document.getElementById('gaDpText').textContent=lbl;
+    document.getElementById('gaDpFrom').value=_gaFromISO;
+    document.getElementById('gaDpTo').value=_gaToISO;
+    gaDpClose();
+    broadcastToReports(_gaFromISO,_gaToISO,lbl,'ga');
+  } else { gaDpClose(); }
+}
+function gaDpRenderCals() {
+  var now=new Date(); now.setHours(0,0,0,0);
+  if(!_gaViewL) { _gaViewL=new Date(now.getFullYear(),now.getMonth()-1,1); }
+  _gaViewR=new Date(_gaViewL.getFullYear(),_gaViewL.getMonth()+1,1);
+  gaDpRenderMonth('gaCalL',_gaViewL);
+  gaDpRenderMonth('gaCalR',_gaViewR);
+  if(_gaDpSelStart) document.getElementById('gaDpFrom').value=_gaFmtISO(_gaDpSelStart);
+  if(_gaDpSelEnd)   document.getElementById('gaDpTo').value=_gaFmtISO(_gaDpSelEnd);
+}
+function gaDpRenderMonth(elId, viewDate) {
+  var el=document.getElementById(elId); if(!el) return;
+  var y=viewDate.getFullYear(), m=viewDate.getMonth();
+  var today=new Date(); today.setHours(0,0,0,0);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var html='<div class="dp-month-header"><button class="dp-nav-btn" onclick="gaDpNav(-1)">‹</button><span class="dp-month-title">'+months[m]+' '+y+'</span><button class="dp-nav-btn" onclick="gaDpNav(1)">›</button></div>';
+  html+='<div class="dp-grid"><div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>';
+  var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<first;i++) html+='<div class="dp-day dp-day-empty"></div>';
+  for(var d=1;d<=days;d++) {
+    var dt=new Date(y,m,d); dt.setHours(0,0,0,0);
+    var iso=_gaFmtISO(dt);
+    var cls='dp-day';
+    if(dt.getTime()===today.getTime()) cls+=' today';
+    if(_gaDpSelStart&&dt.getTime()===_gaDpSelStart.getTime()) cls+=' sel-start';
+    if(_gaDpSelEnd&&dt.getTime()===_gaDpSelEnd.getTime()) cls+=' sel-end';
+    if(_gaDpSelStart&&_gaDpSelEnd&&dt>_gaDpSelStart&&dt<_gaDpSelEnd) cls+=' in-range';
+    html+='<div class="'+cls+'" onclick="gaDpClickDay(\'' + iso + '\')" >'+d+'</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+function gaDpNav(dir) {
+  _gaViewL=new Date(_gaViewL.getFullYear(),_gaViewL.getMonth()+dir,1);
+  gaDpRenderCals();
+}
+function gaDpClickDay(iso) {
+  var parts=iso.split('-').map(Number);
+  var clicked=new Date(parts[0],parts[1]-1,parts[2]); clicked.setHours(0,0,0,0);
+  if(!_gaDpSelStart||(_gaDpSelStart&&_gaDpSelEnd)) { _gaDpSelStart=clicked; _gaDpSelEnd=null; }
+  else { if(clicked<_gaDpSelStart){_gaDpSelEnd=_gaDpSelStart;_gaDpSelStart=clicked;}else{_gaDpSelEnd=clicked;} }
+  gaDpRenderCals();
 }
 
 function gaRenderPage() {
@@ -6000,6 +6582,14 @@ function clvExportCSV() {
       if(!STATE[pid]?.open) return;
       const p=document.getElementById(`${pid}DpPanel`),t=document.getElementById(`${pid}DpTrigger`);
       if(p&&t&&!p.contains(e.target)&&!t.contains(e.target)) window[`${pid}DpClose`]();
+    });
+    // Outside-click close for ad page pickers
+    [['gaDpPanel','gaDpTrigger',function(){if(_gaDpOpen){_gaDpOpen=false;document.getElementById('gaDpPanel').style.display='none';document.getElementById('gaDpArrow').textContent='▼';}}],
+     ['metaDpPanel','metaDpTrigger',function(){if(_metaDpOpen){_metaDpOpen=false;document.getElementById('metaDpPanel').style.display='none';document.getElementById('metaDpArrow').textContent='▼';}}],
+     ['msDpPanel','msDpTrigger',function(){if(_msDpOpen){_msDpOpen=false;document.getElementById('msDpPanel').style.display='none';document.getElementById('msDpArrow').textContent='▼';}}]
+    ].forEach(function(x){
+      var p=document.getElementById(x[0]),t=document.getElementById(x[1]);
+      if(p&&t&&p.style.display!=='none'&&!p.contains(e.target)&&!t.contains(e.target))x[2]();
     });
     // Also close the old PA simple dropdown if somehow still open
     const pp=document.getElementById('paDpPanel');
