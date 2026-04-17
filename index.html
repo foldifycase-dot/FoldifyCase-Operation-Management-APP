@@ -423,7 +423,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   font-family:'Inter',sans-serif;
   font-size:10px;font-weight:600;text-transform:uppercase;
   letter-spacing:.06em;color:var(--c3);
-  position:sticky;top:0;z-index:3;gap:0;
+  position:sticky;top:0;z-index:10;gap:0;
   min-width:996px;
 }
 .or-th { flex-shrink:0;white-space:nowrap;padding:0 4px;font-family:'Inter',sans-serif; }
@@ -2465,6 +2465,8 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <!-- ── SECTION 3: Order Table ──────────────────────────────────────── -->
     <div style="margin:0 28px 16px">
       <div class="card" style="padding:0;overflow:hidden">
+        <!-- Shared horizontal scroll wrapper — header + totals + body all scroll together -->
+        <div style="overflow-x:auto;overflow-y:auto;max-height:600px">
         <!-- Table header — matching the screenshot style -->
         <div class="or-tbl-head">
           <div><input type="checkbox" id="or-check-all" onchange="orToggleAll(this)" style="cursor:pointer"></div>
@@ -2498,9 +2500,10 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div></div>
         </div>
         <!-- Body -->
-        <div id="or-table-body" style="max-height:520px;overflow-y:auto">
+        <div id="or-table-body" style="overflow:visible">
           <div style="padding:50px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load order data</div>
         </div>
+        </div><!-- /scroll wrapper -->
         <!-- Pagination -->
         <div id="or-pagination" style="display:none;padding:12px 16px;border-top:1px solid rgba(28,27,24,0.06);display:flex;align-items:center;gap:12px">
           <button onclick="orSetPage(orPage-1)" id="or-prev-btn" class="or-page-btn">‹ Prev</button>
