@@ -1674,6 +1674,10 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <!-- ── REPORTS ── -->
     <div class="sb-div"></div>
     <div class="sb-label" style="padding-top:4px">Reports</div>
+    <div class="sb-nav-item" onclick="closePage()" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">🏠</span><span>Dashboard</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
     <div class="sb-nav-item" id="navProductAnalytics" onclick="openPage('productAnalytics')" style="cursor:pointer;">
       <div class="sb-nav-left"><span class="sb-nav-icon">📦</span><span>Product Analytics</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
@@ -2458,7 +2462,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="orSync()" id="orSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export</button>
+        <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
