@@ -4556,6 +4556,9 @@ function closePage() {
 function openTxFeePage() { openPage('txFee'); }
 function closeTxFeePage() { closePage(); }
 
+// Fee gateway keys (flat-fee gateways only — shopify3rd handled separately)
+const FEE_KEYS = ['shopify','stripe','paypal','klarna','afterpay','manual','other'];
+
 function updateFeeExamples() {
   const ORDER = 100;
   FEE_KEYS.forEach(k => {
@@ -4566,6 +4569,16 @@ function updateFeeExamples() {
     const fee = ORDER * (parseFloat(pEl.value || 0) / 100) + parseFloat(fEl.value || 0);
     exEl.textContent = `A$${fee.toFixed(2)}`;
   });
+  // Shopify 3rd-party fee example (on non-Shopify-Payments $100 order)
+  const s3El = document.getElementById('fee_shopify3rd_pct');
+  const s3Ex = document.getElementById('ex_shopify3rd');
+  if (s3El && s3Ex) {
+    const s3fee = ORDER * (parseFloat(s3El.value || 0) / 100);
+    s3Ex.textContent = `A$${s3fee.toFixed(2)}`;
+  }
+  // Update formula label
+  const fLabel = document.getElementById('formula-shopify3rd');
+  if (fLabel && s3El) fLabel.textContent = `(${parseFloat(s3El.value||0).toFixed(0)}%)`;
 }
 
 function loadFeeRates() {
@@ -4577,6 +4590,9 @@ function loadFeeRates() {
       if (pEl && saved[`fee_${k}_pct`]  != null) pEl.value = saved[`fee_${k}_pct`];
       if (fEl && saved[`fee_${k}_flat`] != null) fEl.value = saved[`fee_${k}_flat`];
     });
+    // Load Shopify 3rd-party fee
+    const s3El = document.getElementById('fee_shopify3rd_pct');
+    if (s3El && saved['fee_shopify3rd_pct'] != null) s3El.value = saved['fee_shopify3rd_pct'];
   } catch(e) {}
 }
 
@@ -4588,6 +4604,9 @@ function saveFeeRates() {
     if (pEl) rates[`fee_${k}_pct`]  = parseFloat(pEl.value || 0);
     if (fEl) rates[`fee_${k}_flat`] = parseFloat(fEl.value || 0);
   });
+  // Save Shopify 3rd-party fee
+  const s3El = document.getElementById('fee_shopify3rd_pct');
+  if (s3El) rates['fee_shopify3rd_pct'] = parseFloat(s3El.value || 2.00);
   localStorage.setItem('fc_fee_rates', JSON.stringify(rates));
   closeTxFeePage();
   toast('✓ Fee rates saved — refreshing data', 'ok');
@@ -4598,10 +4617,13 @@ function getFeeParams() {
   // Load from localStorage (not DOM — DOM may not have fee page open)
   try {
     const saved = JSON.parse(localStorage.getItem('fc_fee_rates') || '{}');
-    return FEE_KEYS.map(k => [
+    const gatewayParams = FEE_KEYS.map(k => [
       `fee_${k}_pct=${encodeURIComponent(saved[`fee_${k}_pct`]  ?? getDefaultPct(k))}`,
       `fee_${k}_flat=${encodeURIComponent(saved[`fee_${k}_flat`] ?? getDefaultFlat(k))}`,
     ].join('&')).join('&');
+    // Add Shopify 3rd-party fee param
+    const s3pct = encodeURIComponent(saved['fee_shopify3rd_pct'] ?? 2.00);
+    return `${gatewayParams}&fee_shopify3rd_pct=${s3pct}`;
   } catch(e) { return ''; }
 }
 
@@ -4943,6 +4965,11 @@ FEE_KEYS.forEach(k => {
     if (el) el.addEventListener('input', updateFeeExamples);
   });
 });
+// Live listener for shopify 3rd-party fee
+(function() {
+  var s3 = document.getElementById('fee_shopify3rd_pct');
+  if (s3) s3.addEventListener('input', updateFeeExamples);
+})();
 
 // ── Google Ads Page ─────────────────────────────────────────────────────
 function metaPageSync() {
