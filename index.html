@@ -4672,6 +4672,11 @@ function saveFeeRates() {
   closeTxFeePage();
   toast('✓ Fee rates saved — refreshing data', 'ok');
   doSync();
+  // If Order Report is open, recalc client-side fees immediately
+  if (typeof orAllOrders !== 'undefined' && orAllOrders.length > 0) {
+    orAllOrders = orAllOrders.map(orRecalcFee);
+    orFilterAndRender();
+  }
 }
 
 function getFeeParams() {
@@ -6141,6 +6146,46 @@ const orFmt$ = n => {
   return parseFloat(n) < 0 ? `(${s})` : s;
 };
 
+
+// ── Client-side transaction fee recalculation ─────────────────────────────
+// Uses saved fee rates from localStorage, matching exact gateway per order.
+// This runs after proxy data loads so rate changes apply instantly without
+// needing to redeploy the proxy.
+function orGetFeeRates() {
+  try { return JSON.parse(localStorage.getItem('fc_fee_rates') || '{}'); } catch(e) { return {}; }
+}
+
+function orCalcTxFee(gateway, subtotal) {
+  const rates = orGetFeeRates();
+  // Normalise gateway: lowercase, replace underscores/hyphens with spaces
+  const gw = (gateway || 'other').toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
+  const KEYS = {
+    'shopify payments': { pct: rates.fee_shopify_pct  ?? 1.75, flat: rates.fee_shopify_flat ?? 0.30, no3rd: true  },
+    'stripe':           { pct: rates.fee_stripe_pct   ?? 2.90, flat: rates.fee_stripe_flat  ?? 0.30, no3rd: false },
+    'paypal':           { pct: rates.fee_paypal_pct   ?? 4.40, flat: rates.fee_paypal_flat  ?? 0.30, no3rd: false },
+    'klarna':           { pct: rates.fee_klarna_pct   ?? 2.90, flat: rates.fee_klarna_flat  ?? 0.30, no3rd: false },
+    'afterpay':         { pct: rates.fee_afterpay_pct ?? 0.00, flat: rates.fee_afterpay_flat?? 0.00, no3rd: false },
+    'manual':           { pct: 0,                              flat: 0,                               no3rd: true  },
+    'other':            { pct: rates.fee_other_pct    ?? 2.90, flat: rates.fee_other_flat   ?? 0.30, no3rd: false },
+  };
+  const key   = Object.keys(KEYS).find(k => gw.includes(k) || k.includes(gw)) || 'other';
+  const r     = KEYS[key];
+  const gwFee = subtotal * (parseFloat(r.pct) / 100) + parseFloat(r.flat);
+  const s3pct = parseFloat(rates.fee_shopify3rd_pct ?? 2.00) / 100;
+  const s3fee = r.no3rd ? 0 : subtotal * s3pct;
+  return Math.round((gwFee + s3fee) * 100) / 100;
+}
+
+function orRecalcFee(o) {
+  // Use subtotal if available, otherwise revenue (proxy may not return subtotal yet)
+  const sub      = parseFloat(o.subtotal ?? o.revenue ?? 0);
+  const txFee    = orCalcTxFee(o.gateway, sub);
+  const gp       = Math.round((parseFloat(o.revenue) - parseFloat(o.cogs||0)) * 100) / 100;
+  const profit   = Math.round((parseFloat(o.revenue) - (o.cogs||0) - (o.shipping||0) - txFee) * 100) / 100;
+  const margin   = o.revenue > 0 ? Math.round(profit / o.revenue * 10000) / 100 : 0;
+  return { ...o, txFee, grossProfit: gp, profit, margin };
+}
+
 function orFilterAndRender() {
   const search  = (document.getElementById('or-search')?.value || '').toLowerCase();
   const status  = document.getElementById('or-status-filter')?.value || 'all';
@@ -6743,7 +6788,7 @@ async function orSyncWithRange(from,to){
     const r=await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
     if(!r.ok){const e=await r.json().catch(()=>({}));orSetStatus(`✗ Error: ${e.error||r.status}`,true);return;}
     const data=await r.json();
-    orAllOrders=data.orders||[];
+    orAllOrders=(data.orders||[]).map(orRecalcFee);
     const gws=[...new Set(orAllOrders.map(o=>o.gateway).filter(Boolean))];
     const gwSel=document.getElementById('or-gateway-filter');
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
