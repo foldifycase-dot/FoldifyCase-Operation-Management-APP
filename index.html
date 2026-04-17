@@ -3845,8 +3845,10 @@ let rows         = [];          // live data merged from Shopify + ad platforms
 let activeRange  = '7d';
 const _gN=new Date();_gN.setHours(0,0,0,0);
 const _gF=new Date(_gN.getTime());
-window.GLOBAL_FROM=_gF.toISOString().slice(0,10);
-window.GLOBAL_TO=_gN.toISOString().slice(0,10);
+// Use local date parts to avoid UTC timezone shift (fixes off-by-one in AU/UTC+ timezones)
+function _localISO(d){var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dy;}
+window.GLOBAL_FROM=_localISO(_gF);
+window.GLOBAL_TO=_localISO(_gN);
 window.GLOBAL_LABEL='Today';
 let activeMkt    = 'all';
 let isLiveData   = false;
@@ -3876,13 +3878,13 @@ function getRange(key) {
     return { from: dpCustomFrom, to: dpCustomTo };
   }
   const now   = new Date();
-  const today = now.toISOString().slice(0,10);
+  const today = _localISO(now); // local date to avoid AU timezone offset
 
   if (key === 'today') {
-    return { from: today, to: today };
+    const t=_localISO(now); return { from: t, to: t };
   }
   if (key === 'yesterday') {
-    const y = new Date(now - 86400000).toISOString().slice(0,10);
+    const yD=new Date(now);yD.setDate(yD.getDate()-1);const y=_localISO(yD);
     return { from: y, to: y };
   }
   if (key === 'lastmonth') {
@@ -3902,8 +3904,8 @@ function getRange(key) {
   const map = { '7d':6, '30d':29, '90d':89,
     ytd: Math.floor((now - new Date(now.getFullYear(),0,1)) / 86400000) };
   const days = map[key] ?? 0;
-  const from = new Date(now - days * 86400000).toISOString().slice(0,10);
-  return { from, to: today };
+  const fromD = new Date(now); fromD.setDate(fromD.getDate()-days);
+  return { from: _localISO(fromD), to: _localISO(now) };
 }
 
 /* ══════════════════════════════════════════
@@ -4843,8 +4845,9 @@ function applyCustomRange() {
   const label = _smartLabel(_fromISO2, _toISO2);
   document.getElementById('dpTriggerText').textContent = label;
   dpCustomFrom=fmtISO(dpSelStart);dpCustomTo=fmtISO(end);
-  window.GLOBAL_FROM=dpCustomFrom;window.GLOBAL_TO=dpCustomTo;window.GLOBAL_LABEL=label;
-  closeDatePicker();doSync();broadcastToReports(dpCustomFrom,dpCustomTo,label,null);
+  closeDatePicker();
+  // broadcastToReports sets GLOBAL_FROM/TO and calls doSync() — no double-fetch
+  broadcastToReports(dpCustomFrom,dpCustomTo,label,null);
 }
 
 function applyAndSync(label) {
@@ -4941,10 +4944,8 @@ function broadcastToReports(from,to,label,sourcePid){
     if(pid==='meta'){_metaFromISO=from;_metaToISO=to;}
     if(pid==='ms'){_msFromISO=from;_msToISO=to;}
   });
-  // Only re-fetch the open report if a REPORT picker triggered the change.
-  // If sourcePid===null it means the main dashboard date picker changed,
-  // and the onOpen handler already fired the report fetch — don't double-fetch.
-  if(sourcePid!==null) syncOpenReport(from,to);
+  // Always sync open report/ad pages after date change
+  syncOpenReport(from,to);
 }
 function syncOpenReport(from,to){
   var f=from||window.GLOBAL_FROM,t=to||window.GLOBAL_TO;
