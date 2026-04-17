@@ -81,8 +81,8 @@ module.exports = async function handler(req, res) {
         const key = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
         const rate = feeRates[key];
         const gwFee = (subtotal * rate.pct) + rate.flat;
-        const noShopify3rd = key === "shopify payments" || key === "manual";
-        return gwFee + (noShopify3rd ? 0 : subtotal * shopify3rdPct);
+        const noS3 = key === "shopify payments" || key === "manual";
+        return gwFee + (noS3 ? 0 : subtotal * shopify3rdPct);
       };
 
       // Step 1: Store timezone
@@ -114,7 +114,7 @@ module.exports = async function handler(req, res) {
         created_at_min:   fromUTC,
         created_at_max:   toUTC,
         limit:            "250",
-        fields:           "id,created_at,total_price,subtotal_price,payment_gateway_names,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,transactions",
+        fields:           "id,created_at,total_price,subtotal_price,payment_gateway_names,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at",
       });
 
       let allOrders = [];
@@ -186,20 +186,6 @@ module.exports = async function handler(req, res) {
       }
       console.log(`[proxy] COGS: ${Object.keys(costMap).length}/${variantIds.length} variants mapped`);
 
-      // ── Fetch ACTUAL fees from Shopify Payments Balance Transactions ─────────
-      const dsActualFeeMap = {};
-      try {
-        const btRes = await fetch(`${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`, { headers: HEADERS });
-        if (btRes.ok) {
-          const btJson = await btRes.json();
-          (btJson.transactions || []).forEach(t => {
-            if (t.source_type === 'charge' && t.fee != null)
-              dsActualFeeMap[String(t.source_id)] = Math.abs(parseFloat(t.fee));
-          });
-          console.log('[proxy] balance txns:', Object.keys(dsActualFeeMap).length);
-        }
-      } catch(e) { console.log('[proxy] balance txns unavailable:', e.message); }
-
       // Step 6: Group by store-local date
       const byDate = {};
       const round2 = n => Math.round(n * 100) / 100;
@@ -224,8 +210,7 @@ module.exports = async function handler(req, res) {
 
         // Transaction fee: calculated per order using payment gateway + configured rates
         // Fee is on subtotal (excluding shipping) — gateways don't charge on shipping
-        const _dsTxnId = o.transactions && o.transactions[0] ? String(o.transactions[0].id) : null;
-        d.transaction_fees += (_dsTxnId && dsActualFeeMap[_dsTxnId] != null) ? dsActualFeeMap[_dsTxnId] : calcTxFee(o.payment_gateway_names, subTotal);
+        d.transaction_fees += calcTxFee(o.payment_gateway_names, subTotal);
 
         // COGS
         (o.line_items || []).forEach(li => {
@@ -352,6 +337,7 @@ module.exports = async function handler(req, res) {
       }
 
       // Step 5: Fee rates from query params
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const feeRates = {
         "shopify payments": { pct: parseFloat(req.query.fee_shopify_pct  ?? 1.75)/100, flat: parseFloat(req.query.fee_shopify_flat  ?? 0.30) },
         "stripe":           { pct: parseFloat(req.query.fee_stripe_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_stripe_flat   ?? 0.30) },
@@ -361,7 +347,6 @@ module.exports = async function handler(req, res) {
         "manual":           { pct: 0, flat: 0 },
         "other":            { pct: parseFloat(req.query.fee_other_pct    ?? 2.90)/100, flat: parseFloat(req.query.fee_other_flat    ?? 0.30) },
       };
-      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const getRate = (gateways) => {
         const raw = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g," ").replace(/-/g," ").trim();
         const key = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
@@ -377,8 +362,8 @@ module.exports = async function handler(req, res) {
         if (!byDate[localDate]) byDate[localDate] = { date:localDate, grossSales:0, discounts:0, refundAmt:0, orders:0, cogs:0, adSpend:0, txFee:0, shippingCharged:0, shippingCost:0 };
         const d = byDate[localDate];
         const sub = parseFloat(o.subtotal_price||0);
-        const {rate, key: _gwKey} = getRate(o.payment_gateway_names);
-        const _s3 = (_gwKey === "shopify payments" || _gwKey === "manual") ? 0 : sub * shopify3rdPct;
+        const {rate, key: _k} = getRate(o.payment_gateway_names);
+        const _s3 = (_k === "shopify payments" || _k === "manual") ? 0 : sub * shopify3rdPct;
         d.grossSales += parseFloat(o.total_price||0);
         d.discounts  += parseFloat(o.total_discounts||0);
         d.orders     += 1;
@@ -470,7 +455,7 @@ module.exports = async function handler(req, res) {
       const params = new URLSearchParams({
         status: "any", financial_status: "any",
         created_at_min: fromUTC, created_at_max: toUTC, limit: "250",
-        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status,transactions",
+        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status",
       });
       let allOrders = [];
       let url = `${REST}/orders.json?${params}`;
@@ -503,16 +488,16 @@ module.exports = async function handler(req, res) {
       }
 
       // Fee rates
+      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const feeRates = {
         "shopify payments": { pct: parseFloat(req.query.fee_shopify_pct  ?? 1.75)/100, flat: parseFloat(req.query.fee_shopify_flat  ?? 0.30) },
         "stripe":           { pct: parseFloat(req.query.fee_stripe_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_stripe_flat   ?? 0.30) },
         "paypal":           { pct: parseFloat(req.query.fee_paypal_pct   ?? 4.40)/100, flat: parseFloat(req.query.fee_paypal_flat   ?? 0.30) },
         "klarna":           { pct: parseFloat(req.query.fee_klarna_pct   ?? 2.90)/100, flat: parseFloat(req.query.fee_klarna_flat   ?? 0.30) },
-        "afterpay":         { pct: parseFloat(req.query.fee_afterpay_pct ?? 6.00)/100, flat: parseFloat(req.query.fee_afterpay_flat ?? 0.30) },
+        "afterpay":         { pct: parseFloat(req.query.fee_afterpay_pct ?? 0.00)/100, flat: parseFloat(req.query.fee_afterpay_flat ?? 0.00) },
         "manual":           { pct: 0, flat: 0 },
         "other":            { pct: parseFloat(req.query.fee_other_pct    ?? 2.90)/100, flat: parseFloat(req.query.fee_other_flat    ?? 0.30) },
       };
-      const shopify3rdPct = parseFloat(req.query.fee_shopify3rd_pct ?? 2.00) / 100;
       const getRate = (gateways) => {
         const raw = ((gateways && gateways[0]) || "other").toLowerCase().replace(/_/g," ").replace(/-/g," ").trim();
         const key = Object.keys(feeRates).find(k => raw.includes(k) || k.includes(raw)) || "other";
@@ -524,30 +509,15 @@ module.exports = async function handler(req, res) {
         timeZone: tz, year:"numeric", month:"2-digit", day:"2-digit"
       }).format(new Date(iso));
 
-      // ── Fetch ACTUAL fees from Shopify Payments Balance Transactions ─────────
-      const actualFeeMap = {};
-      try {
-        const orBtRes = await fetch(`${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`, { headers: HEADERS });
-        if (orBtRes.ok) {
-          const orBtJson = await orBtRes.json();
-          (orBtJson.transactions || []).forEach(t => {
-            if (t.source_type === 'charge' && t.fee != null)
-              actualFeeMap[String(t.source_id)] = Math.abs(parseFloat(t.fee));
-          });
-        }
-      } catch(e) { console.log('[proxy] order-report balance txns unavailable:', e.message); }
-
       // Build order rows
       const orders = allOrders.map(o => {
         const revenue   = parseFloat(o.total_price || 0);
         const subtotal  = parseFloat(o.subtotal_price || 0);
         const discounts = parseFloat(o.total_discounts || 0);
         const shipping  = parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
-        const {rate, key: _gwKey} = getRate(o.payment_gateway_names);
-        const _s3 = (_gwKey === "shopify payments" || _gwKey === "manual") ? 0 : subtotal * shopify3rdPct;
-        const _calcFee = round2(subtotal * rate.pct + rate.flat + _s3);
-        const _orTxnId = o.transactions && o.transactions[0] ? String(o.transactions[0].id) : null;
-        const txFee = (_orTxnId && actualFeeMap[_orTxnId] != null) ? actualFeeMap[_orTxnId] : _calcFee;
+        const {rate, key: _k} = getRate(o.payment_gateway_names);
+        const _s3 = (_k === "shopify payments" || _k === "manual") ? 0 : subtotal * shopify3rdPct;
+        const txFee     = round2(subtotal * rate.pct + rate.flat + _s3);
         let cogs = 0;
         const items = (o.line_items || []).length;
         (o.line_items || []).forEach(li => {
