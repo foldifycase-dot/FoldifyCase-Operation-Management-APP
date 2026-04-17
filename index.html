@@ -1721,7 +1721,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="dpTrigger" onclick="toggleDatePicker()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="dpTriggerText">Last 7 Days</span>
+          <span class="dp-trigger-text" id="dpTriggerText">Last 30 Days</span>
           <span class="dp-trigger-arrow" id="dpArrow">▼</span>
         </div>
 
@@ -1731,8 +1731,8 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div class="dp-presets">
             <button class="dp-preset" onclick="applyPreset('today')">Today</button>
             <button class="dp-preset" onclick="applyPreset('yesterday')">Yesterday</button>
-            <button class="dp-preset active" onclick="applyPreset('7d')">Last 7 days</button>
-            <button class="dp-preset" onclick="applyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="applyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="applyPreset('30d')">Last 30 days</button>
             <button class="dp-preset" onclick="applyPreset('thismonth')">This month</button>
             <button class="dp-preset" onclick="applyPreset('lastmonth')">Last month</button>
             <button class="dp-preset" onclick="applyPreset('90d')">Last 90 days</button>
@@ -3844,10 +3844,10 @@ const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy'
 let rows         = [];          // live data merged from Shopify + ad platforms
 let activeRange  = '7d';
 const _gN=new Date();_gN.setHours(0,0,0,0);
-const _gF=new Date(_gN.getTime()-6*86400000);
+const _gF=new Date(_gN.getTime()-29*86400000);
 window.GLOBAL_FROM=_gF.toISOString().slice(0,10);
 window.GLOBAL_TO=_gN.toISOString().slice(0,10);
-window.GLOBAL_LABEL='Last 7 Days';
+window.GLOBAL_LABEL='Last 30 Days';
 let activeMkt    = 'all';
 let isLiveData   = false;
 
@@ -5482,7 +5482,7 @@ function gaRenderPage() {
 (function() {
   var f = window.GLOBAL_FROM;
   var t = window.GLOBAL_TO;
-  var lbl = window.GLOBAL_LABEL || 'Last 7 Days';
+  var lbl = window.GLOBAL_LABEL || 'Last 30 Days';
   // Seed ALL picker labels with the global date immediately
   ['or','pl','ma','clv','pa','ga','meta','ms'].forEach(function(pid) {
     var el = document.getElementById(pid + 'DpText');
