@@ -959,7 +959,7 @@ module.exports = async function handler(req, res) {
       try {
         const fees = {};
 
-        // Step 1: Fetch all recent payout balance transactions
+        // Step 1: Fetch payout balance transactions (actual fees from Shopify Payments)
         const btRes = await fetch(
           `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
           { headers: HEADERS }
@@ -973,20 +973,32 @@ module.exports = async function handler(req, res) {
         const allBt = (await btRes.json()).transactions || [];
         console.log("[tx-fees] balance txns:", allBt.length);
 
-        // Step 2: Fetch orders for the date range using +10:00 timezone offset
+        // Step 2: Fetch orders for the date range
         const oRes = await fetch(
-          `${REST}/orders.json?status=any&limit=250&fields=id,transactions&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
+          `${REST}/orders.json?status=any&limit=250&fields=id,name&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
           { headers: HEADERS }
         );
         const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
         console.log("[tx-fees] orders:", orders.length);
 
-        // Step 3: Build txnId -> orderId map
+        // Step 3: For each order, fetch its transactions to get txn IDs
+        // transactions are NOT included in the orders list endpoint
         const txnToOrder = {};
-        orders.forEach(o => (o.transactions||[]).forEach(t => {
-          if (t.id) txnToOrder[String(t.id)] = String(o.id);
+        await Promise.all(orders.map(async o => {
+          try {
+            const tRes = await fetch(
+              `${REST}/orders/${o.id}/transactions.json?fields=id`,
+              { headers: HEADERS }
+            );
+            if (tRes.ok) {
+              const tJson = await tRes.json();
+              (tJson.transactions || []).forEach(t => {
+                if (t.id) txnToOrder[String(t.id)] = String(o.id);
+              });
+            }
+          } catch(e) {}
         }));
-        console.log("[tx-fees] txn map:", Object.keys(txnToOrder).length);
+        console.log("[tx-fees] txnToOrder:", Object.keys(txnToOrder).length, "entries");
 
         // Step 4: Join balance txns to orders via source_id = order transaction ID
         allBt.forEach(t => {
@@ -1000,11 +1012,11 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({
           fees, count: Object.keys(fees).length,
           debug: {
-            bt_count: allBt.length,
+            bt_count:    allBt.length,
             order_count: orders.length,
-            txn_count: Object.keys(txnToOrder).length,
-            bt_sample: allBt.slice(0,3).map(t=>({source_id:t.source_id, fee:t.fee})),
-            txn_sample: Object.entries(txnToOrder).slice(0,3).map(([k,v])=>({txnId:k,orderId:v}))
+            txn_count:   Object.keys(txnToOrder).length,
+            bt_sample:   allBt.slice(0,3).map(t=>({source_id:t.source_id, fee:t.fee})),
+            txn_sample:  Object.entries(txnToOrder).slice(0,3).map(([k,v])=>({txnId:k,orderId:v}))
           }
         });
       } catch(err) {
