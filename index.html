@@ -4741,7 +4741,7 @@ function getFeeParams() {
   } catch(e) { return ''; }
 }
 
-function getDefaultPct(k)  { return {shopify:2.90,stripe:2.90,paypal:4.40,klarna:2.90,afterpay:0,manual:0,other:2.90}[k] ?? 0; }
+function getDefaultPct(k)  { return {shopify:1.75,stripe:2.90,paypal:4.40,klarna:2.90,afterpay:0,manual:0,other:2.90}[k] ?? 0; }
 function getDefaultFlat(k) { return {shopify:0.31,stripe:0.30,paypal:0.30,klarna:0.30,afterpay:0,manual:0,other:0.30}[k] ?? 0; }
 
 /* ══════════════════════════════════════════
@@ -6207,7 +6207,7 @@ function orCalcTxFee(gateway, subtotal) {
   const rates = orGetFeeRates();
   const gw = (gateway || 'other').toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
   const KEYS = {
-    'shopify payments': { pct: parseFloat(rates.fee_shopify_pct  ?? 2.90), flat: parseFloat(rates.fee_shopify_flat ?? 0.31) },
+    'shopify payments': { pct: parseFloat(rates.fee_shopify_pct  ?? 1.75), flat: parseFloat(rates.fee_shopify_flat ?? 0.31) },
     'stripe':           { pct: parseFloat(rates.fee_stripe_pct   ?? 2.90), flat: parseFloat(rates.fee_stripe_flat  ?? 0.30) },
     'paypal':           { pct: parseFloat(rates.fee_paypal_pct   ?? 4.40), flat: parseFloat(rates.fee_paypal_flat  ?? 0.30) },
     'klarna':           { pct: parseFloat(rates.fee_klarna_pct   ?? 2.90), flat: parseFloat(rates.fee_klarna_flat  ?? 0.30) },
