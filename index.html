@@ -4017,6 +4017,25 @@ async function doSync() {
           shopifyTotal.shipping_cost    += day.shipping_cost    || 0;
         });
         isLiveData = Object.keys(shopifyDays).length > 0;
+        // Fetch actual Shopify Payments fees and update shopifyDays.transaction_fees
+        try {
+          const tfRes = await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}`);
+          if (tfRes.ok) {
+            const tfData = await tfRes.json();
+            // feesByDate: { "2026-04-17": totalFeeForThatDay } — directly from proxy
+            const feesByDate = tfData.feesByDate || {};
+            if (Object.keys(feesByDate).length > 0) {
+              Object.keys(feesByDate).forEach(date => {
+                if (shopifyDays[date]) {
+                  shopifyDays[date].transaction_fees = feesByDate[date];
+                }
+              });
+              console.log('[FoldifyCase] ✅ Dashboard tx fees updated from Shopify Payments payout data');
+            } else {
+              console.warn('[FoldifyCase] ⚠️ tx-fees returned no feesByDate for dashboard');
+            }
+          }
+        } catch(e) { console.log('[FoldifyCase] Dashboard tx-fees error:', e.message); }
         if (isLiveData) {
           console.log(`[Shopify] ✓ ${Object.keys(shopifyDays).length} days | rev=$${shopifyTotal.revenue.toFixed(2)}`);
           setStatus(`✓ Shopify: ${Object.keys(shopifyDays).length} days fetched | Revenue: $${shopifyTotal.revenue.toFixed(2)} | Orders: ${shopifyTotal.orders}`);
