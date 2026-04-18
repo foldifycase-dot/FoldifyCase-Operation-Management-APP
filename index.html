@@ -3898,7 +3898,8 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 /* ══════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════ */
-const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy';
+const PROXY    = 'https://foldify-case-operation-management-a.vercel.app/api/proxy';
+const TX_FEES  = 'https://foldify-case-operation-management-a.vercel.app/api/tx-fees';
 
 /* ══════════════════════════════════════════
    STATE
@@ -6834,7 +6835,7 @@ async function orSyncWithRange(from,to){
     // Step 2: Fetch ACTUAL transaction fees from Shopify GraphQL
     try {
       const feeParams=getFeeParams();
-      const tfRes=await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}&${feeParams}`);
+      const tfRes=await fetch(`${TX_FEES}?from=${from}&to=${to}`);
       if(tfRes.ok){
         const tfData=await tfRes.json();
         const feeMap=tfData.fees||{};
