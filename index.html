@@ -6831,31 +6831,42 @@ async function orSyncWithRange(from,to){
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
     orFilterAndRender();
     orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} (loading exact fees...)`);
-    // Step 2: Fetch ACTUAL transaction fees from Shopify GraphQL
+    // Step 2: Fetch ACTUAL transaction fees from Shopify Payments Finance > Payouts
     try {
-      const feeParams=getFeeParams();
-      const tfRes=await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}&${feeParams}`);
-      if(tfRes.ok){
-        const tfData=await tfRes.json();
-        const feeMap=tfData.fees||{};
-        // Step 3: Override txFee with actual Shopify data where available
+      console.log('[FoldifyCase] Fetching actual Shopify Payments fees...');
+      const tfRes=await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}`);
+      const tfData=await tfRes.json();
+      console.log('[FoldifyCase] tx-fees response:', tfData);
+      const feeMap=tfData.fees||{};
+      const feeCount=Object.keys(feeMap).length;
+      if(feeCount>0){
         let updated=false;
         orAllOrders=orAllOrders.map(o=>{
           const actual=feeMap[String(o.id)];
           if(actual!=null && actual!==o.txFee){
             updated=true;
-            const profit=Math.round((parseFloat(o.revenue)-(o.cogs||0)-(o.shipping||0)-actual)*100)/100;
+            const txFee=actual;
+            const profit=Math.round((parseFloat(o.revenue)-(o.cogs||0)-(o.shipping||0)-txFee)*100)/100;
             const margin=o.revenue>0?Math.round(profit/o.revenue*10000)/100:0;
-            return {...o,txFee:actual,profit,margin};
+            const grossProfit=Math.round((parseFloat(o.revenue)-(o.cogs||0))*100)/100;
+            return {...o,txFee,profit,margin,grossProfit};
           }
           return o;
         });
-        if(updated) orFilterAndRender();
-        orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+        if(updated){
+          orFilterAndRender();
+          orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} · fees synced from Shopify Payments`);
+          console.log('[FoldifyCase] ✅ Fees updated from Shopify Payments payout data:', feeCount, 'orders');
+        } else {
+          orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+          console.log('[FoldifyCase] ℹ️ Payout fees fetched but matched existing values');
+        }
       } else {
         orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+        console.warn('[FoldifyCase] ⚠️ tx-fees returned empty:', tfData.error || 'no fees found - check Shopify Payments scope or SHOPIFY_TOKEN in Vercel');
       }
     } catch(e){
+      console.warn('[FoldifyCase] tx-fees fetch error:', e.message);
       orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
     }
   }catch(e){orSetStatus(`✗ ${e.message}`,true);}
