@@ -1045,23 +1045,10 @@ module.exports = async function handler(req, res) {
     }
 
 
-    if (action === "shipping-labels") {
-      // Fetch Shopify Payments label_purchase balance transactions
-      // and map them to order IDs via fulfillment IDs
+        if (action === "shipping-labels") {
       if (!from || !to) return res.status(400).json({ error: "from and to required" });
       try {
-        // Step 1: Get label_purchase balance transactions for the date window
-        const lbRes = await fetch(
-          `${REST}/shopify_payments/balance/transactions.json?transaction_type=label_purchase&limit=250`,
-          { headers: HEADERS }
-        );
-        if (!lbRes.ok) {
-          return res.status(200).json({ labels: {}, count: 0,
-            error: `Shopify Payments API ${lbRes.status} - check shopify_payments scope` });
-        }
-        const labelTxns = (await lbRes.json()).transactions || [];
-
-        // Step 2: Get orders in date range with their fulfillment IDs
+        // Step 1: Fetch orders in date range with fulfillment details
         const oRes = await fetch(
           `${REST}/orders.json?status=any&limit=250&fields=id,fulfillments,created_at` +
           `&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
@@ -1069,35 +1056,43 @@ module.exports = async function handler(req, res) {
         );
         const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
 
-        // Step 3: Build map: fulfillmentId -> orderId
-        const fulfillmentToOrder = {};
-        orders.forEach(o => {
-          (o.fulfillments || []).forEach(f => {
-            fulfillmentToOrder[String(f.id)] = String(o.id);
-          });
-        });
+        // Step 2: Get shipping cost from each fulfillment's receipt
+        // Shopify stores the label cost in the fulfillment receipt as "subtotal"
+        const labels = {};
+        const debugFulfillments = [];
 
-        // Step 4: Sum label costs per order
-        const labels = {}; // orderId -> total label cost
-        labelTxns.forEach(t => {
-          const fid = String(t.source_id || '');
-          const oid = fulfillmentToOrder[fid];
-          if (!oid) return;
-          const cost = Math.abs(parseFloat(t.amount || 0));
-          labels[oid] = Math.round(((labels[oid] || 0) + cost) * 100) / 100;
-        });
+        for (const o of orders) {
+          for (const f of (o.fulfillments || [])) {
+            // The fulfillment receipt contains the shipping label cost
+            const receipt = f.receipt || {};
+            const subtotal = parseFloat(receipt.subtotal || 0);
+            const total = parseFloat(receipt.total || 0);
+            const labelCost = subtotal || total;
 
-        // DEBUG: log first 3 transactions to see actual field structure
-        console.log('[shipping-labels] first txn sample:', JSON.stringify(labelTxns.slice(0,2)));
-        console.log('[shipping-labels] fulfillmentToOrder sample:', JSON.stringify(Object.entries(fulfillmentToOrder).slice(0,3)));
-        console.log('[shipping-labels] txns:', labelTxns.length, 'matched orders:', Object.keys(labels).length);
-        return res.status(200).json({ labels, count: Object.keys(labels).length,
+            debugFulfillments.push({
+              order_id: o.id,
+              fulfillment_id: f.id,
+              status: f.status,
+              receipt_keys: Object.keys(receipt),
+              subtotal,
+              total,
+            });
+
+            if (labelCost > 0) {
+              const oid = String(o.id);
+              labels[oid] = Math.round(((labels[oid] || 0) + labelCost) * 100) / 100;
+            }
+          }
+        }
+
+        console.log('[shipping-labels] orders:', orders.length, 'matched:', Object.keys(labels).length);
+        return res.status(200).json({
+          labels,
+          count: Object.keys(labels).length,
           debug: {
-            label_txns: labelTxns.length,
             orders: orders.length,
-            fulfillments: Object.keys(fulfillmentToOrder).length,
-            sample_txn: labelTxns[0] || null,
-            sample_fulfillment_ids: Object.keys(fulfillmentToOrder).slice(0,3),
+            fulfillments: debugFulfillments.length,
+            sample_fulfillments: debugFulfillments.slice(0, 3),
           }
         });
       } catch(err) {
