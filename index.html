@@ -2003,16 +2003,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div class="txfee-icon" style="background:#5C6AC4">S</div>
             <div>
               <div class="txfee-name">Shopify Payments</div>
-              <div class="txfee-desc">Calculated by Shopify</div>
+              <div class="txfee-desc">2.9% + A$0.31 (online/intl) · includes GST via formula</div>
             </div>
           </div>
           <div class="txfee-cell">
-            <input class="txfee-inp" id="fee_shopify_pct"  type="number" step="0.01" min="0" value="1.75">
+            <input class="txfee-inp" id="fee_shopify_pct"  type="number" step="0.01" min="0" value="2.90">
             <span class="txfee-unit">%</span>
           </div>
           <div class="txfee-cell">
             <span class="txfee-prefix">A$</span>
-            <input class="txfee-inp" id="fee_shopify_flat" type="number" step="0.01" min="0" value="0.30">
+            <input class="txfee-inp" id="fee_shopify_flat" type="number" step="0.01" min="0" value="0.31">
           </div>
           <div class="txfee-example" id="ex_shopify">—</div>
         </div>
@@ -4688,13 +4688,15 @@ function getFeeParams() {
       `fee_${k}_flat=${encodeURIComponent(saved[`fee_${k}_flat`] ?? getDefaultFlat(k))}`,
     ].join('&')).join('&');
     // Add Shopify 3rd-party fee param
-    const s3pct = encodeURIComponent(saved['fee_shopify3rd_pct'] ?? 2.00);
-    return `${gatewayParams}&fee_shopify3rd_pct=${s3pct}`;
+    const s3pct   = encodeURIComponent(saved['fee_shopify3rd_pct']  ?? 2.00);
+    const gstPct  = encodeURIComponent(saved['fee_shopify_gst_pct']  ?? 10.00);
+    const convPct = encodeURIComponent(saved['fee_shopify_conv_pct'] ?? 2.00);
+    return `${gatewayParams}&fee_shopify3rd_pct=${s3pct}&fee_shopify_gst_pct=${gstPct}&fee_shopify_conv_pct=${convPct}`;
   } catch(e) { return ''; }
 }
 
-function getDefaultPct(k)  { return {shopify:1.75,stripe:2.90,paypal:4.40,klarna:2.90,afterpay:0,manual:0,other:2.90}[k] ?? 0; }
-function getDefaultFlat(k) { return {shopify:0.30,stripe:0.30,paypal:0.30,klarna:0.30,afterpay:0,manual:0,other:0.30}[k] ?? 0; }
+function getDefaultPct(k)  { return {shopify:2.90,stripe:2.90,paypal:4.40,klarna:2.90,afterpay:0,manual:0,other:2.90}[k] ?? 0; }
+function getDefaultFlat(k) { return {shopify:0.31,stripe:0.30,paypal:0.30,klarna:0.30,afterpay:0,manual:0,other:0.30}[k] ?? 0; }
 
 /* ══════════════════════════════════════════
    CONTROLS
@@ -6157,22 +6159,31 @@ function orGetFeeRates() {
 
 function orCalcTxFee(gateway, subtotal) {
   const rates = orGetFeeRates();
-  // Normalise gateway: lowercase, replace underscores/hyphens with spaces
   const gw = (gateway || 'other').toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
   const KEYS = {
-    'shopify payments': { pct: rates.fee_shopify_pct  ?? 1.75, flat: rates.fee_shopify_flat ?? 0.30, no3rd: true  },
-    'stripe':           { pct: rates.fee_stripe_pct   ?? 2.90, flat: rates.fee_stripe_flat  ?? 0.30, no3rd: false },
-    'paypal':           { pct: rates.fee_paypal_pct   ?? 4.40, flat: rates.fee_paypal_flat  ?? 0.30, no3rd: false },
-    'klarna':           { pct: rates.fee_klarna_pct   ?? 2.90, flat: rates.fee_klarna_flat  ?? 0.30, no3rd: false },
-    'afterpay':         { pct: rates.fee_afterpay_pct ?? 0.00, flat: rates.fee_afterpay_flat?? 0.00, no3rd: false },
-    'manual':           { pct: 0,                              flat: 0,                               no3rd: true  },
-    'other':            { pct: rates.fee_other_pct    ?? 2.90, flat: rates.fee_other_flat   ?? 0.30, no3rd: false },
+    'shopify payments': { pct: parseFloat(rates.fee_shopify_pct  ?? 2.90), flat: parseFloat(rates.fee_shopify_flat ?? 0.31) },
+    'stripe':           { pct: parseFloat(rates.fee_stripe_pct   ?? 2.90), flat: parseFloat(rates.fee_stripe_flat  ?? 0.30) },
+    'paypal':           { pct: parseFloat(rates.fee_paypal_pct   ?? 4.40), flat: parseFloat(rates.fee_paypal_flat  ?? 0.30) },
+    'klarna':           { pct: parseFloat(rates.fee_klarna_pct   ?? 2.90), flat: parseFloat(rates.fee_klarna_flat  ?? 0.30) },
+    'afterpay':         { pct: parseFloat(rates.fee_afterpay_pct ?? 0.00), flat: parseFloat(rates.fee_afterpay_flat?? 0.00) },
+    'manual':           { pct: 0,                                           flat: 0 },
+    'other':            { pct: parseFloat(rates.fee_other_pct    ?? 2.90), flat: parseFloat(rates.fee_other_flat   ?? 0.30) },
   };
   const key   = Object.keys(KEYS).find(k => gw.includes(k) || k.includes(gw)) || 'other';
   const r     = KEYS[key];
-  const gwFee = subtotal * (parseFloat(r.pct) / 100) + parseFloat(r.flat);
+  const gwFee = subtotal * (r.pct / 100) + r.flat;
+
+  if (key === 'shopify payments') {
+    // Shopify Payments AU: gateway fee + 10% GST + 2% currency conversion + 10% GST on conversion
+    const gstPct  = parseFloat(rates.fee_shopify_gst_pct  ?? 10.00) / 100;
+    const convPct = parseFloat(rates.fee_shopify_conv_pct ?? 2.00)  / 100;
+    const gwWithGst   = gwFee * (1 + gstPct);
+    const convWithGst = subtotal * convPct * (1 + gstPct);
+    return Math.round((gwWithGst + convWithGst) * 100) / 100;
+  }
+  // Other gateways: fee + Shopify 3rd-party platform fee (except manual)
   const s3pct = parseFloat(rates.fee_shopify3rd_pct ?? 2.00) / 100;
-  const s3fee = r.no3rd ? 0 : subtotal * s3pct;
+  const s3fee = key === 'manual' ? 0 : subtotal * s3pct;
   return Math.round((gwFee + s3fee) * 100) / 100;
 }
 
@@ -6788,12 +6799,40 @@ async function orSyncWithRange(from,to){
     const r=await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
     if(!r.ok){const e=await r.json().catch(()=>({}));orSetStatus(`✗ Error: ${e.error||r.status}`,true);return;}
     const data=await r.json();
+    // Step 1: Load orders with client-side fee calc as initial estimate
     orAllOrders=(data.orders||[]).map(orRecalcFee);
     const gws=[...new Set(orAllOrders.map(o=>o.gateway).filter(Boolean))];
     const gwSel=document.getElementById('or-gateway-filter');
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
     orFilterAndRender();
-    orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+    orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} (loading exact fees...)`);
+    // Step 2: Fetch ACTUAL transaction fees from Shopify GraphQL
+    try {
+      const feeParams=getFeeParams();
+      const tfRes=await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}&${feeParams}`);
+      if(tfRes.ok){
+        const tfData=await tfRes.json();
+        const feeMap=tfData.fees||{};
+        // Step 3: Override txFee with actual Shopify data where available
+        let updated=false;
+        orAllOrders=orAllOrders.map(o=>{
+          const actual=feeMap[String(o.id)];
+          if(actual!=null && actual!==o.txFee){
+            updated=true;
+            const profit=Math.round((parseFloat(o.revenue)-(o.cogs||0)-(o.shipping||0)-actual)*100)/100;
+            const margin=o.revenue>0?Math.round(profit/o.revenue*10000)/100:0;
+            return {...o,txFee:actual,profit,margin};
+          }
+          return o;
+        });
+        if(updated) orFilterAndRender();
+        orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+      } else {
+        orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+      }
+    } catch(e){
+      orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+    }
   }catch(e){orSetStatus(`✗ ${e.message}`,true);}
   finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
 }
