@@ -4623,6 +4623,31 @@ function closeTxFeePage() { closePage(); }
 // Fee gateway keys (flat-fee gateways only — shopify3rd handled separately)
 const FEE_KEYS = ['shopify','stripe','paypal','klarna','afterpay','manual','other'];
 
+// ── Auto-migrate stale fee rates from localStorage ────────────────────────
+// If saved Shopify Payments rate is old 1.75% default, reset to correct 2.9%
+(function migrateFeeRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('fc_fee_rates') || '{}');
+    if (!saved.fee_shopify_pct || parseFloat(saved.fee_shopify_pct) < 2.5) {
+      // Old/missing rates — reset to correct defaults
+      const fresh = {
+        fee_shopify_pct:    2.90, fee_shopify_flat:    0.31,
+        fee_stripe_pct:     2.90, fee_stripe_flat:     0.30,
+        fee_paypal_pct:     4.40, fee_paypal_flat:     0.30,
+        fee_klarna_pct:     2.90, fee_klarna_flat:     0.30,
+        fee_afterpay_pct:   0.00, fee_afterpay_flat:   0.00,
+        fee_manual_pct:     0.00, fee_manual_flat:     0.00,
+        fee_other_pct:      2.90, fee_other_flat:      0.30,
+        fee_shopify3rd_pct: 2.00,
+        fee_shopify_gst_pct:  10.00,
+        fee_shopify_conv_pct:  2.00,
+      };
+      localStorage.setItem('fc_fee_rates', JSON.stringify(fresh));
+      console.log('[FoldifyCase] Fee rates migrated to correct 2.9%+GST+conversion formula');
+    }
+  } catch(e) {}
+})();
+
 function updateFeeExamples() {
   const ORDER = 100;
   FEE_KEYS.forEach(k => {
