@@ -1006,6 +1006,7 @@ module.exports = async function handler(req, res) {
           `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
         ];
         let btLoaded = false;
+        let btJsonSample = [];
         for (const btUrl of btUrls) {
           const btRes = await fetch(btUrl, { headers: HEADERS });
           if (!btRes.ok) {
@@ -1013,6 +1014,10 @@ module.exports = async function handler(req, res) {
             break;
           }
           const btJson = await btRes.json();
+          // Capture sample for debug (shows what source_id looks like)
+          btJsonSample = (btJson.transactions || []).slice(0,3).map(t=>({
+            id:t.id, type:t.type, source_id:t.source_id, source_type:t.source_type, fee:t.fee
+          }));
           (btJson.transactions || []).forEach(t => {
             if (t.source_id && t.fee != null) {
               const orderId = txnToOrder[String(t.source_id)];
@@ -1026,7 +1031,15 @@ module.exports = async function handler(req, res) {
         console.log("[tx-fees] payout fees loaded:", Object.keys(fees).length, "orders,", Object.keys(txnToOrder).length, "order-txns mapped");
       } catch(e) { console.log("[tx-fees] payout error:", e.message); }
 
-      return res.status(200).json({ fees, count: Object.keys(fees).length });
+      return res.status(200).json({
+        fees,
+        count: Object.keys(fees).length,
+        debug: {
+          txnToOrder_count: Object.keys(txnToOrder).length,
+          txnToOrder_sample: Object.entries(txnToOrder).slice(0,3).map(([k,v])=>({txnId:k,orderId:v})),
+          balance_txn_sample: btJsonSample,
+        }
+      });
     }
 
     return res.status(400).json({ error: "Unknown shopify action", received: action });
