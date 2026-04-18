@@ -6386,7 +6386,7 @@ function orRenderTable() {
       <div class="or-cell-num" style="color:${gpColor};font-weight:600">${orFmt$(o.grossProfit||0)}</div>
       <div class="or-cell-num" style="color:var(--c3);font-size:11px">${(o.grossMargin||0).toFixed(1)}%</div>
       <div class="or-cell-num" style="color:var(--red)">(${orFmt$(o.txFee)})</div>
-      <div class="or-cell-num" style="color:#4A7FC1">${o.shippingLabel>0?('('+orFmt$(o.shippingLabel)+')'):'<span style=\"color:var(--c3)\">—</span>'}</div>
+      <div class="or-cell-num" style="color:${o.shippingLabel>0?'#4A7FC1':'var(--c3)'}">${o.shippingLabel>0?('('+orFmt$(o.shippingLabel)+')'):'—'}</div>
       <div class="or-cell-num" style="color:${profitColor};font-weight:600">${orFmt$(o.profit)}</div>
       <div class="or-cell" style="text-align:center">${statusBadge(o.status)}</div>
     </div>`;
