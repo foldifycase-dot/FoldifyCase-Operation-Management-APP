@@ -957,31 +957,44 @@ module.exports = async function handler(req, res) {
     if (action === "tx-fees") {
       if (!from || !to) return res.status(400).json({ error: "from and to required" });
       try {
-        const fees = {};
+        const fees = {};        // orderId -> fee
+        const feesByDate = {};  // date (YYYY-MM-DD) -> total fees
 
-        // Step 1: Fetch payout balance transactions with ALL fields including source_order_transaction_id
+        // Step 1: Fetch payout balance transactions
         const btRes = await fetch(
           `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
           { headers: HEADERS }
         );
         if (!btRes.ok) {
           return res.status(200).json({
-            fees: {}, count: 0,
+            fees: {}, feesByDate: {}, count: 0,
             error: `Payout API HTTP ${btRes.status} - check read_shopify_payments_payouts scope`
           });
         }
         const allBt = (await btRes.json()).transactions || [];
 
-        // Step 2: Fetch orders for the date range
+        // Step 2: Fetch orders with created_at for date aggregation
         const oRes = await fetch(
-          `${REST}/orders.json?status=any&limit=250&fields=id,name&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
+          `${REST}/orders.json?status=any&limit=250&fields=id,name,created_at&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
           { headers: HEADERS }
         );
         const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
-        console.log("[tx-fees] orders:", orders.length);
 
-        // Step 3: Fetch transactions per order to get ALL transaction IDs
-        const txnToOrder = {}; // maps any txn ID -> order ID
+        // Build orderId -> date map using proper AEST timezone conversion
+        const orderDate = {};
+        orders.forEach(o => {
+          if (o.created_at) {
+            const localDate = new Intl.DateTimeFormat('en-CA', {
+              timeZone: 'Australia/Sydney',
+              year: 'numeric', month: '2-digit', day: '2-digit'
+            }).format(new Date(o.created_at));
+            // en-CA format gives YYYY-MM-DD directly
+            orderDate[String(o.id)] = localDate;
+          }
+        });
+
+        // Step 3: Fetch transactions per order to get IDs for joining
+        const txnToOrder = {};
         await Promise.all(orders.map(async o => {
           try {
             const tRes = await fetch(
@@ -991,43 +1004,42 @@ module.exports = async function handler(req, res) {
             if (tRes.ok) {
               const tJson = await tRes.json();
               (tJson.transactions || []).forEach(t => {
-                if (t.id) txnToOrder[String(t.id)] = String(o.id);
-                // Also map parent_id in case balance txn links to parent
+                if (t.id)        txnToOrder[String(t.id)]        = String(o.id);
                 if (t.parent_id) txnToOrder[String(t.parent_id)] = String(o.id);
               });
             }
           } catch(e) {}
         }));
-        console.log("[tx-fees] txnToOrder:", Object.keys(txnToOrder).length);
 
-        // Step 4: Join using source_order_transaction_id (correct field) OR source_id (fallback)
+        // Step 4: Join via source_order_transaction_id or source_id
         allBt.forEach(t => {
           if (t.fee == null) return;
-          // Try source_order_transaction_id first (direct link to order transaction)
           const linkId = t.source_order_transaction_id || t.source_id;
           if (!linkId) return;
           const oid = txnToOrder[String(linkId)];
-          if (oid) fees[oid] = Math.round(((fees[oid]||0) + Math.abs(parseFloat(t.fee)))*100)/100;
+          if (!oid) return;
+          const fee = Math.abs(parseFloat(t.fee));
+          fees[oid] = Math.round(((fees[oid] || 0) + fee) * 100) / 100;
+          // Aggregate by date
+          const date = orderDate[oid];
+          if (date) feesByDate[date] = Math.round(((feesByDate[date] || 0) + fee) * 100) / 100;
         });
-        console.log("[tx-fees] matched:", Object.keys(fees).length, "orders");
+
+        console.log("[tx-fees] matched:", Object.keys(fees).length, "orders across", Object.keys(feesByDate).length, "dates");
 
         return res.status(200).json({
-          fees, count: Object.keys(fees).length,
+          fees,
+          feesByDate,
+          count: Object.keys(fees).length,
           debug: {
-            bt_count:    allBt.length,
+            bt_count: allBt.length,
             order_count: orders.length,
-            txn_count:   Object.keys(txnToOrder).length,
-            bt_sample:   allBt.slice(0,3).map(t=>({
-              source_id: t.source_id,
-              source_order_transaction_id: t.source_order_transaction_id,
-              fee: t.fee
-            })),
-            txn_sample: Object.entries(txnToOrder).slice(0,5).map(([k,v])=>({txnId:k,orderId:v}))
+            txn_count: Object.keys(txnToOrder).length,
           }
         });
       } catch(err) {
         console.log("[tx-fees] crash:", err.message);
-        return res.status(200).json({ fees:{}, count:0, error: err.message });
+        return res.status(200).json({ fees:{}, feesByDate:{}, count:0, error: err.message });
       }
     }
 
