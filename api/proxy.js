@@ -1048,56 +1048,74 @@ module.exports = async function handler(req, res) {
     if (action === "shipping-labels") {
       if (!from || !to) return res.status(400).json({ error: "from and to required" });
       try {
-        // Get orders with full fulfillment details including receipt
-        const oRes = await fetch(
-          `${REST}/orders.json?status=any&limit=250` +
-          `&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00` +
-          `&fields=id,name,fulfillments`,
-          { headers: HEADERS }
-        );
-        const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
+        const GRAPHQL = `https://${STORE}/admin/api/2024-01/graphql.json`;
 
-        // For each fulfillment, fetch the full details to get receipt/label cost
-        const labels = {};
-        const debugData = [];
+        // Query orders via GraphQL to get fulfillment shipping label costs
+        // Shopify stores the label cost in the fulfillmentOrder's lineItems
+        // and in the order's shippingLine discountedPriceSet (merchant cost)
+        const fromDT = `${from}T00:00:00+10:00`;
+        const toDT   = `${to}T23:59:59+10:00`;
 
-        for (const o of orders) {
-          for (const f of (o.fulfillments || [])) {
-            // Fetch full fulfillment details
-            const fRes = await fetch(
-              `${REST}/orders/${o.id}/fulfillments/${f.id}.json`,
-              { headers: HEADERS }
-            );
-            if (!fRes.ok) continue;
-            const fData = (await fRes.json()).fulfillment || {};
-            const receipt = fData.receipt || {};
-
-            // Try all known receipt fields for label cost
-            const labelCost = parseFloat(receipt.subtotal || receipt.total_price || 
-                              receipt.label_cost || receipt.amount || 0);
-
-            debugData.push({
-              order_id: o.id,
-              fulfillment_id: f.id,
-              tracking_company: f.tracking_company,
-              receipt_keys: Object.keys(receipt),
-              receipt: receipt,
-              label_cost: labelCost,
-            });
-
-            if (labelCost > 0) {
-              const oid = String(o.id);
-              labels[oid] = Math.round(((labels[oid] || 0) + labelCost) * 100) / 100;
+        const query = `{
+          orders(first: 50, query: "created_at:>='${from}' created_at:<='${to}'") {
+            edges {
+              node {
+                id
+                name
+                fulfillmentOrders(first: 5) {
+                  edges {
+                    node {
+                      id
+                      status
+                      fulfillments(first: 5) {
+                        edges {
+                          node {
+                            id
+                            status
+                            totalQuantity
+                            shippingLabel {
+                              trackingNumber
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
-        }
+        }`;
 
+        const gqlRes = await fetch(GRAPHQL, {
+          method: 'POST',
+          headers: { ...HEADERS, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const gqlData = await gqlRes.json();
+        
+        // Also try fetching via the Shopify billing charges REST endpoint
+        // /admin/api/2024-01/reports.json - no
+        // Try: orders with their carrier_service to find label cost
+        const oRes = await fetch(
+          `${REST}/orders.json?status=any&limit=10` +
+          `&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00` +
+          `&fields=id,name,shipping_lines`,
+          { headers: HEADERS }
+        );
+        const oData = oRes.ok ? await oRes.json() : {};
+        
         return res.status(200).json({
-          labels,
-          count: Object.keys(labels).length,
+          labels: {},
+          count: 0,
           debug: {
-            orders: orders.length,
-            sample_fulfillments: debugData.slice(0, 2),
+            graphql_errors: gqlData.errors || null,
+            graphql_data: gqlData.data || null,
+            sample_shipping_lines: (oData.orders || []).slice(0,2).map(o => ({
+              name: o.name,
+              id: o.id,
+              shipping_lines: o.shipping_lines
+            }))
           }
         });
       } catch(err) {
