@@ -6302,6 +6302,7 @@ function orRenderKPIs() {
   const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
+  const shipLabel = orders.reduce((s,o)=>s+(o.shippingLabel||0),0);
   const profit    = orders.reduce((s,o)=>s+o.profit,0);
   const aov       = total > 0 ? revenue/total : 0;
   const margin    = revenue > 0 ? profit/revenue*100 : 0;
@@ -6330,7 +6331,6 @@ function orRenderTotalsRow() {
   const shipping  = orders.reduce((s,o)=>s+o.shipping,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
-  const shipLabel = orders.reduce((s,o)=>s+(o.shippingLabel||0),0);
   const profit    = orders.reduce((s,o)=>s+o.profit,0);
   const items     = orders.reduce((s,o)=>s+o.items,0);
   const grossProfitTotal = orders.reduce((s,o)=>s+(o.grossProfit||0),0);
@@ -6840,6 +6840,32 @@ function clvExportCSV() {
 })();
 
 // ── Sync wrappers accepting explicit date range ───────────────────────────
+async function orFetchShippingLabels(from, to) {
+  try {
+    const r = await fetch(`${PROXY}?service=shopify&action=shipping-labels&from=${from}&to=${to}`);
+    if (!r.ok) return;
+    const data = await r.json();
+    const labels = data.labels || {};
+    if (!Object.keys(labels).length) return;
+    // Update orAllOrders with real label costs
+    let updated = false;
+    orAllOrders = orAllOrders.map(o => {
+      const cost = labels[String(o.id)];
+      if (cost != null && cost !== o.shippingLabel) {
+        updated = true;
+        return { ...o, shippingLabel: cost };
+      }
+      return o;
+    });
+    if (updated) {
+      orFilterAndRender();
+      console.log('[FoldifyCase] ✅ Shipping labels loaded:', Object.keys(labels).length, 'orders');
+    }
+  } catch(e) {
+    console.warn('[FoldifyCase] shipping-labels fetch error:', e.message);
+  }
+}
+
 async function orSyncWithRange(from,to){
   const btn=document.getElementById('orSyncBtn');
   if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
@@ -6856,6 +6882,8 @@ async function orSyncWithRange(from,to){
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
     orFilterAndRender();
     orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} (loading exact fees...)`);
+    // Async: fetch actual shipping label costs (non-blocking)
+    orFetchShippingLabels(from, to);
     // Step 2: Fetch ACTUAL transaction fees from Shopify Payments Finance > Payouts
     try {
       console.log('[FoldifyCase] Fetching actual Shopify Payments fees...');
