@@ -1087,9 +1087,18 @@ module.exports = async function handler(req, res) {
           labels[oid] = Math.round(((labels[oid] || 0) + cost) * 100) / 100;
         });
 
+        // DEBUG: log first 3 transactions to see actual field structure
+        console.log('[shipping-labels] first txn sample:', JSON.stringify(labelTxns.slice(0,2)));
+        console.log('[shipping-labels] fulfillmentToOrder sample:', JSON.stringify(Object.entries(fulfillmentToOrder).slice(0,3)));
         console.log('[shipping-labels] txns:', labelTxns.length, 'matched orders:', Object.keys(labels).length);
         return res.status(200).json({ labels, count: Object.keys(labels).length,
-          debug: { label_txns: labelTxns.length, orders: orders.length, fulfillments: Object.keys(fulfillmentToOrder).length }
+          debug: {
+            label_txns: labelTxns.length,
+            orders: orders.length,
+            fulfillments: Object.keys(fulfillmentToOrder).length,
+            sample_txn: labelTxns[0] || null,
+            sample_fulfillment_ids: Object.keys(fulfillmentToOrder).slice(0,3),
+          }
         });
       } catch(err) {
         console.log('[shipping-labels] error:', err.message);
