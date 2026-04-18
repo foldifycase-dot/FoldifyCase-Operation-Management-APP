@@ -6895,7 +6895,7 @@ async function orSyncWithRange(from,to){
     if(!r.ok){const e=await r.json().catch(()=>({}));orSetStatus(`✗ Error: ${e.error||r.status}`,true);return;}
     const data=await r.json();
     // Step 1: Load orders with client-side fee calc as initial estimate
-    orAllOrders=(data.orders||[]).map(orRecalcFee);
+    orAllOrders=(data.orders||[]).map(orRecalcFee); window.orAllOrders=orAllOrders;
     const gws=[...new Set(orAllOrders.map(o=>o.gateway).filter(Boolean))];
     const gwSel=document.getElementById('or-gateway-filter');
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
@@ -6992,7 +6992,21 @@ async function paSyncWithRange(from,to){
   try{
     const r=await fetch(`${PROXY}?service=shopify&action=product-analytics&from=${from}&to=${to}&${getFeeParams()}`);
     if(!r.ok){const e=await r.json().catch(()=>({}));paSetStatus(`✗ ${e.error||r.status}`,true);return;}
-    paData=await r.json(); paRender(); paSetStatus(`✓ ${paData.total_products} products · ${from} → ${to}`);
+    paData=await r.json(); paRender();
+    // If OR data already loaded, refresh KPIs for consistency
+    if(window.orAllOrders&&window.orAllOrders.length>0) paRenderKPIs();
+    // If OR not yet loaded, trigger a silent OR fetch
+    else if(window.GLOBAL_FROM){
+      (async()=>{
+        try{
+          const _f=window.GLOBAL_FROM,_t=window.GLOBAL_TO;
+          const _r=await fetch(`${PROXY}?service=shopify&action=order-report&from=${_f}&to=${_t}&${getFeeParams()}`);
+          if(_r.ok){const _d=await _r.json();const _os=(_d.orders||[]).map(orRecalcFee);
+            window.orAllOrders=_os;orAllOrders=_os;paRenderKPIs();}
+        }catch(e){}
+      })();
+    }
+    paSetStatus(`✓ ${paData.total_products} products · ${from} → ${to}`);
   }catch(e){paSetStatus(`✗ ${e.message}`,true);}
   finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
 }
@@ -7596,19 +7610,49 @@ const paFmt$ = n => '$' + Math.abs(n).toLocaleString('en-AU', {minimumFractionDi
 const paFmtN = n => n.toLocaleString('en-AU');
 
 function paRenderKPIs() {
-  const t = paData.totals;
-  document.getElementById('pa-revenue').textContent    = paFmt$(t.revenue);
-  document.getElementById('pa-revenue-sub').textContent = `${paData.total_products} products`;
-  document.getElementById('pa-units').textContent      = paFmtN(t.units);
-  document.getElementById('pa-units-sub').textContent  = `${paFmtN(t.orders)} orders`;
-  document.getElementById('pa-aov').textContent        = paFmt$(t.aov);
-  document.getElementById('pa-profit').textContent     = paFmt$(t.profit);
-  document.getElementById('pa-profit').style.color     = t.profit >= 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('pa-margin-sub').textContent = `${t.margin.toFixed(2)}% margin`;
-  document.getElementById('pa-cogs').textContent       = paFmt$(t.cogs);
-  document.getElementById('pa-cogs-sub').textContent   = t.revenue > 0 ? `${(t.cogs/t.revenue*100).toFixed(1)}% of revenue` : 'cost of goods';
-  document.getElementById('pa-products').textContent   = paData.total_products;
-  document.getElementById('pa-products-sub').textContent = `${paData.total_variants} variants`;
+  // Use Order Report data when available — ensures KPIs match OR exactly
+  // orAllOrders is the single source of truth for order-level metrics
+  if (window.orAllOrders && window.orAllOrders.length > 0) {
+    // Filter same way as Order Report KPIs (exclude cancelled/refunded/voided)
+    const orders = window.orAllOrders.filter(o =>
+      !o.cancelled && o.status !== 'refunded' && o.status !== 'voided'
+    );
+    const total   = orders.length;
+    const revenue = orders.reduce((s,o)=>s+o.revenue,0);
+    const cogs    = orders.reduce((s,o)=>s+o.cogs,0);
+    const fees    = orders.reduce((s,o)=>s+o.txFee,0);
+    const profit  = orders.reduce((s,o)=>s+o.profit,0);
+    const aov     = total > 0 ? revenue/total : 0;
+    const margin  = revenue > 0 ? profit/revenue*100 : 0;
+    const units   = paData ? paData.totals.units : 0;
+    document.getElementById('pa-revenue').textContent     = paFmt$(revenue);
+    document.getElementById('pa-revenue-sub').textContent = paData ? `${paData.total_products} products` : '';
+    document.getElementById('pa-units').textContent       = paFmtN(units);
+    document.getElementById('pa-units-sub').textContent   = `${paFmtN(total)} orders`;
+    document.getElementById('pa-aov').textContent         = paFmt$(aov);
+    document.getElementById('pa-profit').textContent      = paFmt$(profit);
+    document.getElementById('pa-profit').style.color      = profit >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('pa-margin-sub').textContent  = `${margin.toFixed(2)}% margin`;
+    document.getElementById('pa-cogs').textContent        = paFmt$(cogs);
+    document.getElementById('pa-cogs-sub').textContent    = revenue > 0 ? `${(cogs/revenue*100).toFixed(1)}% of revenue` : 'cost of goods';
+    document.getElementById('pa-products').textContent    = paData ? paData.total_products : '—';
+    document.getElementById('pa-products-sub').textContent = paData ? `${paData.total_variants} variants` : '';
+  } else if (paData) {
+    // Fallback to paData.totals if OR data not yet loaded
+    const t = paData.totals;
+    document.getElementById('pa-revenue').textContent     = paFmt$(t.revenue);
+    document.getElementById('pa-revenue-sub').textContent = `${paData.total_products} products`;
+    document.getElementById('pa-units').textContent       = paFmtN(t.units);
+    document.getElementById('pa-units-sub').textContent   = `${paFmtN(t.orders)} orders`;
+    document.getElementById('pa-aov').textContent         = paFmt$(t.aov);
+    document.getElementById('pa-profit').textContent      = paFmt$(t.profit);
+    document.getElementById('pa-profit').style.color      = t.profit >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('pa-margin-sub').textContent  = `${t.margin.toFixed(2)}% margin`;
+    document.getElementById('pa-cogs').textContent        = paFmt$(t.cogs);
+    document.getElementById('pa-cogs-sub').textContent    = t.revenue > 0 ? `${(t.cogs/t.revenue*100).toFixed(1)}% of revenue` : 'cost of goods';
+    document.getElementById('pa-products').textContent    = paData.total_products;
+    document.getElementById('pa-products-sub').textContent = `${paData.total_variants} variants`;
+  }
 }
 
 function paSort(key) {
