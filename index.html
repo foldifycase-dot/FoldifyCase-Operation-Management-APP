@@ -4146,6 +4146,20 @@ async function doSync() {
       const cogsNote = shopifyHasCogs ? '' : ' | ⚠ No COGS — add cost/item in Shopify';
       setStatus(`✓ LIVE — ${sources.join(' + ')} | ${rows.length} days | Rev: $${shopifyTotal.revenue.toFixed(2)}${cogsNote}`);
       toast(`✓ Live data loaded`, 'ok');
+      // Background: fetch order tx fees to sync cost breakdown chart
+      (async()=>{
+        try{
+          const _r=await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
+          if(_r.ok){
+            const _d=await _r.json();
+            const _orders=(_d.orders||[]);
+            if(_orders.length>0){
+              window.GLOBAL_TX_FEE=_orders.reduce((s,o)=>s+(parseFloat(o.txFee)||0),0);
+              renderBreakdown();
+            }
+          }
+        }catch(e){}
+      })();
 
     } else {
       console.warn('[Sync] No Shopify data — falling back to sample');
