@@ -975,8 +975,23 @@ module.exports = async function handler(req, res) {
         const allBt = (await btRes.json()).transactions || [];
 
         // Step 2: Fetch orders with created_at for date aggregation
+        // Use proper timezone-aware UTC window (same as daily-sales/order-report)
+        let tzTxFees = "Australia/Melbourne";
+        try {
+          const tzRes = await fetch(`${REST}/shop.json?fields=iana_timezone`, { headers: HEADERS });
+          const tzJson = await tzRes.json();
+          if (tzJson.shop?.iana_timezone) tzTxFees = tzJson.shop.iana_timezone;
+        } catch(e) {}
+        const _getOffsetMs = (dateStr, tz) => {
+          const probe = new Date(dateStr + "T12:00:00Z");
+          const localH = parseInt(new Intl.DateTimeFormat("en-AU", { timeZone: tz, hour: "2-digit", hour12: false }).format(probe));
+          return (localH - 12) * 3600000;
+        };
+        const txOffsetMs = _getOffsetMs(from, tzTxFees);
+        const txFromUTC = new Date(new Date(from + "T00:00:00Z").getTime() - txOffsetMs).toISOString();
+        const txToUTC   = new Date(new Date(to   + "T23:59:59Z").getTime() - txOffsetMs).toISOString();
         const oRes = await fetch(
-          `${REST}/orders.json?status=any&limit=250&fields=id,name,created_at&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
+          `${REST}/orders.json?status=any&limit=250&fields=id,name,created_at&created_at_min=${encodeURIComponent(txFromUTC)}&created_at_max=${encodeURIComponent(txToUTC)}`,
           { headers: HEADERS }
         );
         const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
