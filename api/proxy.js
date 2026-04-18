@@ -452,7 +452,7 @@ module.exports = async function handler(req, res) {
       const params = new URLSearchParams({
         status: "any", financial_status: "any",
         created_at_min: fromUTC, created_at_max: toUTC, limit: "250",
-        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status",
+        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status,fulfillments",
       });
       let allOrders = [];
       let url = `${REST}/orders.json?${params}`;
@@ -541,8 +541,16 @@ module.exports = async function handler(req, res) {
           status:      o.financial_status,
           gateway:     (o.payment_gateway_names && o.payment_gateway_names[0]) || 'unknown',
           cancelled:   !!o.cancelled_at,
-          fulfillment: o.fulfillment_status || 'unfulfilled',
-          hasCogs:     cogs > 0,
+          fulfillment:   o.fulfillment_status || 'unfulfilled',
+          hasCogs:       cogs > 0,
+          shippingLabel: (() => {
+            const fuls = o.fulfillments || [];
+            const cost = fuls.reduce((sum, f) => {
+              const r = f.receipt || {};
+              return sum + parseFloat(r.subtotal_price || r.total_price || 0);
+            }, 0);
+            return Math.round(cost * 100) / 100;
+          })(),
         };
       });
 
