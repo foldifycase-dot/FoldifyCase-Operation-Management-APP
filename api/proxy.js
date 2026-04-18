@@ -1045,54 +1045,76 @@ module.exports = async function handler(req, res) {
     }
 
 
-        if (action === "shipping-labels") {
+    if (action === "shipping-labels") {
       if (!from || !to) return res.status(400).json({ error: "from and to required" });
       try {
-        // Step 1: Fetch orders in date range with fulfillment details
+        // Fetch ALL balance transactions - no type filter, then inspect what's there
+        // Fetch multiple pages to get recent label purchases
+        let allTxns = [];
+        let nextUrl = `${REST}/shopify_payments/balance/transactions.json?limit=100`;
+        for (let page = 0; page < 5 && nextUrl; page++) {
+          const r = await fetch(nextUrl, { headers: HEADERS });
+          if (!r.ok) break;
+          const j = await r.json();
+          const batch = j.transactions || [];
+          allTxns = allTxns.concat(batch);
+          // Check Link header for next page
+          const link = r.headers.get('Link') || '';
+          const nextMatch = link.match(/<([^>]+)>;\s*rel="next"/);
+          nextUrl = nextMatch ? nextMatch[1] : null;
+          if (batch.length < 100) break;
+        }
+
+        // Group transactions by source_type to understand the data structure
+        const byType = {};
+        allTxns.forEach(t => {
+          const key = t.source_type || t.type || 'unknown';
+          if (!byType[key]) byType[key] = [];
+          byType[key].push(t);
+        });
+
+        // Find label transactions - try multiple possible source_type values
+        const labelTypes = ['label', 'label_purchase', 'shipping_label', 'shipping'];
+        let labelTxns = [];
+        for (const lt of labelTypes) {
+          if (byType[lt] && byType[lt].length > 0) {
+            labelTxns = byType[lt];
+            break;
+          }
+        }
+
+        // Also get orders for matching via source_order_id
         const oRes = await fetch(
-          `${REST}/orders.json?status=any&limit=250&fields=id,fulfillments,created_at` +
+          `${REST}/orders.json?status=any&limit=250&fields=id,created_at` +
           `&created_at_min=${from}T00:00:00%2B10:00&created_at_max=${to}T23:59:59%2B10:00`,
           { headers: HEADERS }
         );
         const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
+        const orderIds = new Set(orders.map(o => String(o.id)));
 
-        // Step 2: Get shipping cost from each fulfillment's receipt
-        // Shopify stores the label cost in the fulfillment receipt as "subtotal"
+        // Match label transactions to orders via source_order_id
         const labels = {};
-        const debugFulfillments = [];
+        labelTxns.forEach(t => {
+          const oid = String(t.source_order_id || '');
+          if (!oid || !orderIds.has(oid)) return;
+          const cost = Math.abs(parseFloat(t.amount || 0));
+          labels[oid] = Math.round(((labels[oid] || 0) + cost) * 100) / 100;
+        });
 
-        for (const o of orders) {
-          for (const f of (o.fulfillments || [])) {
-            // The fulfillment receipt contains the shipping label cost
-            const receipt = f.receipt || {};
-            const subtotal = parseFloat(receipt.subtotal || 0);
-            const total = parseFloat(receipt.total || 0);
-            const labelCost = subtotal || total;
+        // Build type summary for debug
+        const typeSummary = {};
+        Object.keys(byType).forEach(k => { typeSummary[k] = byType[k].length; });
 
-            debugFulfillments.push({
-              order_id: o.id,
-              fulfillment_id: f.id,
-              status: f.status,
-              receipt_keys: Object.keys(receipt),
-              subtotal,
-              total,
-            });
-
-            if (labelCost > 0) {
-              const oid = String(o.id);
-              labels[oid] = Math.round(((labels[oid] || 0) + labelCost) * 100) / 100;
-            }
-          }
-        }
-
-        console.log('[shipping-labels] orders:', orders.length, 'matched:', Object.keys(labels).length);
         return res.status(200).json({
           labels,
           count: Object.keys(labels).length,
           debug: {
-            orders: orders.length,
-            fulfillments: debugFulfillments.length,
-            sample_fulfillments: debugFulfillments.slice(0, 3),
+            total_txns: allTxns.length,
+            by_source_type: typeSummary,
+            label_txns_found: labelTxns.length,
+            orders_in_range: orders.length,
+            sample_label_txn: labelTxns[0] || null,
+            all_source_types: Object.keys(typeSummary),
           }
         });
       } catch(err) {
