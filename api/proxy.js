@@ -452,7 +452,7 @@ module.exports = async function handler(req, res) {
       const params = new URLSearchParams({
         status: "any", financial_status: "any",
         created_at_min: fromUTC, created_at_max: toUTC, limit: "250",
-        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status,fulfillments",
+        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status",
       });
       let allOrders = [];
       let url = `${REST}/orders.json?${params}`;
@@ -541,10 +541,8 @@ module.exports = async function handler(req, res) {
           status:      o.financial_status,
           gateway:     (o.payment_gateway_names && o.payment_gateway_names[0]) || 'unknown',
           cancelled:   !!o.cancelled_at,
-          fulfillment:    o.fulfillment_status || 'unfulfilled',
-          hasCogs:        cogs > 0,
-          fulfillmentIds: (o.fulfillments || []).map(f => String(f.id)),
-          shippingLabel:  0, // will be populated below from balance transactions
+          fulfillment: o.fulfillment_status || 'unfulfilled',
+          hasCogs:     cogs > 0,
         };
       });
 
