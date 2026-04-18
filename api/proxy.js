@@ -541,8 +541,9 @@ module.exports = async function handler(req, res) {
           status:      o.financial_status,
           gateway:     (o.payment_gateway_names && o.payment_gateway_names[0]) || 'unknown',
           cancelled:   !!o.cancelled_at,
-          fulfillment: o.fulfillment_status || 'unfulfilled',
-          hasCogs:     cogs > 0,
+          fulfillment:   o.fulfillment_status || 'unfulfilled',
+          hasCogs:       cogs > 0,
+          shippingLabel: 0,
         };
       });
 
