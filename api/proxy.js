@@ -506,7 +506,7 @@ module.exports = async function handler(req, res) {
       }).format(new Date(iso));
 
       // Build order rows
-      let   orders = llOrders.map(o => {
+      let   orders = allOrders.map(o => {
         const revenue   = parseFloat(o.total_price || 0);
         const subtotal  = parseFloat(o.subtotal_price || 0);
         const discounts = parseFloat(o.total_discounts || 0);
