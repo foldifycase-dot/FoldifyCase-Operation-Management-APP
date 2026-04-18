@@ -41,27 +41,6 @@ module.exports = async function handler(req, res) {
     const GQL     = `https://${STORE}/admin/api/2024-10/graphql.json`;
     const HEADERS = { "X-Shopify-Access-Token": TOKEN, "Content-Type": "application/json" };
 
-    // ── Shopify Payments: import actual transaction fees from Finance > Payouts ──
-    // source_id on each balance transaction = the order's payment transaction ID
-    // This gives penny-perfect fees matching Shopify Analytics exactly
-    const payoutFeeMap = {};
-    try {
-      const _pr = await fetch(
-        `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
-        { headers: HEADERS }
-      );
-      if (_pr.ok) {
-        const _pj = await _pr.json();
-        (_pj.transactions || []).forEach(t => {
-          if (t.source_id && t.fee != null)
-            payoutFeeMap[String(t.source_id)] = Math.abs(parseFloat(t.fee));
-        });
-        console.log("[proxy] payout fees:", Object.keys(payoutFeeMap).length, "entries");
-      } else {
-        console.log("[proxy] payout HTTP", _pr.status, "- using formula fallback");
-      }
-    } catch(_e) { console.log("[proxy] payout error:", _e.message); }
-
     // ── DAILY SALES ──────────────────────────────────────────────────────────
     if (action === "daily-sales") {
       if (!from || !to) return res.status(400).json({ error: "from and to required" });
@@ -134,7 +113,7 @@ module.exports = async function handler(req, res) {
         created_at_min:   fromUTC,
         created_at_max:   toUTC,
         limit:            "250",
-        fields:           "id,created_at,total_price,subtotal_price,payment_gateway_names,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,transactions",
+        fields:           "id,created_at,total_price,subtotal_price,payment_gateway_names,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at",
       });
 
       let allOrders = [];
@@ -228,13 +207,9 @@ module.exports = async function handler(req, res) {
         d.subtotal += subTotal;
         d.orders   += 1;
 
-        // Transaction fee: use actual Shopify Payments fee from Finance > Payouts if available
-        const _dsTxnId = o.transactions && o.transactions[0] ? String(o.transactions[0].id) : null;
-        if (_dsTxnId && payoutFeeMap[_dsTxnId] != null) {
-          d.transaction_fees += payoutFeeMap[_dsTxnId];
-        } else {
-          d.transaction_fees += calcTxFee(o.payment_gateway_names, subTotal);
-        }
+        // Transaction fee: calculated per order using payment gateway + configured rates
+        // Fee is on subtotal (excluding shipping) — gateways don't charge on shipping
+        d.transaction_fees += calcTxFee(o.payment_gateway_names, subTotal);
 
         // COGS
         (o.line_items || []).forEach(li => {
@@ -477,7 +452,7 @@ module.exports = async function handler(req, res) {
       const params = new URLSearchParams({
         status: "any", financial_status: "any",
         created_at_min: fromUTC, created_at_max: toUTC, limit: "250",
-        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status,transactions",
+        fields: "id,name,created_at,total_price,subtotal_price,total_discounts,total_shipping_price_set,shipping_lines,line_items,financial_status,cancelled_at,payment_gateway_names,customer,fulfillment_status",
       });
       let allOrders = [];
       let url = `${REST}/orders.json?${params}`;
@@ -536,11 +511,8 @@ module.exports = async function handler(req, res) {
         const subtotal  = parseFloat(o.subtotal_price || 0);
         const discounts = parseFloat(o.total_discounts || 0);
         const shipping  = parseFloat(o.total_shipping_price_set?.shop_money?.amount || 0);
-        const _orTxnId  = o.transactions && o.transactions[0] ? String(o.transactions[0].id) : null;
         const rate      = getRate(o.payment_gateway_names);
-        const txFee     = (_orTxnId && payoutFeeMap[_orTxnId] != null)
-          ? round2(payoutFeeMap[_orTxnId])
-          : round2(subtotal * rate.pct + rate.flat);
+        const txFee     = round2(subtotal * rate.pct + rate.flat);
         let cogs = 0;
         const items = (o.line_items || []).length;
         (o.line_items || []).forEach(li => {
@@ -979,6 +951,76 @@ module.exports = async function handler(req, res) {
         total_variants: variantIds.length,
         debug: { store_timezone: tz, raw_orders: allOrders.length, kept_orders: orders.length, utc_window: { from: fromUTC, to: toUTC } },
       });
+    }
+
+    // ── TX-FEES: Import actual fees from Shopify Finance > Payouts ─────────────
+    // Called by the app after loading orders to get penny-perfect fees per order
+    // Returns { fees: { "orderId": actualFeeAmount } }
+    if (action === "tx-fees") {
+      if (!from || !to) return res.status(400).json({ error: "from and to required" });
+
+      const fees = {};
+
+      // Step 1: Get order transaction IDs for the date range
+      // We need to map: balance transaction source_id -> order ID
+      let tz = "Australia/Melbourne";
+      try {
+        const tzRes = await fetch(`${REST}/shop.json?fields=iana_timezone`, { headers: HEADERS });
+        const tzJson = await tzRes.json();
+        if (tzJson.shop?.iana_timezone) tz = tzJson.shop.iana_timezone;
+      } catch(e) {}
+
+      const offsetMs = (() => {
+        const probe = new Date(from + "T12:00:00Z");
+        const localH = parseInt(new Intl.DateTimeFormat("en-AU", { timeZone: tz, hour: "2-digit", hour12: false }).format(probe));
+        return (localH - 12) * 3600000;
+      })();
+      const fromUTC = new Date(new Date(from + "T00:00:00Z").getTime() - offsetMs).toISOString();
+      const toUTC   = new Date(new Date(to   + "T00:00:00Z").getTime() - offsetMs + 86399999).toISOString();
+
+      // Step 2: Fetch orders with transactions to get txn IDs
+      const txnToOrder = {}; // order transaction ID -> order numeric ID
+      try {
+        let url = `${REST}/orders.json?created_at_min=${fromUTC}&created_at_max=${toUTC}&status=any&limit=250&fields=id,transactions`;
+        while (url) {
+          const r = await fetch(url, { headers: HEADERS });
+          if (!r.ok) break;
+          const j = await r.json();
+          (j.orders || []).forEach(o => {
+            (o.transactions || []).forEach(t => {
+              if (t.id) txnToOrder[String(t.id)] = String(o.id);
+            });
+          });
+          const link = r.headers.get("Link") || "";
+          const nextMatch = link.includes('rel="next"') ? link.split('<').find(p => p.includes('rel="next"')) : null;
+          url = nextMatch ? nextMatch.split('>')[0] : null;
+        }
+      } catch(e) { console.log("[tx-fees] orders fetch error:", e.message); }
+
+      // Step 3: Fetch balance transactions (actual fees from Shopify Payments)
+      try {
+        const btRes = await fetch(
+          `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
+          { headers: HEADERS }
+        );
+        if (btRes.ok) {
+          const btJson = await btRes.json();
+          (btJson.transactions || []).forEach(t => {
+            if (t.source_id && t.fee != null) {
+              const orderId = txnToOrder[String(t.source_id)];
+              if (orderId) {
+                // Sum fees per order (in case of multiple transactions)
+                fees[orderId] = Math.round(((fees[orderId] || 0) + Math.abs(parseFloat(t.fee))) * 100) / 100;
+              }
+            }
+          });
+          console.log("[tx-fees] payout fees loaded:", Object.keys(fees).length, "orders");
+        } else {
+          console.log("[tx-fees] payout HTTP", btRes.status, "- need read_shopify_payments_payouts scope");
+        }
+      } catch(e) { console.log("[tx-fees] payout error:", e.message); }
+
+      return res.status(200).json({ fees, count: Object.keys(fees).length });
     }
 
     return res.status(400).json({ error: "Unknown shopify action", received: action });
