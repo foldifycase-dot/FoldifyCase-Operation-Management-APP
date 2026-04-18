@@ -959,7 +959,7 @@ module.exports = async function handler(req, res) {
       try {
         const fees = {};
 
-        // Step 1: Fetch payout balance transactions (actual fees)
+        // Step 1: Fetch payout balance transactions with ALL fields including source_order_transaction_id
         const btRes = await fetch(
           `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
           { headers: HEADERS }
@@ -978,44 +978,51 @@ module.exports = async function handler(req, res) {
           { headers: HEADERS }
         );
         const orders = oRes.ok ? ((await oRes.json()).orders || []) : [];
+        console.log("[tx-fees] orders:", orders.length);
 
-        // Step 3: Fetch transactions per order to get payment_id
-        // source_id in balance transactions = payment_id on order transactions (NOT txn id)
-        const paymentToOrder = {};
+        // Step 3: Fetch transactions per order to get ALL transaction IDs
+        const txnToOrder = {}; // maps any txn ID -> order ID
         await Promise.all(orders.map(async o => {
           try {
             const tRes = await fetch(
-              `${REST}/orders/${o.id}/transactions.json?fields=id,payment_id`,
+              `${REST}/orders/${o.id}/transactions.json`,
               { headers: HEADERS }
             );
             if (tRes.ok) {
               const tJson = await tRes.json();
               (tJson.transactions || []).forEach(t => {
-                // payment_id matches balance_transaction.source_id
-                if (t.payment_id) paymentToOrder[String(t.payment_id)] = String(o.id);
+                if (t.id) txnToOrder[String(t.id)] = String(o.id);
+                // Also map parent_id in case balance txn links to parent
+                if (t.parent_id) txnToOrder[String(t.parent_id)] = String(o.id);
               });
             }
           } catch(e) {}
         }));
-        console.log("[tx-fees] payment_id map:", Object.keys(paymentToOrder).length, "entries");
+        console.log("[tx-fees] txnToOrder:", Object.keys(txnToOrder).length);
 
-        // Step 4: Join: balance_txn.source_id -> payment_id -> order_id
+        // Step 4: Join using source_order_transaction_id (correct field) OR source_id (fallback)
         allBt.forEach(t => {
-          if (t.source_id && t.fee != null) {
-            const oid = paymentToOrder[String(t.source_id)];
-            if (oid) fees[oid] = Math.round(((fees[oid]||0) + Math.abs(parseFloat(t.fee)))*100)/100;
-          }
+          if (t.fee == null) return;
+          // Try source_order_transaction_id first (direct link to order transaction)
+          const linkId = t.source_order_transaction_id || t.source_id;
+          if (!linkId) return;
+          const oid = txnToOrder[String(linkId)];
+          if (oid) fees[oid] = Math.round(((fees[oid]||0) + Math.abs(parseFloat(t.fee)))*100)/100;
         });
         console.log("[tx-fees] matched:", Object.keys(fees).length, "orders");
 
         return res.status(200).json({
           fees, count: Object.keys(fees).length,
           debug: {
-            bt_count:      allBt.length,
-            order_count:   orders.length,
-            payment_count: Object.keys(paymentToOrder).length,
-            bt_sample:     allBt.slice(0,3).map(t=>({source_id:t.source_id,fee:t.fee})),
-            pay_sample:    Object.entries(paymentToOrder).slice(0,3).map(([k,v])=>({paymentId:k,orderId:v}))
+            bt_count:    allBt.length,
+            order_count: orders.length,
+            txn_count:   Object.keys(txnToOrder).length,
+            bt_sample:   allBt.slice(0,3).map(t=>({
+              source_id: t.source_id,
+              source_order_transaction_id: t.source_order_transaction_id,
+              fee: t.fee
+            })),
+            txn_sample: Object.entries(txnToOrder).slice(0,5).map(([k,v])=>({txnId:k,orderId:v}))
           }
         });
       } catch(err) {
