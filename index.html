@@ -6331,6 +6331,7 @@ function orRenderTotalsRow() {
   const shipping  = orders.reduce((s,o)=>s+o.shipping,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
+  const shipLabel = orders.reduce((s,o)=>s+(o.shippingLabel||0),0);
   const profit    = orders.reduce((s,o)=>s+o.profit,0);
   const items     = orders.reduce((s,o)=>s+o.items,0);
   const grossProfitTotal = orders.reduce((s,o)=>s+(o.grossProfit||0),0);
