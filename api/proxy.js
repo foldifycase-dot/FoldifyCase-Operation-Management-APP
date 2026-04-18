@@ -953,93 +953,82 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // ── TX-FEES: Import actual fees from Shopify Finance > Payouts ─────────────
-    // Called by the app after loading orders to get penny-perfect fees per order
-    // Returns { fees: { "orderId": actualFeeAmount } }
+    // ── TX-FEES: Import actual fees from Shopify Finance > Payouts ─────────
     if (action === "tx-fees") {
       if (!from || !to) return res.status(400).json({ error: "from and to required" });
-
-      const fees = {};
-
-      // Step 1: Get order transaction IDs for the date range
-      // We need to map: balance transaction source_id -> order ID
-      let tz = "Australia/Melbourne";
       try {
-        const tzRes = await fetch(`${REST}/shop.json?fields=iana_timezone`, { headers: HEADERS });
-        const tzJson = await tzRes.json();
-        if (tzJson.shop?.iana_timezone) tz = tzJson.shop.iana_timezone;
-      } catch(e) {}
+        const fees = {};
 
-      const offsetMs = (() => {
-        const probe = new Date(from + "T12:00:00Z");
-        const localH = parseInt(new Intl.DateTimeFormat("en-AU", { timeZone: tz, hour: "2-digit", hour12: false }).format(probe));
-        return (localH - 12) * 3600000;
-      })();
-      const fromUTC = new Date(new Date(from + "T00:00:00Z").getTime() - offsetMs).toISOString();
-      const toUTC   = new Date(new Date(to   + "T00:00:00Z").getTime() - offsetMs + 86399999).toISOString();
+        // Step 1: Timezone
+        let tz = "Australia/Melbourne";
+        try {
+          const s = await fetch(`${REST}/shop.json?fields=iana_timezone`, { headers: HEADERS });
+          const j = await s.json();
+          if (j.shop?.iana_timezone) tz = j.shop.iana_timezone;
+        } catch(e) {}
 
-      // Step 2: Fetch orders with transactions to get txn IDs
-      const txnToOrder = {}; // order transaction ID -> order numeric ID
-      try {
-        let url = `${REST}/orders.json?created_at_min=${fromUTC}&created_at_max=${toUTC}&status=any&limit=250&fields=id,transactions`;
-        while (url) {
-          const r = await fetch(url, { headers: HEADERS });
-          if (!r.ok) break;
-          const j = await r.json();
-          (j.orders || []).forEach(o => {
+        // Step 2: UTC window for the date range
+        const probe  = new Date(from + "T12:00:00Z");
+        const localH = parseInt(new Intl.DateTimeFormat("en-AU",{ timeZone:tz, hour:"2-digit", hour12:false }).format(probe));
+        const off    = (localH - 12) * 3600000;
+        const fromUTC = new Date(new Date(from+"T00:00:00Z").getTime()-off).toISOString();
+        const toUTC   = new Date(new Date(to  +"T00:00:00Z").getTime()-off+86399999).toISOString();
+
+        // Step 3: Get order transaction IDs (maps txn ID -> order ID)
+        const txnToOrder = {};
+        let oUrl = `${REST}/orders.json?created_at_min=${fromUTC}&created_at_max=${toUTC}&status=any&limit=250&fields=id,transactions`;
+        while (oUrl) {
+          const oRes = await fetch(oUrl, { headers: HEADERS });
+          if (!oRes.ok) break;
+          const oJson = await oRes.json();
+          (oJson.orders || []).forEach(o => {
             (o.transactions || []).forEach(t => {
               if (t.id) txnToOrder[String(t.id)] = String(o.id);
             });
           });
-          const link = r.headers.get("Link") || "";
-          const nextMatch = link.includes('rel="next"') ? link.split('<').find(p => p.includes('rel="next"')) : null;
-          url = nextMatch ? nextMatch.split('>')[0] : null;
+          const lnk = oRes.headers.get("Link") || "";
+          const nx  = lnk.split(",").find(p => p.includes('rel="next"'));
+          oUrl = nx ? (nx.match(/<([^>]+)>/) || [])[1] : null;
         }
-      } catch(e) { console.log("[tx-fees] orders fetch error:", e.message); }
+        console.log("[tx-fees] order txns mapped:", Object.keys(txnToOrder).length);
 
-      // Step 3: Fetch balance transactions (actual fees from Shopify Payments)
-      try {
-        // Fetch with date filter so we get the right transactions
-        // Also fetch without date filter as fallback (in case dates differ)
-        const btUrls = [
-          `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250&created_at_min=${fromUTC}&created_at_max=${toUTC}`,
+        // Step 4: Fetch actual fees from Shopify Payments balance transactions
+        const btRes = await fetch(
           `${REST}/shopify_payments/balance/transactions.json?transaction_type=charge&limit=250`,
-        ];
-        let btLoaded = false;
-        let btJsonSample = [];
-        for (const btUrl of btUrls) {
-          const btRes = await fetch(btUrl, { headers: HEADERS });
-          if (!btRes.ok) {
-            console.log("[tx-fees] payout HTTP", btRes.status, "- need read_shopify_payments_payouts scope");
-            break;
-          }
-          const btJson = await btRes.json();
-          // Capture sample for debug (shows what source_id looks like)
-          btJsonSample = (btJson.transactions || []).slice(0,3).map(t=>({
-            id:t.id, type:t.type, source_id:t.source_id, source_type:t.source_type, fee:t.fee
-          }));
-          (btJson.transactions || []).forEach(t => {
-            if (t.source_id && t.fee != null) {
-              const orderId = txnToOrder[String(t.source_id)];
-              if (orderId) {
-                fees[orderId] = Math.round(((fees[orderId] || 0) + Math.abs(parseFloat(t.fee))) * 100) / 100;
-              }
-            }
+          { headers: HEADERS }
+        );
+        if (!btRes.ok) {
+          return res.status(200).json({
+            fees: {}, count: 0,
+            error: `Payout API HTTP ${btRes.status} - add read_shopify_payments_payouts scope`,
+            txn_count: Object.keys(txnToOrder).length
           });
-          if (Object.keys(fees).length > 0) { btLoaded = true; break; }
         }
-        console.log("[tx-fees] payout fees loaded:", Object.keys(fees).length, "orders,", Object.keys(txnToOrder).length, "order-txns mapped");
-      } catch(e) { console.log("[tx-fees] payout error:", e.message); }
-
-      return res.status(200).json({
-        fees,
-        count: Object.keys(fees).length,
-        debug: {
-          txnToOrder_count: Object.keys(txnToOrder).length,
-          txnToOrder_sample: Object.entries(txnToOrder).slice(0,3).map(([k,v])=>({txnId:k,orderId:v})),
-          balance_txn_sample: btJsonSample,
-        }
-      });
+        const btJson = await btRes.json();
+        const btSample = (btJson.transactions||[]).slice(0,3).map(t=>({
+          id:t.id, source_id:t.source_id, source_type:t.source_type, fee:t.fee
+        }));
+        (btJson.transactions || []).forEach(t => {
+          if (t.source_id && t.fee != null) {
+            const oid = txnToOrder[String(t.source_id)];
+            if (oid) fees[oid] = Math.round(((fees[oid]||0) + Math.abs(parseFloat(t.fee)))*100)/100;
+          }
+        });
+        console.log("[tx-fees] fees loaded:", Object.keys(fees).length, "orders from", (btJson.transactions||[]).length, "balance txns");
+        return res.status(200).json({
+          fees,
+          count: Object.keys(fees).length,
+          debug: {
+            txn_count: Object.keys(txnToOrder).length,
+            bt_count: (btJson.transactions||[]).length,
+            bt_sample: btSample,
+            txn_sample: Object.entries(txnToOrder).slice(0,3).map(([k,v])=>({txnId:k,orderId:v}))
+          }
+        });
+      } catch(err) {
+        console.log("[tx-fees] crash:", err.message, err.stack);
+        return res.status(200).json({ fees:{}, count:0, error: err.message });
+      }
     }
 
     return res.status(400).json({ error: "Unknown shopify action", received: action });
