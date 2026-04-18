@@ -415,7 +415,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 /* Table header */
 .or-tbl-head {
-  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 72px 88px 72px;
   align-items:center;
   padding:10px 16px;
   background:rgba(28,27,24,0.03);
@@ -424,7 +424,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   font-size:10px;font-weight:600;text-transform:uppercase;
   letter-spacing:.06em;color:var(--c3);
   position:sticky;top:0;z-index:10;gap:0;
-  min-width:996px;
+  min-width:1068px;
 }
 .or-th { flex-shrink:0;white-space:nowrap;padding:0 4px;font-family:'Inter',sans-serif; }
 .or-th:first-child { padding-left:0; }
@@ -435,24 +435,24 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 
 /* Totals row */
 .or-totals-row {
-  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 72px 88px 72px;
   align-items:center;
   padding:10px 16px;
   border-bottom:2px solid rgba(28,27,24,0.1);
   border-top:1px solid rgba(28,27,24,0.08);
   background:rgba(28,27,24,0.02);
   font-family:'Inter',sans-serif;
-  min-width:996px; gap:0;
+  min-width:1068px; gap:0;
 }
 
 /* Body rows */
 .or-row {
-  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 72px 88px 72px;
   align-items:center;
   padding:8px 16px;
   border-bottom:1px solid rgba(28,27,24,0.04);
   transition:background .1s;gap:0;
-  cursor:default;min-width:996px;
+  cursor:default;min-width:1068px;
   font-family:'Inter',sans-serif;
 }
 .or-row:hover { background:rgba(200,169,110,0.04); }
@@ -2539,6 +2539,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div onclick="orSort('grossProfit')" class="or-th or-sortable or-num">Gross Profit</div>
           <div onclick="orSort('grossMargin')" class="or-th or-sortable or-num">GM%</div>
           <div onclick="orSort('txFee')" class="or-th or-sortable or-num">Tx Fees</div>
+          <div onclick="orSort('shippingLabel')" class="or-th or-sortable or-num" title="Shopify Shipping label cost">Shipping Fees</div>
                     <div onclick="orSort('profit')" class="or-th or-sortable or-num">Net Profit</div>
           <div class="or-th" style="text-align:center">Status</div>
         </div>
@@ -2555,6 +2556,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div class="or-num" style="color:var(--green);font-weight:700;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-grossprofit">—</div>
           <div class="or-num" style="color:var(--c3);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-grossmargin">—</div>
           <div class="or-num" style="color:var(--red);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-fees">—</div>
+          <div class="or-num" style="color:#4A7FC1;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-shiplabel">—</div>
           <div class="or-num" style="font-weight:700;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-profit">—</div>
           <div></div>
         </div>
@@ -6300,6 +6302,7 @@ function orRenderKPIs() {
   const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
+  const shipLabel = orders.reduce((s,o)=>s+(o.shippingLabel||0),0);
   const profit    = orders.reduce((s,o)=>s+o.profit,0);
   const aov       = total > 0 ? revenue/total : 0;
   const margin    = revenue > 0 ? profit/revenue*100 : 0;
@@ -6342,6 +6345,8 @@ function orRenderTotalsRow() {
   const gmEl = document.getElementById('or-totals-grossmargin');
   if(gmEl) gmEl.textContent=grossMarginTotal.toFixed(1)+'%';
   document.getElementById('or-totals-fees').textContent     = '('+orFmt$(fees)+')';
+  const slEl = document.getElementById('or-totals-shiplabel');
+  if(slEl) slEl.textContent = shipLabel>0?('('+orFmt$(shipLabel)+')'):'—';
   const profEl = document.getElementById('or-totals-profit');
   profEl.textContent  = orFmt$(profit);
   profEl.style.color  = profit >= 0 ? 'var(--green)' : 'var(--red)';
@@ -6381,6 +6386,7 @@ function orRenderTable() {
       <div class="or-cell-num" style="color:${gpColor};font-weight:600">${orFmt$(o.grossProfit||0)}</div>
       <div class="or-cell-num" style="color:var(--c3);font-size:11px">${(o.grossMargin||0).toFixed(1)}%</div>
       <div class="or-cell-num" style="color:var(--red)">(${orFmt$(o.txFee)})</div>
+      <div class="or-cell-num" style="color:${o.shippingLabel>0?'#4A7FC1':'var(--c3)'}">${o.shippingLabel>0?('('+orFmt$(o.shippingLabel)+')'):'—'}</div>
       <div class="or-cell-num" style="color:${profitColor};font-weight:600">${orFmt$(o.profit)}</div>
       <div class="or-cell" style="text-align:center">${statusBadge(o.status)}</div>
     </div>`;
