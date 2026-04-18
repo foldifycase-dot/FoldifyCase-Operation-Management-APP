@@ -506,7 +506,7 @@ module.exports = async function handler(req, res) {
       }).format(new Date(iso));
 
       // Build order rows
-      let   orders = allOrders.map(o => {
+      const orders = allOrders.map(o => {
         const revenue   = parseFloat(o.total_price || 0);
         const subtotal  = parseFloat(o.subtotal_price || 0);
         const discounts = parseFloat(o.total_discounts || 0);
@@ -547,34 +547,6 @@ module.exports = async function handler(req, res) {
           shippingLabel:  0, // will be populated below from balance transactions
         };
       });
-
-      // Fetch actual shipping label costs from Shopify Payments balance transactions
-      try {
-        const lbRes = await fetch(
-          `${REST}/shopify_payments/balance/transactions.json?transaction_type=label_purchase&limit=250`,
-          { headers: HEADERS }
-        );
-        if (lbRes.ok) {
-          const lbJson = await lbRes.json();
-          const labelTxns = lbJson.transactions || [];
-          // Build map: fulfillmentId -> label cost
-          const labelByFulfillment = {};
-          labelTxns.forEach(t => {
-            if (t.source_id) {
-              labelByFulfillment[String(t.source_id)] =
-                Math.round(((labelByFulfillment[String(t.source_id)] || 0) + Math.abs(parseFloat(t.amount || 0))) * 100) / 100;
-            }
-          });
-          // Match to orders via fulfillment IDs
-          orders = orders.map(o => {
-            const labelCost = (o.fulfillmentIds || []).reduce((sum, fid) => sum + (labelByFulfillment[fid] || 0), 0);
-            return { ...o, shippingLabel: Math.round(labelCost * 100) / 100 };
-          });
-          console.log('[order-report] label costs loaded:', Object.keys(labelByFulfillment).length, 'fulfillments');
-        }
-      } catch(e) {
-        console.log('[order-report] label fetch error:', e.message);
-      }
 
       return res.status(200).json({
         orders,
