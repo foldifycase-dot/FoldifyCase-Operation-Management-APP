@@ -103,6 +103,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   display:flex; align-items:center; gap:8px;
   padding:16px 28px 0;
   flex-wrap:wrap;
+  padding-bottom:12px;
 }
 /* ════════════════════════  DATE PICKER  */
 .dp-trigger {
@@ -327,7 +328,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 
 .sb-label {
-  font-family:'Inter',sans-serif;x0;
+  font-family:'Inter',sans-serif;
   letter-spacing:0.18em;
   text-transform:uppercase;
   color:var(--gold);
@@ -405,51 +406,59 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   border:1px solid rgba(28,27,24,0.08);
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
+  display:flex;flex-direction:column;
 }
-.or-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.or-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .or-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .or-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.or-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Table header */
 .or-tbl-head {
-  display:flex;align-items:center;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
+  align-items:center;
   padding:10px 16px;
   background:rgba(28,27,24,0.03);
   border-bottom:1px solid rgba(28,27,24,0.08);
-  font-size:10px;font-weight:700;text-transform:uppercase;
+  font-family:'Inter',sans-serif;
+  font-size:10px;font-weight:600;text-transform:uppercase;
   letter-spacing:.06em;color:var(--c3);
-  position:sticky;top:0;z-index:3;
-  gap:0;
+  position:sticky;top:0;z-index:10;gap:0;
+  min-width:996px;
 }
-.or-th { flex-shrink:0;white-space:nowrap;padding:0 6px; }
+.or-th { flex-shrink:0;white-space:nowrap;padding:0 4px;font-family:'Inter',sans-serif; }
 .or-th:first-child { padding-left:0; }
-.or-num { width:100px;text-align:right;padding:0 6px; }
+.or-num { text-align:right;padding:0 4px; }
 .or-sortable { cursor:pointer; }
 .or-sortable:hover { color:var(--gold); }
 .or-sort-active { color:var(--gold) !important; }
 
 /* Totals row */
 .or-totals-row {
-  display:flex;align-items:center;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
+  align-items:center;
   padding:10px 16px;
-  background:rgba(200,169,110,0.06);
-  border-bottom:2px solid rgba(200,169,110,0.2);
-  border-top:1px solid rgba(200,169,110,0.15);
-  gap:0;
+  border-bottom:2px solid rgba(28,27,24,0.1);
+  border-top:1px solid rgba(28,27,24,0.08);
+  background:rgba(28,27,24,0.02);
+  font-family:'Inter',sans-serif;
+  min-width:996px; gap:0;
 }
 
 /* Body rows */
 .or-row {
-  display:flex;align-items:center;
-  padding:10px 16px;
+  display:grid;grid-template-columns:28px 90px 88px 120px 46px 90px 82px 78px 90px 52px 72px 88px 72px;
+  align-items:center;
+  padding:8px 16px;
   border-bottom:1px solid rgba(28,27,24,0.04);
   transition:background .1s;gap:0;
-  cursor:default;
+  cursor:default;min-width:996px;
+  font-family:'Inter',sans-serif;
 }
 .or-row:hover { background:rgba(200,169,110,0.04); }
 .or-row:last-child { border-bottom:none; }
-.or-cell { flex-shrink:0;padding:0 6px;font-size:12px; }
-.or-cell-num { width:100px;text-align:right;font-family:'Inter',sans-serif;font-size:12px;padding:0 6px;color:var(--c2); }
+.or-cell { padding:0 4px;font-size:12px;min-width:0; }
+.or-cell-num { text-align:right;font-family:'Inter',sans-serif;font-size:12px;padding:0 4px;color:var(--c2); }
 
 /* Status badges */
 .or-badge {
@@ -483,10 +492,12 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   border:1px solid rgba(28,27,24,0.08);
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
+  display:flex;flex-direction:column;
 }
-.clv-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.clv-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .clv-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .clv-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.clv-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Cohort heatmap */
 .clv-cohort-grid { display:grid;border-collapse:collapse; }
@@ -558,10 +569,12 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   border:1px solid rgba(28,27,24,0.08);
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
+  display:flex;flex-direction:column;
 }
-.ma-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.ma-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .ma-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .ma-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.ma-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Channel cards */
 .ma-ch-card { padding:0; }
@@ -636,10 +649,12 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   border:1px solid rgba(28,27,24,0.08);
   padding:14px 16px;
   border-top:3px solid rgba(28,27,24,0.08);
+  display:flex;flex-direction:column;
 }
-.pl-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:8px;display:flex;align-items:center;gap:5px; }
+.pl-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);margin-bottom:6px;display:flex;align-items:flex-start;gap:5px;min-height:28px; }
 .pl-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
 .pl-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.pl-kpi-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
 
 /* Granularity toggle */
 .pl-gran-btn {
@@ -745,7 +760,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .pl-bench-row:last-child { border-bottom:none; }
 
 /* Period table */
-.pl-pt-wrap { min-width:900px; }
+.pl-pt-wrap { min-width:994px; }
 .pl-pt-head {
   display:grid;font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:.06em;color:var(--c3);
@@ -763,22 +778,23 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .pa-kpi-card {
   background:#fff; border-radius:10px;
   border:1px solid rgba(28,27,24,0.08);
-  padding:14px 16px; display:flex;
-  flex-direction:column; gap:4px;
+  padding:14px 16px;
+  border-top:3px solid rgba(28,27,24,0.08);
+  display:flex;flex-direction:column;
 }
 .pa-kpi-label {
-  font-family:'Inter',sans-serif; font-size:10px; font-weight:500; 
-  text-transform:uppercase; letter-spacing:.06em; 
+  font-family:'Inter',sans-serif; font-size:10px; font-weight:500;
+  text-transform:uppercase; letter-spacing:.06em;
   color:rgba(28,27,24,0.45);
-  display:flex; align-items:center; gap:5px; margin-bottom:8px;
+  display:flex; align-items:flex-start; gap:5px; margin-bottom:6px; min-height:28px;
 }
 .pa-kpi-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .pa-kpi-val {
-  font-family:'Inter',sans-serif;x0; color:var(--ink); line-height:1;
+  font-family:'Inter',sans-serif; font-size:22px; font-weight:700; color:var(--ink); line-height:1;
   margin-top:2px;
   letter-spacing:-0.01em;
 }
-.pa-kpi-sub { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); }
+.pa-kpi-sub { font-family:'Inter',sans-serif; font-size:10px; color:var(--c3); margin-top:4px; }
 
 /* Table shared styles */
 .pa-tbl-head {
@@ -882,7 +898,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 }
 .rcs-icon { font-size:52px; margin-bottom:20px; opacity:.85; }
 .rcs-title {
-  font-family:'Inter',sans-serif;x0;
+  font-family:'Inter',sans-serif;
   color:var(--ink); margin-bottom:12px; letter-spacing:-.02em;
 }
 .rcs-desc {
@@ -1033,7 +1049,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .sec::after { content:''; flex:1; height:1px; background:rgba(28,27,24,0.1); }
 
 /* Padding wrapper */
-.pad { padding:22px 28px; }
+.pad { padding:0 28px 20px; }
 .pad-t { padding-top:22px; }
 
 /* ════════════════════════  KPI STRIP  */
@@ -1048,6 +1064,7 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   border-radius:var(--r); padding:16px 16px 14px;
   position:relative; overflow:hidden;
   transition:border-color 0.15s; cursor:default;
+  display:flex; flex-direction:column;
 }
 .kpi:hover { border-color:rgba(200,169,110,0.5); }
 .kpi::before {
@@ -1067,11 +1084,12 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   letter-spacing:0.06em;
   text-transform:uppercase;
   color:rgba(28,27,24,0.45);
-  margin-bottom:9px;
-  display:flex; align-items:center; gap:6px;
+  margin-bottom:6px;
+  display:flex; align-items:flex-start; gap:6px;
   font-weight:500;
+  min-height:28px;
 }
-.kpi-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.kpi-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:1px; }
 .kpi-val {
   font-family:'Inter', sans-serif;
   font-weight:700;
@@ -1545,6 +1563,24 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .ads-row-chg.good { color:var(--green); }
 .ads-row-chg.warn { color:var(--orange); }
 .ads-row-chg.bad  { color:var(--red); }
+
+/* ── Google Ads Page ─────────────────────────────── */
+.ga-kpi { background:#fff;border-radius:10px;border:1px solid rgba(28,27,24,0.08);padding:14px 16px;display:flex;flex-direction:column; }
+.ga-kpi-lbl { font-family:'Inter',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:rgba(28,27,24,0.45);display:flex;align-items:flex-start;gap:5px;margin-bottom:6px;min-height:28px; }
+.ga-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px; }
+.ga-kpi-val { font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-0.01em; }
+.ga-kpi-sub { font-family:'Inter',sans-serif;font-size:10px;color:var(--c3);margin-top:4px; }
+.ga-is-row { display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif; }
+.ga-is-label { font-size:10px;color:var(--c3);width:80px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em; }
+.ga-is-bar-wrap { flex:1;height:6px;background:rgba(28,27,24,0.08);border-radius:3px;overflow:hidden; }
+.ga-is-bar { height:100%;border-radius:3px;transition:width .4s ease; }
+.ga-is-pct { font-size:11px;font-weight:600;color:var(--ink);width:36px;text-align:right; }
+.ga-score-row { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+.ga-score-label { font-family:'Inter',sans-serif;font-size:11px;color:var(--c2); }
+.ga-score-badge { font-family:'Inter',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(28,27,24,0.06);color:var(--c3); }
+.ga-step { display:flex;align-items:flex-start;gap:10px;font-family:'Inter',sans-serif;font-size:11px;color:var(--c2);line-height:1.5; }
+.ga-step-num { width:20px;height:20px;border-radius:50%;background:#4285F4;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
+.ga-step-text code { background:rgba(28,27,24,0.06);padding:1px 4px;border-radius:3px;font-size:10px;color:var(--ink); }
 </style>
 </head>
 <body>
@@ -1616,24 +1652,32 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <div class="sb-div"></div>
-    <div class="sb-label" style="padding-top:4px">Platform ROAS</div>
+    <div class="sb-label" style="padding-top:4px">Platform Performance</div>
 
-    <div class="sb-nav-item" onclick="void(0)">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">●</span>Google Ads</div>
-      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">4.2×</span>
+    <div class="sb-nav-item" id="navMarketing" onclick="openPage('marketing')" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span><span>Marketing Attribution</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
-    <div class="sb-nav-item" onclick="void(0)">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">●</span>Meta Ads</div>
+    <div class="sb-nav-item" onclick="openGoogleAdsPage()" style="cursor:pointer">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#4285F4">G</span>Google Ads</div>
+      <span class="sb-nav-badge" id="ga-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
+    </div>
+    <div class="sb-nav-item" onclick="openMetaAdsPage()" style="cursor:pointer">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#1877F2">f</span>Meta Ads</div>
       <span class="sb-nav-badge" id="meta-roas-badge" style="background:var(--orange-dim);color:var(--orange)">—</span>
     </div>
-    <div class="sb-nav-item" onclick="void(0)">
-      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">●</span>Microsoft Ads</div>
-      <span class="sb-nav-badge" style="background:rgba(90,158,114,0.15);color:var(--green)">—</span>
+    <div class="sb-nav-item" onclick="openMsAdsPage()" style="cursor:pointer">
+      <div class="sb-nav-left"><span class="sb-nav-icon" style="color:#00A4EF">M</span>Microsoft Ads</div>
+      <span class="sb-nav-badge" id="ms-roas-badge" style="background:rgba(28,27,24,0.06);color:var(--c3)">—</span>
     </div>
 
     <!-- ── REPORTS ── -->
     <div class="sb-div"></div>
     <div class="sb-label" style="padding-top:4px">Reports</div>
+    <div class="sb-nav-item" onclick="closePage()" style="cursor:pointer;">
+      <div class="sb-nav-left"><span class="sb-nav-icon">🏠</span><span>Dashboard</span></div>
+      <span style="font-size:10px;color:var(--c3)">→</span>
+    </div>
     <div class="sb-nav-item" id="navProductAnalytics" onclick="openPage('productAnalytics')" style="cursor:pointer;">
       <div class="sb-nav-left"><span class="sb-nav-icon">📦</span><span>Product Analytics</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
@@ -1643,13 +1687,10 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
     <div class="sb-nav-item" id="navPnL" onclick="openPage('pnl')" style="cursor:pointer;">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span><span>P&amp;L Report</span></div>
+      <div class="sb-nav-left"><span class="sb-nav-icon">📊</span><span>Profit &amp; Loss Report</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
     </div>
-    <div class="sb-nav-item" id="navMarketing" onclick="openPage('marketing')" style="cursor:pointer;">
-      <div class="sb-nav-left"><span class="sb-nav-icon">📣</span><span>Marketing Attribution</span></div>
-      <span style="font-size:10px;color:var(--c3)">→</span>
-    </div>
+
     <div class="sb-nav-item" id="navCLV" onclick="openPage('clv')" style="cursor:pointer;">
       <div class="sb-nav-left"><span class="sb-nav-icon">👥</span><span>Customer Lifetime Value</span></div>
       <span style="font-size:10px;color:var(--c3)">→</span>
@@ -1679,12 +1720,12 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Controls bar — date picker + export -->
-    <div class="main-controls">
+    <div class="main-controls" style="margin-top:0">
       <!-- Date picker trigger -->
       <div style="position:relative">
         <div class="dp-trigger" id="dpTrigger" onclick="toggleDatePicker()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="dpTriggerText">Last 7 Days</span>
+          <span class="dp-trigger-text" id="dpTriggerText">Today</span>
           <span class="dp-trigger-arrow" id="dpArrow">▼</span>
         </div>
 
@@ -1692,9 +1733,9 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         <div class="dp-panel" id="dpPanel">
           <!-- Left: presets -->
           <div class="dp-presets">
-            <button class="dp-preset" onclick="applyPreset('today')">Today</button>
+            <button class="dp-preset active" onclick="applyPreset('today')">Today</button>
             <button class="dp-preset" onclick="applyPreset('yesterday')">Yesterday</button>
-            <button class="dp-preset active" onclick="applyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset" onclick="applyPreset('7d')">Last 7 days</button>
             <button class="dp-preset" onclick="applyPreset('30d')">Last 30 days</button>
             <button class="dp-preset" onclick="applyPreset('thismonth')">This month</button>
             <button class="dp-preset" onclick="applyPreset('lastmonth')">Last month</button>
@@ -1732,18 +1773,10 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <!-- Sync status bar -->
-    <div id="syncStatus" style="
-      display:none; margin:8px 28px 0;
-      padding:8px 14px; border-radius:6px;
-      font-family:'Inter',sans-serif; font-size:11px;
-      border:1px solid rgba(28,27,24,0.1);
-      background:rgba(28,27,24,0.04);
-    "></div>
+
 
     <!-- ── 1. KPI STRIP ── -->
     <div class="pad">
-      <div class="sec">Key Performance Indicators</div>
       <div class="kpi-strip">
 
         <div class="kpi k-profit">
@@ -1970,16 +2003,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             <div class="txfee-icon" style="background:#5C6AC4">S</div>
             <div>
               <div class="txfee-name">Shopify Payments</div>
-              <div class="txfee-desc">Calculated by Shopify</div>
+              <div class="txfee-desc">2.9% + A$0.31 (online/intl) · includes GST via formula</div>
             </div>
           </div>
           <div class="txfee-cell">
-            <input class="txfee-inp" id="fee_shopify_pct"  type="number" step="0.01" min="0" value="1.75">
+            <input class="txfee-inp" id="fee_shopify_pct"  type="number" step="0.01" min="0" value="2.90">
             <span class="txfee-unit">%</span>
           </div>
           <div class="txfee-cell">
             <span class="txfee-prefix">A$</span>
-            <input class="txfee-inp" id="fee_shopify_flat" type="number" step="0.01" min="0" value="0.30">
+            <input class="txfee-inp" id="fee_shopify_flat" type="number" step="0.01" min="0" value="0.31">
           </div>
           <div class="txfee-example" id="ex_shopify">—</div>
         </div>
@@ -2118,6 +2151,61 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div><!-- /card -->
     </div>
 
+    <!-- ══ Shopify Fee for 3rd-Party Payments ══════════════════════════ -->
+    <div style="margin:20px 28px 28px">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:700;color:var(--ink)">Shopify Fee for 3rd-Party Payments</div>
+        <a href="https://help.shopify.com/en/manual/payments/shopify-payments/third-party-payment-providers"
+           target="_blank" style="font-size:12px;color:var(--gold);font-weight:600;text-decoration:none">Learn more ↗</a>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+
+        <!-- Main row -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px;gap:16px">
+          <div style="display:flex;align-items:flex-start;gap:14px;flex:1">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(92,106,196,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">🛍️</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px">Third-party transaction fee</div>
+              <div style="font-size:12px;color:var(--c3);line-height:1.6;max-width:540px">
+                Based on your Shopify plan. <strong style="color:var(--c2)">Not applied</strong> to orders using
+                <strong style="color:var(--c2)">Shopify Payments</strong> or <strong style="color:var(--c2)">manual payment methods</strong>
+                in Shopify settings. Applied on top of the gateway fee for all other providers.
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;font-family:'Inter',sans-serif">
+                <span style="font-size:11px;padding:3px 10px;background:rgba(200,169,110,0.12);border-radius:12px;color:var(--gold);font-weight:600">Basic: 2%</span>
+                <span style="font-size:11px;padding:3px 10px;background:rgba(28,27,24,0.06);border-radius:12px;color:var(--c2)">Shopify: 1%</span>
+                <span style="font-size:11px;padding:3px 10px;background:rgba(28,27,24,0.06);border-radius:12px;color:var(--c2)">Advanced: 0.5%</span>
+                <span style="font-size:11px;padding:3px 10px;background:rgba(28,27,24,0.06);border-radius:12px;color:var(--c2)">Plus: 0.15%</span>
+              </div>
+            </div>
+          </div>
+          <!-- Rate input -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;min-width:80px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);font-family:'Inter',sans-serif">Your Rate</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <input class="txfee-inp" id="fee_shopify3rd_pct" type="number" step="0.01" min="0" max="10" value="2.00"
+                style="width:56px;font-size:18px;font-weight:700;text-align:center;padding:6px 4px">
+              <span style="font-size:16px;font-weight:700;color:var(--ink)">%</span>
+            </div>
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;text-align:center" id="ex_shopify3rd_label">A$2.00 on $100</div>
+          </div>
+        </div>
+
+        <!-- Footer note -->
+        <div style="border-top:1px solid rgba(28,27,24,0.07);padding:12px 20px;background:rgba(92,106,196,0.04);display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:#5C6AC4;font-weight:700;flex-shrink:0">ℹ</span>
+          <span style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;line-height:1.5">
+            Included in your <strong style="color:var(--c2)">Tx Fees</strong> column across Order Report and P&amp;L.
+            Set your plan rate above, then save to recalculate all figures.
+          </span>
+          <button onclick="saveFeeRates()" style="margin-left:auto;padding:7px 18px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Save &amp; Refresh Data</button>
+        </div>
+
+      </div>
+    </div>
+
   </main><!-- /txfee-main -->
 
   <!-- ══════════  REPORT PAGES  ══════════ -->
@@ -2139,15 +2227,20 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="paDpTrigger" onclick="paDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="paDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="paDpText">Today</span>
           <span class="dp-trigger-arrow" id="paDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="paDpPanel">
           <div class="dp-presets">
+            <button class="dp-preset" onclick="paApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="paApplyPreset('yesterday')">Yesterday</button>
             <button class="dp-preset" onclick="paApplyPreset('7d')">Last 7 days</button>
             <button class="dp-preset active" onclick="paApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="paApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="paApplyPreset('lastmonth')">Last month</button>
             <button class="dp-preset" onclick="paApplyPreset('90d')">Last 90 days</button>
-            <button class="dp-preset" onclick="paApplyPreset('365d')">Last 12 months</button>
+            <button class="dp-preset" onclick="paApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="paApplyPreset('lastyear')">Last year</button>
           </div>
           <div style="flex:1;display:flex;flex-direction:column">
             <div class="dp-cal-area">
@@ -2183,36 +2276,35 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     </div>
 
     <!-- Status bar -->
-    <div id="pa-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div id="pa-kpis" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
-      <div class="pa-kpi-card" id="pa-k-revenue">
+      <div class="pa-kpi-card" style="border-top:3px solid var(--gold)" id="pa-k-revenue">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--gold)"></span>Total Revenue</div>
         <div class="pa-kpi-val" id="pa-revenue">—</div>
         <div class="pa-kpi-sub" id="pa-revenue-sub">—</div>
       </div>
-      <div class="pa-kpi-card" id="pa-k-units">
+      <div class="pa-kpi-card" style="border-top:3px solid #4A7FC1" id="pa-k-units">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#4A7FC1"></span>Units Sold</div>
         <div class="pa-kpi-val" id="pa-units">—</div>
         <div class="pa-kpi-sub" id="pa-units-sub">— orders</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid #7E6DB5">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#7E6DB5"></span>Avg Order Value</div>
         <div class="pa-kpi-val" id="pa-aov">—</div>
         <div class="pa-kpi-sub" id="pa-aov-sub">per order</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid var(--green)">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--green)"></span>Gross Profit</div>
         <div class="pa-kpi-val" id="pa-profit">—</div>
         <div class="pa-kpi-sub" id="pa-margin-sub">—% margin</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid var(--red)">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:var(--red)"></span>Total COGS</div>
         <div class="pa-kpi-val" id="pa-cogs">—</div>
         <div class="pa-kpi-sub" id="pa-cogs-sub">cost of goods</div>
       </div>
-      <div class="pa-kpi-card">
+      <div class="pa-kpi-card" style="border-top:3px solid #C8A96E">
         <div class="pa-kpi-label"><span class="pa-kpi-dot" style="background:#C8A96E"></span>Unique Products</div>
         <div class="pa-kpi-val" id="pa-products">—</div>
         <div class="pa-kpi-sub" id="pa-products-sub">— variants</div>
@@ -2334,14 +2426,20 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       <div style="position:relative">
         <div class="dp-trigger" id="orDpTrigger" onclick="orDpToggle()">
           <span class="dp-trigger-icon">📅</span>
-          <span class="dp-trigger-text" id="orDpText">Last 30 Days</span>
+          <span class="dp-trigger-text" id="orDpText">Today</span>
           <span class="dp-trigger-arrow" id="orDpArrow">▼</span>
         </div>
         <div class="dp-panel" id="orDpPanel">
           <div class="dp-presets">
+            <button class="dp-preset" onclick="orApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="orApplyPreset('yesterday')">Yesterday</button>
             <button class="dp-preset" onclick="orApplyPreset('7d')">Last 7 days</button>
             <button class="dp-preset active" onclick="orApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="orApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="orApplyPreset('lastmonth')">Last month</button>
             <button class="dp-preset" onclick="orApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="orApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="orApplyPreset('lastyear')">Last year</button>
           </div>
           <div style="flex:1;display:flex;flex-direction:column">
             <div class="dp-cal-area">
@@ -2364,21 +2462,20 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="orSync()" id="orSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export</button>
+        <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
     <!-- Status -->
-    <div id="or-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
-      <div class="or-kpi"><div class="or-kpi-lbl">🧾 Total Orders</div><div class="or-kpi-val" id="or-total-orders">—</div><div class="or-kpi-sub" id="or-orders-sub">in period</div></div>
-      <div class="or-kpi" style="border-top:3px solid var(--gold)"><div class="or-kpi-lbl">💰 Total Revenue</div><div class="or-kpi-val" id="or-total-revenue" style="color:var(--gold)">—</div><div class="or-kpi-sub" id="or-revenue-sub">gross sales</div></div>
-      <div class="or-kpi" style="border-top:3px solid #4A7FC1"><div class="or-kpi-lbl">🛒 Avg Order Value</div><div class="or-kpi-val" id="or-aov" style="color:#4A7FC1">—</div><div class="or-kpi-sub">per order</div></div>
-      <div class="or-kpi" style="border-top:3px solid #7E6DB5"><div class="or-kpi-lbl">📦 Total COGS</div><div class="or-kpi-val" id="or-total-cogs" style="color:#7E6DB5">—</div><div class="or-kpi-sub" id="or-cogs-sub">product cost</div></div>
-      <div class="or-kpi" style="border-top:3px solid var(--red)"><div class="or-kpi-lbl">💳 Transaction Fees</div><div class="or-kpi-val" id="or-total-fees" style="color:var(--red)">—</div><div class="or-kpi-sub" id="or-fees-sub">gateway costs</div></div>
-      <div class="or-kpi" style="border-top:3px solid var(--green)"><div class="or-kpi-lbl">✅ Net Profit</div><div class="or-kpi-val" id="or-net-profit" style="color:var(--green)">—</div><div class="or-kpi-sub" id="or-margin-sub">—% margin</div></div>
+      <div class="or-kpi"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:rgba(28,27,24,0.3)"></span>Orders</div><div class="or-kpi-val" id="or-total-orders">—</div><div class="or-kpi-sub" id="or-orders-sub">in period</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--gold)"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:var(--gold)"></span>Revenue</div><div class="or-kpi-val" id="or-total-revenue" style="color:var(--gold)">—</div><div class="or-kpi-sub" id="or-revenue-sub">gross sales</div></div>
+      <div class="or-kpi" style="border-top:3px solid #4A7FC1"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:#4A7FC1"></span>Value</div><div class="or-kpi-val" id="or-aov" style="color:#4A7FC1">—</div><div class="or-kpi-sub">per order</div></div>
+      <div class="or-kpi" style="border-top:3px solid #7E6DB5"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:#7E6DB5"></span>COGS</div><div class="or-kpi-val" id="or-total-cogs" style="color:#7E6DB5">—</div><div class="or-kpi-sub" id="or-cogs-sub">product cost</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--red)"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:var(--red)"></span>Fees</div><div class="or-kpi-val" id="or-total-fees" style="color:var(--red)">—</div><div class="or-kpi-sub" id="or-fees-sub">gateway costs</div></div>
+      <div class="or-kpi" style="border-top:3px solid var(--green)"><div class="or-kpi-lbl"><span class="or-kpi-dot" style="background:var(--green)"></span>Profit</div><div class="or-kpi-val" id="or-net-profit" style="color:var(--green)">—</div><div class="or-kpi-sub" id="or-margin-sub">—% margin</div></div>
     </div>
 
     <!-- ── SECTION 2: Controls + Cost Breakdown ────────────────────────── -->
@@ -2427,40 +2524,45 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
     <!-- ── SECTION 3: Order Table ──────────────────────────────────────── -->
     <div style="margin:0 28px 16px">
       <div class="card" style="padding:0;overflow:hidden">
+        <!-- Shared horizontal scroll wrapper — header + totals + body all scroll together -->
+        <div style="overflow-x:auto;overflow-y:auto;max-height:600px">
         <!-- Table header — matching the screenshot style -->
         <div class="or-tbl-head">
-          <div style="width:24px"><input type="checkbox" id="or-check-all" onchange="orToggleAll(this)" style="cursor:pointer"></div>
-          <div onclick="orSort('name')" class="or-th or-sortable" style="flex:1.2">Order ID</div>
-          <div onclick="orSort('date')" class="or-th or-sortable" style="width:100px">Date</div>
-          <div class="or-th" style="width:130px">Customer</div>
-          <div class="or-th" style="width:70px;text-align:center">Items</div>
+          <div><input type="checkbox" id="or-check-all" onchange="orToggleAll(this)" style="cursor:pointer"></div>
+          <div onclick="orSort('name')" class="or-th or-sortable">Order ID</div>
+          <div onclick="orSort('date')" class="or-th or-sortable">Date</div>
+          <div class="or-th">Customer</div>
+          <div class="or-th" style="text-align:center">Items</div>
           <div onclick="orSort('revenue')" class="or-th or-sortable or-num">Revenue</div>
           <div onclick="orSort('discounts')" class="or-th or-sortable or-num">Discounts</div>
-          <div onclick="orSort('shipping')" class="or-th or-sortable or-num">Shipping</div>
-          <div onclick="orSort('cogs')" class="or-th or-sortable or-num">Total COGS</div>
+          <div onclick="orSort('cogs')" class="or-th or-sortable or-num">COGS</div>
+          <div onclick="orSort('grossProfit')" class="or-th or-sortable or-num">Gross Profit</div>
+          <div onclick="orSort('grossMargin')" class="or-th or-sortable or-num">GM%</div>
           <div onclick="orSort('txFee')" class="or-th or-sortable or-num">Tx Fees</div>
           <div onclick="orSort('profit')" class="or-th or-sortable or-num">Net Profit</div>
-          <div class="or-th" style="width:90px;text-align:center">Status</div>
+          <div class="or-th" style="text-align:center">Status</div>
         </div>
-        <!-- Totals row (like screenshot) -->
-        <div id="or-totals-row" style="display:none" class="or-totals-row">
-          <div style="width:24px"></div>
-          <div style="flex:1.2;font-weight:700;font-size:12px;color:var(--ink)" id="or-totals-label">Total from — orders</div>
-          <div style="width:100px"></div>
-          <div style="width:130px"></div>
-          <div style="width:70px;text-align:center;font-family:'Inter',sans-serif;font-size:12px;font-weight:700" id="or-totals-items">—</div>
+        <!-- Totals row -->
+        <div class="or-totals-row" id="or-totals-row" style="display:none">
+          <div></div>
+          <div style="font-weight:700;font-size:12px;color:var(--ink)" id="or-totals-label">Total</div>
+          <div></div>
+          <div></div>
+          <div style="text-align:center;font-family:'Inter',sans-serif;font-size:12px;font-weight:700" id="or-totals-items">—</div>
           <div class="or-num" style="font-weight:700;color:var(--gold);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-revenue">—</div>
           <div class="or-num" style="color:var(--red);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-discounts">—</div>
-          <div class="or-num" style="color:var(--c3);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-shipping">—</div>
           <div class="or-num" style="color:#7E6DB5;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-cogs">—</div>
+          <div class="or-num" style="color:var(--green);font-weight:700;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-grossprofit">—</div>
+          <div class="or-num" style="color:var(--c3);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-grossmargin">—</div>
           <div class="or-num" style="color:var(--red);font-family:'Inter',sans-serif;font-size:12px" id="or-totals-fees">—</div>
           <div class="or-num" style="font-weight:700;font-family:'Inter',sans-serif;font-size:12px" id="or-totals-profit">—</div>
-          <div style="width:90px"></div>
+          <div></div>
         </div>
         <!-- Body -->
-        <div id="or-table-body" style="max-height:520px;overflow-y:auto">
+        <div id="or-table-body" style="overflow:visible">
           <div style="padding:50px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load order data</div>
         </div>
+        </div><!-- /scroll wrapper -->
         <!-- Pagination -->
         <div id="or-pagination" style="display:none;padding:12px 16px;border-top:1px solid rgba(28,27,24,0.06);display:flex;align-items:center;gap:12px">
           <button onclick="orSetPage(orPage-1)" id="or-prev-btn" class="or-page-btn">‹ Prev</button>
@@ -2478,33 +2580,30 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">P&amp;L</span> <span class="gold">REPORT</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <!-- Granularity toggle -->
-        <div style="display:flex;gap:4px;background:rgba(28,27,24,0.06);padding:3px;border-radius:8px">
-          <button onclick="plSetGranularity('daily')"   id="pl-g-daily"   class="pl-gran-btn pl-gran-active">Daily</button>
-          <button onclick="plSetGranularity('weekly')"  id="pl-g-weekly"  class="pl-gran-btn">Weekly</button>
-          <button onclick="plSetGranularity('monthly')" id="pl-g-monthly" class="pl-gran-btn">Monthly</button>
-        </div>
-        <div style="position:relative">
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
           <div class="dp-trigger" id="plDpTrigger" onclick="plDpToggle()">
             <span class="dp-trigger-icon">📅</span>
-            <span class="dp-trigger-text" id="plDpText">Last 30 Days</span>
+            <span class="dp-trigger-text" id="plDpText">Today</span>
             <span class="dp-trigger-arrow" id="plDpArrow">▼</span>
           </div>
           <div class="dp-panel" id="plDpPanel">
             <div class="dp-presets">
-              <button class="dp-preset" onclick="plApplyPreset('7d')">Last 7 days</button>
-              <button class="dp-preset active" onclick="plApplyPreset('30d')">Last 30 days</button>
-              <button class="dp-preset" onclick="plApplyPreset('thismonth')">This month</button>
-              <button class="dp-preset" onclick="plApplyPreset('lastmonth')">Last month</button>
-              <button class="dp-preset" onclick="plApplyPreset('90d')">Last 90 days</button>
-              <button class="dp-preset" onclick="plApplyPreset('ytd')">This year</button>
-              <button class="dp-preset" onclick="plApplyPreset('lastyear')">Last year</button>
-            </div>
+            <button class="dp-preset" onclick="plApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="plApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="plApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="plApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="plApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="plApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="plApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="plApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="plApplyPreset('lastyear')">Last year</button>
+          </div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div class="dp-cal-area">
                 <div class="dp-inputs">
@@ -2524,43 +2623,43 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
+
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="plSync()" id="plSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+        <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
-    <!-- Status -->
-    <div id="pl-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="pl-kpi">
-        <div class="pl-kpi-lbl">💰 Gross Revenue</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--gold)"></span>Gross Revenue</div>
         <div class="pl-kpi-val" id="pl-gross-rev">—</div>
         <div class="pl-kpi-sub" id="pl-gross-rev-sub">total sales</div>
       </div>
       <div class="pl-kpi">
-        <div class="pl-kpi-lbl">🏷️ Net Revenue</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:#4A7FC1"></span>Net Revenue</div>
         <div class="pl-kpi-val" id="pl-net-rev">—</div>
         <div class="pl-kpi-sub" id="pl-net-rev-sub">after discounts & refunds</div>
       </div>
       <div class="pl-kpi" style="border-top:3px solid #4A7FC1">
-        <div class="pl-kpi-lbl">📦 Gross Profit</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:#4A7FC1"></span>Gross Profit</div>
         <div class="pl-kpi-val" id="pl-gross-profit" style="color:#4A7FC1">—</div>
         <div class="pl-kpi-sub" id="pl-gross-margin">—% gross margin</div>
       </div>
       <div class="pl-kpi" style="border-top:3px solid var(--green)">
-        <div class="pl-kpi-lbl">⚡ Contribution Margin</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--green)"></span>Contribution Margin</div>
         <div class="pl-kpi-val" id="pl-contrib" style="color:var(--green)">—</div>
         <div class="pl-kpi-sub" id="pl-contrib-pct">—% of revenue</div>
       </div>
       <div class="pl-kpi" style="border-top:3px solid var(--gold)">
-        <div class="pl-kpi-lbl">🏆 Net Profit</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--gold)"></span>Net Profit</div>
         <div class="pl-kpi-val" id="pl-net-profit" style="color:var(--gold)">—</div>
         <div class="pl-kpi-sub" id="pl-net-margin">—% net margin</div>
       </div>
       <div class="pl-kpi">
-        <div class="pl-kpi-lbl">📉 Total Costs</div>
+        <div class="pl-kpi-lbl"><span class="pl-kpi-dot" style="background:var(--red)"></span>Total Costs</div>
         <div class="pl-kpi-val" id="pl-total-costs" style="color:var(--red)">—</div>
         <div class="pl-kpi-sub" id="pl-cost-pct">—% of revenue</div>
       </div>
@@ -2673,27 +2772,30 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">MARKETING</span> <span class="gold">ATTRIBUTION</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <div style="position:relative">
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
           <div class="dp-trigger" id="maDpTrigger" onclick="maDpToggle()">
             <span class="dp-trigger-icon">📅</span>
-            <span class="dp-trigger-text" id="maDpText">Last 30 Days</span>
+            <span class="dp-trigger-text" id="maDpText">Today</span>
             <span class="dp-trigger-arrow" id="maDpArrow">▼</span>
           </div>
           <div class="dp-panel" id="maDpPanel">
             <div class="dp-presets">
-              <button class="dp-preset" onclick="maApplyPreset('7d')">Last 7 days</button>
-              <button class="dp-preset active" onclick="maApplyPreset('30d')">Last 30 days</button>
-              <button class="dp-preset" onclick="maApplyPreset('thismonth')">This month</button>
-              <button class="dp-preset" onclick="maApplyPreset('lastmonth')">Last month</button>
-              <button class="dp-preset" onclick="maApplyPreset('90d')">Last 90 days</button>
-              <button class="dp-preset" onclick="maApplyPreset('ytd')">This year</button>
-              <button class="dp-preset" onclick="maApplyPreset('lastyear')">Last year</button>
-            </div>
+            <button class="dp-preset" onclick="maApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="maApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="maApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="maApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="maApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="maApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="maApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="maApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="maApplyPreset('lastyear')">Last year</button>
+          </div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div class="dp-cal-area">
                 <div class="dp-inputs">
@@ -2713,43 +2815,42 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="maSync()" id="maSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+        <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
-    <!-- Status -->
-    <div id="ma-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="ma-kpi" style="border-top:3px solid var(--gold)">
-        <div class="ma-kpi-lbl">💸 Total Ad Spend</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--red)"></span>Total Ad Spend</div>
         <div class="ma-kpi-val" id="ma-spend">—</div>
         <div class="ma-kpi-sub" id="ma-spend-sub">all channels</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid var(--green)">
-        <div class="ma-kpi-lbl">📈 Attributed Revenue</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--green)"></span>Attributed Revenue</div>
         <div class="ma-kpi-val" id="ma-revenue" style="color:var(--green)">—</div>
         <div class="ma-kpi-sub" id="ma-revenue-sub">platform-reported</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid #4A7FC1">
-        <div class="ma-kpi-lbl">🎯 Blended ROAS</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--gold)"></span>Blended ROAS</div>
         <div class="ma-kpi-val" id="ma-roas" style="color:#4A7FC1">—</div>
         <div class="ma-kpi-sub">revenue ÷ spend</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid #7E6DB5">
-        <div class="ma-kpi-lbl">⚡ MER</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#4A7FC1"></span>MER</div>
         <div class="ma-kpi-val" id="ma-mer" style="color:#7E6DB5">—</div>
         <div class="ma-kpi-sub">store rev ÷ ad spend</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid var(--red)">
-        <div class="ma-kpi-lbl">🎟️ Blended CPA</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#7E6DB5"></span>Blended CPA</div>
         <div class="ma-kpi-val" id="ma-cpa" style="color:var(--red)">—</div>
         <div class="ma-kpi-sub" id="ma-cpa-sub">per conversion</div>
       </div>
       <div class="ma-kpi">
-        <div class="ma-kpi-lbl">🔢 Total Conversions</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--green)"></span>Total Conversions</div>
         <div class="ma-kpi-val" id="ma-conv">—</div>
         <div class="ma-kpi-sub" id="ma-conv-sub">across all channels</div>
       </div>
@@ -2951,12 +3052,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Header -->
     <div class="page-hd">
-      <div style="display:flex;align-items:center;gap:16px;flex:1">
+      <div style="display:flex;align-items:center;gap:16px">
         <button onclick="closePage()" class="page-back-btn">←</button>
         <div class="page-title"><span style="color:var(--c1)">CUSTOMER</span> <span class="gold">LIFETIME VALUE</span></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-right:28px">
-        <div style="position:relative">
+    </div>
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
           <div class="dp-trigger" id="clvDpTrigger" onclick="clvDpToggle()">
             <span class="dp-trigger-icon">📅</span>
             <span class="dp-trigger-text" id="clvDpText">Last 12 Months</span>
@@ -2964,12 +3066,16 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
           <div class="dp-panel" id="clvDpPanel">
             <div class="dp-presets">
-              <button class="dp-preset" onclick="clvApplyPreset('90d')">Last 90 days</button>
-              <button class="dp-preset" onclick="clvApplyPreset('thismonth')">This month</button>
-              <button class="dp-preset" onclick="clvApplyPreset('lastmonth')">Last month</button>
-              <button class="dp-preset active" onclick="clvApplyPreset('ytd')">This year</button>
-              <button class="dp-preset" onclick="clvApplyPreset('lastyear')">Last year</button>
-            </div>
+            <button class="dp-preset" onclick="clvApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="clvApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="clvApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset" onclick="clvApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="clvApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="clvApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="clvApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset active" onclick="clvApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="clvApplyPreset('lastyear')">Last year</button>
+          </div>
             <div style="flex:1;display:flex;flex-direction:column">
               <div class="dp-cal-area">
                 <div class="dp-inputs">
@@ -2989,43 +3095,42 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
             </div>
           </div>
         </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="clvSync()" id="clvSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
-        <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ CSV</button>
+        <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
-    <!-- Status -->
-    <div id="clv-status" style="display:none;margin:0 28px 12px;padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:11px;border:1px solid rgba(28,27,24,0.1);background:rgba(28,27,24,0.03)"></div>
 
     <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
       <div class="clv-kpi" style="border-top:3px solid var(--gold)">
-        <div class="clv-kpi-lbl">💰 Avg Customer LTV</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:var(--gold)"></span>Avg Customer LTV</div>
         <div class="clv-kpi-val" id="clv-ltv" style="color:var(--gold)">—</div>
         <div class="clv-kpi-sub">AOV × Freq × Lifespan</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid #4A7FC1">
-        <div class="clv-kpi-lbl">🛒 Avg Order Value</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:#4A7FC1"></span>Avg Order Value</div>
         <div class="clv-kpi-val" id="clv-aov" style="color:#4A7FC1">—</div>
         <div class="clv-kpi-sub" id="clv-aov-sub">per order</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid var(--green)">
-        <div class="clv-kpi-lbl">🔁 Repeat Purchase Rate</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:var(--green)"></span>Repeat Purchase Rate</div>
         <div class="clv-kpi-val" id="clv-rpr" style="color:var(--green)">—</div>
         <div class="clv-kpi-sub" id="clv-rpr-sub">bought 2+ times</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid #7E6DB5">
-        <div class="clv-kpi-lbl">📅 Purchase Frequency</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:#7E6DB5"></span>Purchase Frequency</div>
         <div class="clv-kpi-val" id="clv-freq" style="color:#7E6DB5">—</div>
         <div class="clv-kpi-sub">orders per customer</div>
       </div>
       <div class="clv-kpi" style="border-top:3px solid var(--red)">
-        <div class="clv-kpi-lbl">⏱️ Avg Days Between Orders</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:var(--red)"></span>Avg Days Between Orders</div>
         <div class="clv-kpi-val" id="clv-dbo" style="color:var(--red)">—</div>
         <div class="clv-kpi-sub">re-order interval</div>
       </div>
       <div class="clv-kpi">
-        <div class="clv-kpi-lbl">⚖️ LTV:CAC Ratio</div>
+        <div class="clv-kpi-lbl"><span class="clv-kpi-dot" style="background:#C8A96E"></span>LTV:CAC Ratio</div>
         <div class="clv-kpi-val" id="clv-ltvcac">—</div>
         <div class="clv-kpi-sub">target ≥ 3:1</div>
       </div>
@@ -3040,7 +3145,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="width:10px;height:10px;border-radius:50%;background:#4A7FC1;flex-shrink:0"></div>
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2)">New Customers</div>
         </div>
-        <div style="font-family:'Inter',sans-serif;x0;color:var(--ink)" id="clv-new-count">—</div>
+        <div style="font-family:'Inter',sans-serif;color:var(--ink)" id="clv-new-count">—</div>
         <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;margin:4px 0 12px">unique customers</div>
         <div style="display:flex;gap:20px">
           <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:'Inter',sans-serif" id="clv-new-rev">—</div></div>
@@ -3055,7 +3160,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--c2)">Returning Customers</div>
           <div style="margin-left:auto;font-size:10px;color:var(--green);background:var(--green-dim);padding:2px 7px;border-radius:4px;font-weight:700">67% more spend</div>
         </div>
-        <div style="font-family:'Inter',sans-serif;x0;color:var(--ink)" id="clv-ret-count">—</div>
+        <div style="font-family:'Inter',sans-serif;color:var(--ink)" id="clv-ret-count">—</div>
         <div style="font-size:11px;color:var(--c3);font-family:'Inter',sans-serif;margin:4px 0 12px">2+ orders placed</div>
         <div style="display:flex;gap:20px">
           <div><div style="font-size:10px;color:var(--c3);text-transform:uppercase;letter-spacing:.05em">Revenue</div><div style="font-size:14px;font-weight:700;color:var(--ink);font-family:'Inter',sans-serif" id="clv-ret-rev">—</div></div>
@@ -3191,9 +3296,600 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   </main><!-- /pageCLV -->
 
 
+
+
+  <!-- ══ GOOGLE ADS PAGE ══════════════════════════════════════════════════ -->
+  <main class="main report-main" id="pageGoogleAds" style="display:none">
+
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="closeGoogleAdsPage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">GOOGLE</span> <span class="gold">ADS</span></div>
+      </div>
+    </div>
+
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
+        <div class="dp-trigger" id="gaDpTrigger" onclick="gaDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="gaDpText">Today</span>
+          <span class="dp-trigger-arrow" id="gaDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="gaDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="gaApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="gaApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="gaApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="gaApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="gaApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="gaApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="gaApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="gaApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="gaApplyPreset('lastyear')">Last year</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="gaDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="gaDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="gaCalL"></div>
+                <div class="dp-month" id="gaCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="gaDpClose()">Cancel</button>
+              <button class="dp-done" onclick="gaDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="gaRenderPage()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+      </div>
+    </div>
+
+    <!-- ── KPI Strip ── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="ga-kpi" style="border-top:3px solid #4285F4">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4285F4"></span>Total Spend</div>
+        <div class="ga-kpi-val" id="ga-spend">—</div>
+        <div class="ga-kpi-sub" id="ga-spend-sub">budget used</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--green)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--green)"></span>Conv. Value</div>
+        <div class="ga-kpi-val" id="ga-conv-value" style="color:var(--green)">—</div>
+        <div class="ga-kpi-sub">attributed revenue</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--gold)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--gold)"></span>ROAS</div>
+        <div class="ga-kpi-val" id="ga-roas" style="color:var(--gold)">—</div>
+        <div class="ga-kpi-sub">conv. value ÷ cost</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#7E6DB5"></span>CPA</div>
+        <div class="ga-kpi-val" id="ga-cpa">—</div>
+        <div class="ga-kpi-sub">cost per conversion</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4A7FC1"></span>Conversions</div>
+        <div class="ga-kpi-val" id="ga-conv">—</div>
+        <div class="ga-kpi-sub" id="ga-conv-sub">purchases</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--red)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--red)"></span>Avg CPC</div>
+        <div class="ga-kpi-val" id="ga-cpc">—</div>
+        <div class="ga-kpi-sub" id="ga-ctr-sub">CTR: —</div>
+      </div>
+    </div>
+
+    <!-- ── 2-col: Campaign Table + Right Panel ── -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
+
+      <!-- Campaign Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA · CTR by campaign</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+          <div>Campaign</div>
+          <div style="text-align:right">Spend</div>
+          <div style="text-align:right">ROAS</div>
+          <div style="text-align:right">Conv.</div>
+          <div style="text-align:right">CPA</div>
+          <div style="text-align:right">CTR</div>
+        </div>
+        <div id="ga-campaign-table" style="max-height:320px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Connect Google Ads API to view campaign data</div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Impression Share -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Impression Share</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ga-is-row">
+              <div class="ga-is-label">Search IS</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-search" style="width:0%;background:#4285F4"></div></div>
+              <div class="ga-is-pct" id="ga-is-search-pct">—</div>
+            </div>
+            <div class="ga-is-row">
+              <div class="ga-is-label">Lost (Budget)</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-budget" style="width:0%;background:var(--red)"></div></div>
+              <div class="ga-is-pct" id="ga-is-budget-pct">—</div>
+            </div>
+            <div class="ga-is-row">
+              <div class="ga-is-label">Lost (Rank)</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-rank" style="width:0%;background:var(--orange)"></div></div>
+              <div class="ga-is-pct" id="ga-is-rank-pct">—</div>
+            </div>
+            <div class="ga-is-row">
+              <div class="ga-is-label">Abs. Top IS</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-top" style="width:0%;background:var(--green)"></div></div>
+              <div class="ga-is-pct" id="ga-is-top-pct">—</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--c3);margin-top:8px;font-family:'Inter',sans-serif">IS = impressions ÷ eligible impressions</div>
+        </div>
+
+        <!-- Performance Scorecard -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Performance Score</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="ga-score-row"><span class="ga-score-label">ROAS vs Target (4×)</span><span class="ga-score-badge" id="ga-roas-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CTR Benchmark (&gt;3%)</span><span class="ga-score-badge" id="ga-ctr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate (&gt;4%)</span><span class="ga-score-badge" id="ga-cvr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPA vs AOV</span><span class="ga-score-badge" id="ga-cpa-score">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Bottom row: Type breakdown + Device + Setup ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">By Campaign Type</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:2px">Search · Shopping · PMax · Display</div>
+        </div>
+        <div id="ga-type-breakdown" style="padding:14px 16px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">By Device</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:2px">Mobile · Desktop · Tablet</div>
+        </div>
+        <div id="ga-device-breakdown" style="padding:14px 16px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px;background:linear-gradient(135deg,rgba(66,133,244,0.04),rgba(66,133,244,0.01))">
+        <div style="font-size:12px;font-weight:700;color:#4285F4;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">🔌 Connect Google Ads</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="ga-step"><div class="ga-step-num">1</div><div class="ga-step-text">Apply for Google Ads API access at <strong>ads.google.com</strong></div></div>
+          <div class="ga-step"><div class="ga-step-num">2</div><div class="ga-step-text">Add <code>GOOGLE_ADS_DEVELOPER_TOKEN</code> and <code>GOOGLE_ADS_CUSTOMER_ID</code> to Vercel env vars</div></div>
+          <div class="ga-step"><div class="ga-step-num">3</div><div class="ga-step-text">Uncomment the Google Ads fetch in <code>proxy.js</code> — data auto-populates</div></div>
+          <div class="ga-step"><div class="ga-step-num">4</div><div class="ga-step-text">Track: Spend · ROAS · CPA · CTR · Conv. Rate · Impression Share</div></div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageGoogleAds -->
+
+  <!-- ══ META ADS PAGE ════════════════════════════════════════════════════ -->
+  <main class="main report-main" id="pageMetaAds" style="display:none">
+
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="closeMetaAdsPage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">META</span> <span class="gold">ADS</span></div>
+      </div>
+    </div>
+
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
+        <div class="dp-trigger" id="metaDpTrigger" onclick="metaDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="metaDpText">Today</span>
+          <span class="dp-trigger-arrow" id="metaDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="metaDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="metaApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="metaApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="metaApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="metaApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="metaApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="metaApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="metaApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="metaApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="metaApplyPreset('lastyear')">Last year</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="metaDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="metaDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="metaCalL"></div>
+                <div class="dp-month" id="metaCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="metaDpClose()">Cancel</button>
+              <button class="dp-done" onclick="metaDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="metaPageSync()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+      </div>
+    </div>
+
+    <!-- ── KPI Strip ── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="ga-kpi" style="border-top:3px solid #1877F2">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#1877F2"></span>Total Spend</div>
+        <div class="ga-kpi-val" id="mp-spend">—</div>
+        <div class="ga-kpi-sub" id="mp-spend-sub">this period</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--green)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--green)"></span>Conv. Value</div>
+        <div class="ga-kpi-val" id="mp-revenue" style="color:var(--green)">—</div>
+        <div class="ga-kpi-sub" id="mp-revenue-sub">attributed revenue</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--gold)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--gold)"></span>ROAS</div>
+        <div class="ga-kpi-val" id="mp-roas" style="color:var(--gold)">—</div>
+        <div class="ga-kpi-sub">conv. value ÷ spend</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#7E6DB5"></span>CPA</div>
+        <div class="ga-kpi-val" id="mp-cpa">—</div>
+        <div class="ga-kpi-sub">cost per purchase</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4A7FC1"></span>Purchases</div>
+        <div class="ga-kpi-val" id="mp-conv">—</div>
+        <div class="ga-kpi-sub" id="mp-conv-sub">conversions</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--red)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--red)"></span>CTR</div>
+        <div class="ga-kpi-val" id="mp-ctr">—</div>
+        <div class="ga-kpi-sub" id="mp-cpc-sub">CPC: —</div>
+      </div>
+    </div>
+
+    <!-- ── Row 2: Campaign table + Right panels ── -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
+
+      <!-- Campaign Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Purchases · CPA · CTR by campaign</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 64px 64px 76px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+          <div>Campaign</div>
+          <div style="text-align:right">Spend</div>
+          <div style="text-align:right">ROAS</div>
+          <div style="text-align:right">Conv.</div>
+          <div style="text-align:right">CPA</div>
+          <div style="text-align:right">CTR</div>
+        </div>
+        <div id="mp-campaign-table" style="max-height:340px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load campaign data</div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Performance Scorecard -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Performance Score</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ga-score-row"><span class="ga-score-label">ROAS vs Target (3.5×)</span><span class="ga-score-badge" id="mp-roas-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CTR Benchmark (&gt;1.5%)</span><span class="ga-score-badge" id="mp-ctr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPA vs AOV</span><span class="ga-score-badge" id="mp-cpa-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Frequency &lt; 3.0</span><span class="ga-score-badge" id="mp-freq-score">—</span></div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif">2026 ecommerce benchmarks: ROAS 2.79–3.61× · CTR 1.49% avg · CPA $23–38</div>
+          </div>
+        </div>
+
+        <!-- Efficiency Metrics -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Efficiency</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="ga-score-row"><span class="ga-score-label">Impressions</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-impressions">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Clicks</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-clicks">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPM</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-cpm">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="mp-cvr">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Break-even ROAS</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--gold)" id="mp-breakeven">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Row 3: Daily Trend + Attribution Note + Spend Share ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
+
+      <!-- Daily Spend & ROAS Trend -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Daily Trend</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:2px">Spend vs conversions by day</div>
+        </div>
+        <div id="mp-daily-chart" style="padding:14px 16px;max-height:220px;overflow-y:auto">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        </div>
+      </div>
+
+      <!-- Attribution & Learning -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">Attribution & Health</div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-family:'Inter',sans-serif">
+          <div style="background:rgba(24,119,242,0.06);border:1px solid rgba(24,119,242,0.15);border-radius:6px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:#1877F2;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px">Attribution Window</div>
+            <div style="font-size:11px;color:var(--c2)">7-day click · 1-day view</div>
+            <div style="font-size:10px;color:var(--c3);margin-top:3px">Default since Jan 2026</div>
+          </div>
+          <div style="background:rgba(212,135,74,0.06);border:1px solid rgba(212,135,74,0.2);border-radius:6px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px">⚠ ROAS Tip</div>
+            <div style="font-size:10px;color:var(--c2);line-height:1.5">Post-iOS 14, Meta ROAS is underreported by 20–40%. Track blended MER alongside reported ROAS.</div>
+          </div>
+          <div style="background:rgba(90,158,114,0.06);border:1px solid rgba(90,158,114,0.2);border-radius:6px;padding:10px 12px">
+            <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px">Learning Phase</div>
+            <div style="font-size:10px;color:var(--c2);line-height:1.5">Needs 50 purchases/week to exit. Below target = Learning Limited.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2026 Benchmarks Reference -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">2026 Benchmarks</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-family:'Inter',sans-serif">
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Ecomm. avg ROAS</span><span style="font-size:11px;font-weight:600;color:var(--gold)">2.79–3.61×</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">ASC avg ROAS</span><span style="font-size:11px;font-weight:600;color:var(--gold)">4.52×</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CTR</span><span style="font-size:11px;font-weight:600;color:var(--ink)">1.49%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CPA</span><span style="font-size:11px;font-weight:600;color:var(--ink)">$23–38</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">IG Stories CTR</span><span style="font-size:11px;font-weight:600;color:var(--ink)">1.34%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Reels CPA advantage</span><span style="font-size:11px;font-weight:600;color:var(--green)">-18%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Creative fatigue (freq)</span><span style="font-size:11px;font-weight:600;color:var(--red)">&gt; 3.0</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">UGC vs brand CTR</span><span style="font-size:11px;font-weight:600;color:var(--green)">+48%</span></div>
+          <div style="margin-top:6px;padding-top:8px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3)">Source: 27five / AdAmigo / MHI 2026 data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageMetaAds -->
+
+  <!-- ══ MICROSOFT ADS PAGE ═══════════════════════════════════════════════ -->
+  <main class="main report-main" id="pageMsAds" style="display:none">
+
+    <div class="page-hd">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button onclick="closeMsAdsPage()" class="page-back-btn">←</button>
+        <div class="page-title"><span style="color:var(--c1)">MICROSOFT</span> <span class="gold">ADS</span></div>
+      </div>
+    </div>
+
+    <div class="main-controls" style="margin-top:0">
+      <div style="position:relative">
+        <div class="dp-trigger" id="msDpTrigger" onclick="msDpToggle()">
+          <span class="dp-trigger-icon">📅</span>
+          <span class="dp-trigger-text" id="msDpText">Today</span>
+          <span class="dp-trigger-arrow" id="msDpArrow">▼</span>
+        </div>
+        <div class="dp-panel" id="msDpPanel">
+          <div class="dp-presets">
+            <button class="dp-preset" onclick="msApplyPreset('today')">Today</button>
+            <button class="dp-preset" onclick="msApplyPreset('yesterday')">Yesterday</button>
+            <button class="dp-preset" onclick="msApplyPreset('7d')">Last 7 days</button>
+            <button class="dp-preset active" onclick="msApplyPreset('30d')">Last 30 days</button>
+            <button class="dp-preset" onclick="msApplyPreset('thismonth')">This month</button>
+            <button class="dp-preset" onclick="msApplyPreset('lastmonth')">Last month</button>
+            <button class="dp-preset" onclick="msApplyPreset('90d')">Last 90 days</button>
+            <button class="dp-preset" onclick="msApplyPreset('ytd')">This year</button>
+            <button class="dp-preset" onclick="msApplyPreset('lastyear')">Last year</button>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <div class="dp-cal-area">
+              <div class="dp-inputs">
+                <input class="dp-date-input" id="msDpFrom" type="text" placeholder="Start date" readonly>
+                <span class="dp-arrow-sep">→</span>
+                <input class="dp-date-input" id="msDpTo" type="text" placeholder="End date" readonly>
+              </div>
+              <div class="dp-months">
+                <div class="dp-month" id="msCalL"></div>
+                <div class="dp-month" id="msCalR"></div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="dp-cancel" onclick="msDpClose()">Cancel</button>
+              <button class="dp-done" onclick="msDpDone()">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button onclick="msRenderPage()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+      </div>
+    </div>
+
+    <!-- ── KPI Strip ── -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
+      <div class="ga-kpi" style="border-top:3px solid #00A4EF">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#00A4EF"></span>Total Spend</div>
+        <div class="ga-kpi-val" id="ms-spend">—</div>
+        <div class="ga-kpi-sub" id="ms-spend-sub">this period</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--green)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--green)"></span>Conv. Value</div>
+        <div class="ga-kpi-val" id="ms-revenue" style="color:var(--green)">—</div>
+        <div class="ga-kpi-sub">attributed revenue</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--gold)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--gold)"></span>ROAS</div>
+        <div class="ga-kpi-val" id="ms-roas" style="color:var(--gold)">—</div>
+        <div class="ga-kpi-sub">conv. value ÷ spend</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #7E6DB5">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#7E6DB5"></span>CPA</div>
+        <div class="ga-kpi-val" id="ms-cpa">—</div>
+        <div class="ga-kpi-sub">cost per conversion</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid #4A7FC1">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:#4A7FC1"></span>Conversions</div>
+        <div class="ga-kpi-val" id="ms-conv">—</div>
+        <div class="ga-kpi-sub" id="ms-conv-sub">purchases</div>
+      </div>
+      <div class="ga-kpi" style="border-top:3px solid var(--red)">
+        <div class="ga-kpi-lbl"><span class="ga-dot" style="background:var(--red)"></span>Avg CPC</div>
+        <div class="ga-kpi-val" id="ms-cpc">—</div>
+        <div class="ga-kpi-sub" id="ms-ctr-sub">CTR: —</div>
+      </div>
+    </div>
+
+    <!-- ── Row 2: Campaign table + Right panel ── -->
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;margin:0 28px 20px">
+
+      <!-- Campaign Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA · CTR by campaign</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 80px 64px 64px 80px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+          <div>Campaign</div>
+          <div style="text-align:right">Spend</div>
+          <div style="text-align:right">ROAS</div>
+          <div style="text-align:right">Conv.</div>
+          <div style="text-align:right">CPA</div>
+          <div style="text-align:right">CTR</div>
+        </div>
+        <div id="ms-campaign-table" style="max-height:340px;overflow-y:auto">
+          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Connect Microsoft Ads API to view campaign data</div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Performance Scorecard -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Performance Score</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="ga-score-row"><span class="ga-score-label">ROAS vs Target (3×)</span><span class="ga-score-badge" id="ms-roas-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CTR Benchmark (&gt;2.83%)</span><span class="ga-score-badge" id="ms-ctr-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">CPA vs Google (&lt;$41)</span><span class="ga-score-badge" id="ms-cpa-score">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate (&gt;2.94%)</span><span class="ga-score-badge" id="ms-cvr-score">—</span></div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif">2026: avg CTR 2.83% · avg CPA $41.44 · avg CPC $1.54</div>
+          </div>
+        </div>
+
+        <!-- Efficiency Metrics -->
+        <div class="card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Efficiency</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="ga-score-row"><span class="ga-score-label">Impressions</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="ms-impressions">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Clicks</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="ms-clicks">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">Conv. Rate</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--ink)" id="ms-cvr">—</span></div>
+            <div class="ga-score-row"><span class="ga-score-label">vs Google CPC</span><span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--green)" id="ms-vs-google">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Row 3: Platform advantages + Benchmarks + Setup ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
+
+      <!-- Microsoft Ads Advantages -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">Platform Advantages</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif">
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">↓</span>
+            <span><strong>30–40% lower CPC</strong> than Google Ads — more room to test & scale</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">🎯</span>
+            <span><strong>LinkedIn targeting</strong> — layer job title, industry & company size on search intent</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">🖥</span>
+            <span><strong>Desktop-first audience</strong> — 41% of Bing users earn $100K+, higher AOV</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">🤖</span>
+            <span><strong>Copilot integration</strong> — 73% higher CTR vs standard search in tests</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--c2)">
+            <span style="color:#00A4EF;font-weight:700;flex-shrink:0">📦</span>
+            <span><strong>Network reach</strong> — Bing, Yahoo, AOL, MSN, Xbox, Edge browser</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2026 Benchmarks -->
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">2026 Benchmarks</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-family:'Inter',sans-serif">
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CTR (all)</span><span style="font-size:11px;font-weight:600;color:var(--ink)">2.83%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Retail CTR</span><span style="font-size:11px;font-weight:600;color:var(--gold)">3.06%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Apparel CTR</span><span style="font-size:11px;font-weight:600;color:var(--gold)">3.33%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CPC</span><span style="font-size:11px;font-weight:600;color:var(--green)">$1.54</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg CPA (all)</span><span style="font-size:11px;font-weight:600;color:var(--ink)">$41.44</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">Avg Conv. Rate</span><span style="font-size:11px;font-weight:600;color:var(--ink)">2.94%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">PMax CPA reduction</span><span style="font-size:11px;font-weight:600;color:var(--green)">−32%</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">PMax ROAS uplift</span><span style="font-size:11px;font-weight:600;color:var(--green)">3×</span></div>
+          <div class="ga-score-row"><span class="ga-score-label" style="color:var(--c3)">vs Google CPC</span><span style="font-size:11px;font-weight:600;color:var(--green)">30–40% cheaper</span></div>
+          <div style="margin-top:6px;padding-top:8px;border-top:1px solid rgba(28,27,24,0.06)">
+            <div style="font-size:10px;color:var(--c3)">Source: WordStream / LocaliQ / Microsoft 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setup Guide -->
+      <div class="card" style="padding:16px;background:linear-gradient(135deg,rgba(0,164,239,0.04),rgba(0,164,239,0.01))">
+        <div style="font-size:12px;font-weight:700;color:#00A4EF;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">🔌 Connect Microsoft Ads</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">1</div><div class="ga-step-text">Create a Microsoft Ads account at <strong>ads.microsoft.com</strong> — import existing Google campaigns in minutes</div></div>
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">2</div><div class="ga-step-text">Add <code>MS_ADS_CLIENT_ID</code>, <code>MS_ADS_CLIENT_SECRET</code> and <code>MS_ADS_CUSTOMER_ID</code> to Vercel env vars</div></div>
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">3</div><div class="ga-step-text">Install the UET (Universal Event Tracking) tag for conversion tracking and smart bidding</div></div>
+          <div class="ga-step"><div class="ga-step-num" style="background:#00A4EF">4</div><div class="ga-step-text">Recommended budget split: 70–80% Google · 20–30% Microsoft for incremental ROAS</div></div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /pageMsAds -->
+
 </div>
 
 <div class="toast" id="toast"></div>
+
 
 <!-- ══════════════════════════════════════════
      JAVASCRIPT
@@ -3209,6 +3905,13 @@ const PROXY = 'https://foldify-case-operation-management-a.vercel.app/api/proxy'
 ══════════════════════════════════════════ */
 let rows         = [];          // live data merged from Shopify + ad platforms
 let activeRange  = '7d';
+const _gN=new Date();_gN.setHours(0,0,0,0);
+const _gF=new Date(_gN.getTime());
+// Use local date parts to avoid UTC timezone shift (fixes off-by-one in AU/UTC+ timezones)
+function _localISO(d){var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dy;}
+window.GLOBAL_FROM=_localISO(_gF);
+window.GLOBAL_TO=_localISO(_gN);
+window.GLOBAL_LABEL='Today';
 let activeMkt    = 'all';
 let isLiveData   = false;
 
@@ -3229,7 +3932,7 @@ let livePlatforms = {
 let dpCustomFrom = null;
 let dpCustomTo   = null;
 
-const _fmtISO = d => d.toISOString().slice(0,10);
+const _fmtISO=function(d){const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+mo+'-'+dy;};
 
 function getRange(key) {
   // If custom range was set via calendar picker
@@ -3237,13 +3940,13 @@ function getRange(key) {
     return { from: dpCustomFrom, to: dpCustomTo };
   }
   const now   = new Date();
-  const today = now.toISOString().slice(0,10);
+  const today = _localISO(now); // local date to avoid AU timezone offset
 
   if (key === 'today') {
-    return { from: today, to: today };
+    const t=_localISO(now); return { from: t, to: t };
   }
   if (key === 'yesterday') {
-    const y = new Date(now - 86400000).toISOString().slice(0,10);
+    const yD=new Date(now);yD.setDate(yD.getDate()-1);const y=_localISO(yD);
     return { from: y, to: y };
   }
   if (key === 'lastmonth') {
@@ -3263,8 +3966,8 @@ function getRange(key) {
   const map = { '7d':6, '30d':29, '90d':89,
     ytd: Math.floor((now - new Date(now.getFullYear(),0,1)) / 86400000) };
   const days = map[key] ?? 0;
-  const from = new Date(now - days * 86400000).toISOString().slice(0,10);
-  return { from, to: today };
+  const fromD = new Date(now); fromD.setDate(fromD.getDate()-days);
+  return { from: _localISO(fromD), to: _localISO(now) };
 }
 
 /* ══════════════════════════════════════════
@@ -3272,20 +3975,14 @@ function getRange(key) {
 ══════════════════════════════════════════ */
 async function doSync() {
   const btn = document.getElementById('syncBtn');
-  const statusBar = document.getElementById('syncStatus');
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
-  const { from, to } = getRange(activeRange);
+  // Always use GLOBAL date range — keeps doSync in sync with all pickers
+  const from = window.GLOBAL_FROM;
+  const to   = window.GLOBAL_TO;
   const feeParams = getFeeParams(); // configured gateway rates
 
-  const setStatus = (msg, isError=false) => {
-    if (!statusBar) return;
-    statusBar.style.display = 'block';
-    statusBar.style.color   = isError ? 'var(--red)' : 'var(--green)';
-    statusBar.style.borderColor = isError ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-    statusBar.style.background  = isError ? 'rgba(217,84,84,0.05)' : 'rgba(90,158,114,0.05)';
-    statusBar.textContent = msg;
-  };
+  const setStatus = (msg, isError=false) => { /* status bar removed */ };
 
   setStatus(`⟳ Fetching ${from} → ${to}...`);
 
@@ -3350,6 +4047,8 @@ async function doSync() {
           console.error('[Meta] API error:', d.error);
         } else if (d.total) {
           livePlatforms.meta = d.total;
+          livePlatforms.meta.campaigns = d.campaigns || [];
+          livePlatforms.meta.daily = d.daily || [];
           // Update sidebar ROAS badge
           const roas = d.total.roas || 0;
           const roasBadge = document.getElementById('meta-roas-badge');
@@ -3429,15 +4128,13 @@ async function doSync() {
     } else {
       console.warn('[Sync] No Shopify data — falling back to sample');
       setStatus(`⚠ No live data — check env vars SHOPIFY_STORE + SHOPIFY_TOKEN in Vercel Settings`, true);
-      toast('Showing sample data — Shopify not connected', 'err');
-      loadSampleData();
+      toast('Shopify not connected — check Vercel Settings', 'err');
     }
 
   } catch (err) {
     console.error('[Sync] Unexpected error:', err);
     setStatus(`✗ Error: ${err.message}`, true);
-    toast('Sync error — using sample data', 'err');
-    loadSampleData();
+    toast('Sync error — check console for details', 'err');
   }
 
   if (btn) { btn.innerHTML = '<span>⟳</span> REFRESH DATA'; btn.style.opacity='1'; btn.disabled=false; }
@@ -3472,7 +4169,7 @@ function updateAdCard(platform, data) {
   }
 }
 
-/* ── Sample data fallback ── */
+/* ── Sample data — used only by Reset button ── */
 function loadSampleData() {
   rows = [
     {date:'2026-04-09',displayDate:'09 Apr',orders:18,revenue:2140,cogs:225,google:0,meta:310,ms:0,ship:96, ship_label:0,txFee:122.89},
@@ -3703,7 +4400,7 @@ function renderKPIs() {
   document.getElementById('kpi-spend').textContent  = f$(t.ad);
   // Live indicator
   const badge = document.getElementById('liveBadge');
-  if (badge) badge.textContent = isLiveData ? '🟢 LIVE' : '⚪ SAMPLE';
+  if (badge) badge.textContent = isLiveData ? '🟢 LIVE' : '';
 }
 
 function renderSidebar() {
@@ -3870,11 +4567,11 @@ function renderBreakdown() {
 ══════════════════════════════════════════ */
 const PAGES = {
   txFee:            { mainId: 'txFeeMain',            navId: 'txFeeNavItem',          onOpen: () => { loadFeeRates(); updateFeeExamples(); } },
-  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { if (!paData) paSync(); } },
-  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { if (!orAllOrders.length) orSync(); } },
-  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { if (!plData) plSync(); } },
-  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { if (!maData) maSync(); } },
-  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { if (!clvData) clvSync(); } },
+  productAnalytics: { mainId: 'pageProductAnalytics', navId: 'navProductAnalytics',   onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); paSyncWithRange(f,t); } },
+  orderReport:      { mainId: 'pageOrderReport',      navId: 'navOrderReport',        onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); orSyncWithRange(f,t); } },
+  pnl:              { mainId: 'pagePnL',              navId: 'navPnL',                onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); plSyncWithRange(f,t); } },
+  marketing:        { mainId: 'pageMarketing',        navId: 'navMarketing',          onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); maSyncWithRange(f,t); } },
+  clv:              { mainId: 'pageCLV',              navId: 'navCLV',                onOpen: () => { const f=window.GLOBAL_FROM||new Date(Date.now()-6*86400000).toISOString().slice(0,10); const t=window.GLOBAL_TO||new Date().toISOString().slice(0,10); clvSyncWithRange(f,t); } },
 };
 
 let activePage = null;
@@ -3883,16 +4580,8 @@ function openPage(key) {
   const page = PAGES[key];
   if (!page) return;
 
-  // Hide dashboard main, show selected page
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
-
-  // Hide all other pages first
-  Object.values(PAGES).forEach(p => {
-    const el = document.getElementById(p.mainId);
-    if (el) el.style.display = 'none';
-    const nav = document.getElementById(p.navId);
-    if (nav) { nav.style.background = ''; nav.style.color = ''; }
-  });
+  // Hide everything first (dashboard, all report pages, all ad pages)
+  _hideAllPages();
 
   // Show selected page
   const mainEl = document.getElementById(page.mainId);
@@ -3922,14 +4611,42 @@ function closePage() {
   const navEl = document.getElementById(page.navId);
   if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
 
-  // Show dashboard
-  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'block';
+  // Restore dashboard (hides all ad pages too)
+  _showMainDashboard();
   activePage = null;
 }
 
 // Keep old aliases working
 function openTxFeePage() { openPage('txFee'); }
 function closeTxFeePage() { closePage(); }
+
+// Fee gateway keys (flat-fee gateways only — shopify3rd handled separately)
+const FEE_KEYS = ['shopify','stripe','paypal','klarna','afterpay','manual','other'];
+
+// ── Auto-migrate stale fee rates from localStorage ────────────────────────
+// If saved Shopify Payments rate is old 1.75% default, reset to correct 2.9%
+(function migrateFeeRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('fc_fee_rates') || '{}');
+    if (!saved.fee_shopify_pct || parseFloat(saved.fee_shopify_pct) < 2.5) {
+      // Old/missing rates — reset to correct defaults
+      const fresh = {
+        fee_shopify_pct:    2.90, fee_shopify_flat:    0.31,
+        fee_stripe_pct:     2.90, fee_stripe_flat:     0.30,
+        fee_paypal_pct:     4.40, fee_paypal_flat:     0.30,
+        fee_klarna_pct:     2.90, fee_klarna_flat:     0.30,
+        fee_afterpay_pct:   0.00, fee_afterpay_flat:   0.00,
+        fee_manual_pct:     0.00, fee_manual_flat:     0.00,
+        fee_other_pct:      2.90, fee_other_flat:      0.30,
+        fee_shopify3rd_pct: 2.00,
+        fee_shopify_gst_pct:  10.00,
+        fee_shopify_conv_pct:  2.00,
+      };
+      localStorage.setItem('fc_fee_rates', JSON.stringify(fresh));
+      console.log('[FoldifyCase] Fee rates migrated to correct 2.9%+GST+conversion formula');
+    }
+  } catch(e) {}
+})();
 
 function updateFeeExamples() {
   const ORDER = 100;
@@ -3941,6 +4658,13 @@ function updateFeeExamples() {
     const fee = ORDER * (parseFloat(pEl.value || 0) / 100) + parseFloat(fEl.value || 0);
     exEl.textContent = `A$${fee.toFixed(2)}`;
   });
+  // Shopify 3rd-party fee example (on non-Shopify-Payments $100 order)
+  const s3El = document.getElementById('fee_shopify3rd_pct');
+  if (s3El) {
+    const s3fee = ORDER * (parseFloat(s3El.value || 0) / 100);
+    const s3Lbl = document.getElementById('ex_shopify3rd_label');
+    if (s3Lbl) s3Lbl.textContent = 'A$' + s3fee.toFixed(2) + ' on a $100 order';
+  }
 }
 
 function loadFeeRates() {
@@ -3952,6 +4676,9 @@ function loadFeeRates() {
       if (pEl && saved[`fee_${k}_pct`]  != null) pEl.value = saved[`fee_${k}_pct`];
       if (fEl && saved[`fee_${k}_flat`] != null) fEl.value = saved[`fee_${k}_flat`];
     });
+    // Load Shopify 3rd-party fee
+    const s3El = document.getElementById('fee_shopify3rd_pct');
+    if (s3El && saved['fee_shopify3rd_pct'] != null) s3El.value = saved['fee_shopify3rd_pct'];
   } catch(e) {}
 }
 
@@ -3963,25 +4690,38 @@ function saveFeeRates() {
     if (pEl) rates[`fee_${k}_pct`]  = parseFloat(pEl.value || 0);
     if (fEl) rates[`fee_${k}_flat`] = parseFloat(fEl.value || 0);
   });
+  // Save Shopify 3rd-party fee
+  const s3El = document.getElementById('fee_shopify3rd_pct');
+  if (s3El) rates['fee_shopify3rd_pct'] = parseFloat(s3El.value || 2.00);
   localStorage.setItem('fc_fee_rates', JSON.stringify(rates));
   closeTxFeePage();
   toast('✓ Fee rates saved — refreshing data', 'ok');
   doSync();
+  // If Order Report is open, recalc client-side fees immediately
+  if (typeof orAllOrders !== 'undefined' && orAllOrders.length > 0) {
+    orAllOrders = orAllOrders.map(orRecalcFee);
+    orFilterAndRender();
+  }
 }
 
 function getFeeParams() {
   // Load from localStorage (not DOM — DOM may not have fee page open)
   try {
     const saved = JSON.parse(localStorage.getItem('fc_fee_rates') || '{}');
-    return FEE_KEYS.map(k => [
+    const gatewayParams = FEE_KEYS.map(k => [
       `fee_${k}_pct=${encodeURIComponent(saved[`fee_${k}_pct`]  ?? getDefaultPct(k))}`,
       `fee_${k}_flat=${encodeURIComponent(saved[`fee_${k}_flat`] ?? getDefaultFlat(k))}`,
     ].join('&')).join('&');
+    // Add Shopify 3rd-party fee param
+    const s3pct   = encodeURIComponent(saved['fee_shopify3rd_pct']  ?? 2.00);
+    const gstPct  = encodeURIComponent(saved['fee_shopify_gst_pct']  ?? 10.00);
+    const convPct = encodeURIComponent(saved['fee_shopify_conv_pct'] ?? 2.00);
+    return `${gatewayParams}&fee_shopify3rd_pct=${s3pct}&fee_shopify_gst_pct=${gstPct}&fee_shopify_conv_pct=${convPct}`;
   } catch(e) { return ''; }
 }
 
-function getDefaultPct(k)  { return {shopify:1.75,stripe:2.90,paypal:4.40,klarna:2.90,afterpay:0,manual:0,other:2.90}[k] ?? 0; }
-function getDefaultFlat(k) { return {shopify:0.30,stripe:0.30,paypal:0.30,klarna:0.30,afterpay:0,manual:0,other:0.30}[k] ?? 0; }
+function getDefaultPct(k)  { return {shopify:2.90,stripe:2.90,paypal:4.40,klarna:2.90,afterpay:0,manual:0,other:2.90}[k] ?? 0; }
+function getDefaultFlat(k) { return {shopify:0.31,stripe:0.30,paypal:0.30,klarna:0.30,afterpay:0,manual:0,other:0.30}[k] ?? 0; }
 
 /* ══════════════════════════════════════════
    CONTROLS
@@ -3990,6 +4730,7 @@ function getDefaultFlat(k) { return {shopify:0.30,stripe:0.30,paypal:0.30,klarna
    DATE PICKER
 ══════════════════════════════════════════ */
 let dpOpen      = false;
+let _dpClickGuard = false; // prevents outside-click close after day selection
 let dpSelStart  = null;
 let dpSelEnd    = null;
 let dpHover     = null;
@@ -4022,6 +4763,9 @@ function closeDatePicker() {
 
 // Close if click outside
 document.addEventListener('click', e => {
+  // If a calendar day was just clicked, the re-render destroys the target element
+  // making contains() return false — use guard flag to prevent false close
+  if (_dpClickGuard) { _dpClickGuard = false; return; }
   const panel = document.getElementById('dpPanel');
   const trigger = document.getElementById('dpTrigger');
   if (dpOpen && !panel.contains(e.target) && !trigger.contains(e.target)) {
@@ -4043,7 +4787,11 @@ function fmtDisplay(d) {
   return d.toLocaleDateString('en-AU', {day:'2-digit', month:'short', year:'numeric'});
 }
 function fmtISO(d) {
-  return d.toISOString().slice(0,10);
+  // Use local date parts to avoid UTC shift (fixes off-by-one in AU timezone)
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 function renderCals() {
@@ -4122,15 +4870,15 @@ function navMonth(dir) {
 }
 
 function dpClickDay(iso) {
-  const clicked = new Date(iso);
+  // Parse as local date: split ISO string to avoid UTC midnight shift
+  const [cy,cm,cd] = iso.split('-').map(Number);
+  const clicked = new Date(cy, cm-1, cd);
   clicked.setHours(0,0,0,0);
 
   if (!dpSelStart || (dpSelStart && dpSelEnd)) {
-    // Start new selection
     dpSelStart = clicked;
     dpSelEnd   = null;
   } else {
-    // Complete selection
     if (clicked < dpSelStart) {
       dpSelEnd   = dpSelStart;
       dpSelStart = clicked;
@@ -4138,6 +4886,10 @@ function dpClickDay(iso) {
       dpSelEnd = clicked;
     }
   }
+  // Guard: prevent the document click handler from closing the picker
+  // because renderCals() destroys the clicked element from the DOM,
+  // making panel.contains(e.target) return false (stale reference)
+  _dpClickGuard = true;
   renderCals();
 }
 
@@ -4170,31 +4922,30 @@ function applyPreset(key) {
   dpCustomFrom = null;
   dpCustomTo   = null;
 
-  // Update trigger label
-  document.getElementById('dpTriggerText').textContent = p.label;
-
-  // Show that month in calendar
+  // Show selected range in calendar and update trigger label preview
   dpViewLeft = new Date(p.from.getFullYear(), p.from.getMonth(), 1);
   renderCals();
-
-  // Auto-apply and close
-  applyAndSync(p.label);
+  document.getElementById('dpTriggerText').textContent = p.label;
+  // Picker stays open — user must click Done to apply
 }
 
 function applyCustomRange() {
   if (!dpSelStart) { closeDatePicker(); return; }
   const end = dpSelEnd || dpSelStart;
-  const label = fmtDisplay(dpSelStart) + ' – ' + fmtDisplay(end);
+  const _fromISO2=fmtISO(dpSelStart), _toISO2=fmtISO(end||dpSelStart);
+  const label = _smartLabel(_fromISO2, _toISO2);
   document.getElementById('dpTriggerText').textContent = label;
-  dpCustomFrom = fmtISO(dpSelStart);
-  dpCustomTo   = fmtISO(end);
+  dpCustomFrom=fmtISO(dpSelStart);dpCustomTo=fmtISO(end);
   closeDatePicker();
-  doSync();
+  // broadcastToReports sets GLOBAL_FROM/TO and calls doSync() — no double-fetch
+  broadcastToReports(dpCustomFrom,dpCustomTo,label,null);
 }
 
 function applyAndSync(label) {
-  closeDatePicker();
-  doSync();
+  var r=getRange(activeRange);
+  window.GLOBAL_FROM=r.from;window.GLOBAL_TO=r.to;window.GLOBAL_LABEL=label;
+  closeDatePicker();doSync();
+  broadcastToReports(r.from,r.to,label,null);
 }
 
 // Date helpers
@@ -4240,11 +4991,65 @@ function toast(msg, type='ok') {
 }
 
 /* ══════════════════════════════════════════
-   INIT — load sample data then sync live
+   INIT — auto-sync live data on startup
 ══════════════════════════════════════════ */
-loadSampleData();
+rows = [];
 renderAll();
 loadFeeRates();
+(function(){var r=getRange(activeRange);window.GLOBAL_FROM=r.from;window.GLOBAL_TO=r.to;})();
+
+
+// ── Smart date label: shows "Today" or "Yesterday" when applicable ────────
+function _smartLabel(fromISO, toISO) {
+  var now = new Date(); now.setHours(0,0,0,0);
+  var todayISO = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  var yest = new Date(now.getTime()-86400000);
+  var yestISO = yest.getFullYear()+'-'+String(yest.getMonth()+1).padStart(2,'0')+'-'+String(yest.getDate()).padStart(2,'0');
+  if (fromISO === todayISO && toISO === todayISO) return 'Today';
+  if (fromISO === yestISO  && toISO === yestISO)  return 'Yesterday';
+  // Otherwise format as date range
+  function fmtD(iso) {
+    var p=iso.split('-').map(Number);
+    return new Date(p[0],p[1]-1,p[2]).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+  }
+  return fromISO === toISO ? fmtD(fromISO) : fmtD(fromISO)+' – '+fmtD(toISO);
+}
+
+function broadcastToReports(from,to,label,sourcePid){
+  window.GLOBAL_FROM=from;window.GLOBAL_TO=to;window.GLOBAL_LABEL=label||window.GLOBAL_LABEL;
+  // Update main dashboard picker label + re-fetch main dashboard
+  var mt=document.getElementById('dpTriggerText');if(mt)mt.textContent=label;
+  dpCustomFrom=from;dpCustomTo=to;activeRange='custom';
+  document.querySelectorAll('#dpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  doSync();
+  // Update all OTHER report picker labels and STATE
+  ['or','pl','ma','clv','pa','ga','meta','ms'].forEach(function(pid){
+    if(pid===sourcePid)return;
+    var el=document.getElementById(pid+'DpText');if(el)el.textContent=label;
+    document.querySelectorAll('#'+pid+'DpPanel .dp-preset').forEach(function(b){
+      b.classList.toggle('active',b.textContent.trim()===label);
+    });
+    if(window._setDpState)window._setDpState(pid,from,to);
+    // Also update ga/meta/ms internal ISO vars directly
+    if(pid==='ga'){_gaFromISO=from;_gaToISO=to;}
+    if(pid==='meta'){_metaFromISO=from;_metaToISO=to;}
+    if(pid==='ms'){_msFromISO=from;_msToISO=to;}
+  });
+  // Always sync open report/ad pages after date change
+  syncOpenReport(from,to);
+}
+function syncOpenReport(from,to){
+  var f=from||window.GLOBAL_FROM,t=to||window.GLOBAL_TO;
+  [['pageOrderReport',function(){orSyncWithRange(f,t);}],
+   ['pagePnL',function(){plSyncWithRange(f,t);}],
+   ['pageMarketing',function(){maSyncWithRange(f,t);}],
+   ['pageCLV',function(){clvSyncWithRange(f,t);}],
+   ['pageProductAnalytics',function(){paSyncWithRange(f,t);}],
+   ['pageGoogleAds',function(){_gaFromISO=f;_gaToISO=t;gaRenderPage();}],
+   ['pageMetaAds',function(){_metaFromISO=f;_metaToISO=t;metaPageRender();}],
+   ['pageMsAds',function(){_msFromISO=f;_msToISO=t;msRenderPage();}]
+  ].forEach(function(p){var el=document.getElementById(p[0]);if(el&&el.style.display!=='none')p[1]();});
+}
 // Wire up live fee example updates
 FEE_KEYS.forEach(k => {
   ['pct','flat'].forEach(t => {
@@ -4252,7 +5057,594 @@ FEE_KEYS.forEach(k => {
     if (el) el.addEventListener('input', updateFeeExamples);
   });
 });
-doSync();
+// Live listener for shopify 3rd-party fee
+(function() {
+  var s3 = document.getElementById('fee_shopify3rd_pct');
+  if (s3) s3.addEventListener('input', updateFeeExamples);
+})();
+
+// ── Google Ads Page ─────────────────────────────────────────────────────
+function metaPageSync() {
+  // Trigger main dashboard sync which fetches Meta data, then re-render this page
+  doSync();
+  setTimeout(metaPageRender, 3000);
+}
+
+
+// ── Meta Ads Date Picker ──────────────────────────────────────────────────
+var _metaDpOpen=false, _metaDpSelStart=null, _metaDpSelEnd=null, _metaViewL=null;
+var _metaFromISO='', _metaToISO='';
+function _metaFmtISO(d){var y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+mo+'-'+dy;}
+function _metaFmtDisp(d){return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});}
+function metaApplyPreset(key){
+  var _presetLabels={today:"Today",yesterday:"Yesterday","7d":"Last 7 days","30d":"Last 30 days",thismonth:"This month",lastmonth:"Last month","90d":"Last 90 days",ytd:"This year",lastyear:"Last year"};
+  var _lbl=_presetLabels[key]||key;
+  var _lt=document.getElementById('metaDpText');if(_lt)_lt.textContent=_lbl;
+  var now=new Date();now.setHours(0,0,0,0);var s,e;
+  if(key==='today'){s=now;e=now;}
+  else if(key==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);s=y;e=y;}
+  else if(key==='7d'){var f=new Date(now);f.setDate(f.getDate()-6);s=f;e=now;}
+  else if(key==='30d'){var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  else if(key==='thismonth'){s=new Date(now.getFullYear(),now.getMonth(),1);e=now;}
+  else if(key==='lastmonth'){s=new Date(now.getFullYear(),now.getMonth()-1,1);e=new Date(now.getFullYear(),now.getMonth(),0);}
+  else if(key==='90d'){var f=new Date(now);f.setDate(f.getDate()-89);s=f;e=now;}
+  else if(key==='ytd'){s=new Date(now.getFullYear(),0,1);e=now;}
+  else if(key==='lastyear'){s=new Date(now.getFullYear()-1,0,1);e=new Date(now.getFullYear()-1,11,31);}
+  else{var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  _metaDpSelStart=s;_metaDpSelEnd=e;_metaFromISO=_metaFmtISO(s);_metaToISO=_metaFmtISO(e);
+  document.querySelectorAll('#metaDpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('#metaDpPanel .dp-preset[onclick*="' + key + '"]');
+  if(btn)btn.classList.add('active');
+  metaDpRenderCals();
+}
+function metaDpToggle(){_metaDpOpen=!_metaDpOpen;document.getElementById('metaDpPanel').style.display=_metaDpOpen?'flex':'none';document.getElementById('metaDpArrow').textContent=_metaDpOpen?'▲':'▼';if(_metaDpOpen&&!_metaDpSelStart)metaApplyPreset('30d');if(_metaDpOpen)metaDpRenderCals();}
+function metaDpClose(){_metaDpOpen=false;document.getElementById('metaDpPanel').style.display='none';document.getElementById('metaDpArrow').textContent='▼';}
+function metaDpDone(){
+  if(_metaDpSelStart&&_metaDpSelEnd){
+    _metaFromISO=_metaFmtISO(_metaDpSelStart);_metaToISO=_metaFmtISO(_metaDpSelEnd);
+    var lbl=_smartLabel(_metaFromISO,_metaToISO);
+    document.getElementById('metaDpText').textContent=lbl;
+    document.getElementById('metaDpFrom').value=_metaFromISO;document.getElementById('metaDpTo').value=_metaToISO;
+    metaDpClose();
+    broadcastToReports(_metaFromISO,_metaToISO,lbl,'meta');
+  } else { metaDpClose(); }
+}
+function metaDpRenderCals(){
+  var now=new Date();now.setHours(0,0,0,0);
+  if(!_metaViewL){_metaViewL=new Date(now.getFullYear(),now.getMonth()-1,1);}
+  var vR=new Date(_metaViewL.getFullYear(),_metaViewL.getMonth()+1,1);
+  metaDpRenderMonth('metaCalL',_metaViewL);metaDpRenderMonth('metaCalR',vR);
+  if(_metaDpSelStart)document.getElementById('metaDpFrom').value=_metaFmtISO(_metaDpSelStart);
+  if(_metaDpSelEnd)document.getElementById('metaDpTo').value=_metaFmtISO(_metaDpSelEnd);
+}
+function metaDpRenderMonth(elId,viewDate){
+  var el=document.getElementById(elId);if(!el)return;
+  var y=viewDate.getFullYear(),m=viewDate.getMonth();
+  var today=new Date();today.setHours(0,0,0,0);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var h='<div class="dp-month-header"><button class="dp-nav-btn" onclick="metaDpNav(-1)">‹</button><span class="dp-month-title">'+months[m]+' '+y+'</span><button class="dp-nav-btn" onclick="metaDpNav(1)">›</button></div>';
+  h+='<div class="dp-grid"><div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>';
+  var first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<first;i++)h+='<div class="dp-day dp-day-empty"></div>';
+  for(var d=1;d<=days;d++){
+    var dt=new Date(y,m,d);dt.setHours(0,0,0,0);var iso=_metaFmtISO(dt);
+    var cls='dp-day';
+    if(dt.getTime()===today.getTime())cls+=' today';
+    if(_metaDpSelStart&&dt.getTime()===_metaDpSelStart.getTime())cls+=' sel-start';
+    if(_metaDpSelEnd&&dt.getTime()===_metaDpSelEnd.getTime())cls+=' sel-end';
+    if(_metaDpSelStart&&_metaDpSelEnd&&dt>_metaDpSelStart&&dt<_metaDpSelEnd)cls+=' in-range';
+    h+='<div class="'+cls+'" onclick="metaDpClickDay(\'' + iso + '\')" >'+d+'</div>';
+  }
+  h+='</div>';el.innerHTML=h;
+}
+function metaDpNav(dir){_metaViewL=new Date(_metaViewL.getFullYear(),_metaViewL.getMonth()+dir,1);metaDpRenderCals();}
+function metaDpClickDay(iso){var p=iso.split('-').map(Number);var c=new Date(p[0],p[1]-1,p[2]);c.setHours(0,0,0,0);if(!_metaDpSelStart||(_metaDpSelStart&&_metaDpSelEnd)){_metaDpSelStart=c;_metaDpSelEnd=null;}else{if(c<_metaDpSelStart){_metaDpSelEnd=_metaDpSelStart;_metaDpSelStart=c;}else{_metaDpSelEnd=c;}}metaDpRenderCals();}
+
+// ── Microsoft Ads Date Picker ─────────────────────────────────────────────
+var _msDpOpen=false,_msDpSelStart=null,_msDpSelEnd=null,_msViewL=null;
+var _msFromISO='',_msToISO='';
+function _msFmtISO(d){var y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');return y+'-'+mo+'-'+dy;}
+function _msFmtDisp(d){return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});}
+function msApplyPreset(key){
+  var _presetLabels={today:"Today",yesterday:"Yesterday","7d":"Last 7 days","30d":"Last 30 days",thismonth:"This month",lastmonth:"Last month","90d":"Last 90 days",ytd:"This year",lastyear:"Last year"};
+  var _lbl=_presetLabels[key]||key;
+  var _lt=document.getElementById('msDpText');if(_lt)_lt.textContent=_lbl;
+  var now=new Date();now.setHours(0,0,0,0);var s,e;
+  if(key==='today'){s=now;e=now;}
+  else if(key==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);s=y;e=y;}
+  else if(key==='7d'){var f=new Date(now);f.setDate(f.getDate()-6);s=f;e=now;}
+  else if(key==='30d'){var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  else if(key==='thismonth'){s=new Date(now.getFullYear(),now.getMonth(),1);e=now;}
+  else if(key==='lastmonth'){s=new Date(now.getFullYear(),now.getMonth()-1,1);e=new Date(now.getFullYear(),now.getMonth(),0);}
+  else if(key==='90d'){var f=new Date(now);f.setDate(f.getDate()-89);s=f;e=now;}
+  else if(key==='ytd'){s=new Date(now.getFullYear(),0,1);e=now;}
+  else if(key==='lastyear'){s=new Date(now.getFullYear()-1,0,1);e=new Date(now.getFullYear()-1,11,31);}
+  else{var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  _msDpSelStart=s;_msDpSelEnd=e;_msFromISO=_msFmtISO(s);_msToISO=_msFmtISO(e);
+  document.querySelectorAll('#msDpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('#msDpPanel .dp-preset[onclick*="' + key + '"]');
+  if(btn)btn.classList.add('active');
+  msDpRenderCals();
+}
+function msDpToggle(){_msDpOpen=!_msDpOpen;document.getElementById('msDpPanel').style.display=_msDpOpen?'flex':'none';document.getElementById('msDpArrow').textContent=_msDpOpen?'▲':'▼';if(_msDpOpen&&!_msDpSelStart)msApplyPreset('30d');if(_msDpOpen)msDpRenderCals();}
+function msDpClose(){_msDpOpen=false;document.getElementById('msDpPanel').style.display='none';document.getElementById('msDpArrow').textContent='▼';}
+function msDpDone(){
+  if(_msDpSelStart&&_msDpSelEnd){
+    _msFromISO=_msFmtISO(_msDpSelStart);_msToISO=_msFmtISO(_msDpSelEnd);
+    var lbl=_smartLabel(_msFromISO,_msToISO);
+    document.getElementById('msDpText').textContent=lbl;
+    document.getElementById('msDpFrom').value=_msFromISO;document.getElementById('msDpTo').value=_msToISO;
+    msDpClose();
+    broadcastToReports(_msFromISO,_msToISO,lbl,'ms');
+  } else { msDpClose(); }
+}
+function msDpRenderCals(){
+  var now=new Date();now.setHours(0,0,0,0);
+  if(!_msViewL){_msViewL=new Date(now.getFullYear(),now.getMonth()-1,1);}
+  var vR=new Date(_msViewL.getFullYear(),_msViewL.getMonth()+1,1);
+  msDpRenderMonth('msCalL',_msViewL);msDpRenderMonth('msCalR',vR);
+  if(_msDpSelStart)document.getElementById('msDpFrom').value=_msFmtISO(_msDpSelStart);
+  if(_msDpSelEnd)document.getElementById('msDpTo').value=_msFmtISO(_msDpSelEnd);
+}
+function msDpRenderMonth(elId,viewDate){
+  var el=document.getElementById(elId);if(!el)return;
+  var y=viewDate.getFullYear(),m=viewDate.getMonth();
+  var today=new Date();today.setHours(0,0,0,0);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var h='<div class="dp-month-header"><button class="dp-nav-btn" onclick="msDpNav(-1)">‹</button><span class="dp-month-title">'+months[m]+' '+y+'</span><button class="dp-nav-btn" onclick="msDpNav(1)">›</button></div>';
+  h+='<div class="dp-grid"><div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>';
+  var first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<first;i++)h+='<div class="dp-day dp-day-empty"></div>';
+  for(var d=1;d<=days;d++){
+    var dt=new Date(y,m,d);dt.setHours(0,0,0,0);var iso=_msFmtISO(dt);
+    var cls='dp-day';
+    if(dt.getTime()===today.getTime())cls+=' today';
+    if(_msDpSelStart&&dt.getTime()===_msDpSelStart.getTime())cls+=' sel-start';
+    if(_msDpSelEnd&&dt.getTime()===_msDpSelEnd.getTime())cls+=' sel-end';
+    if(_msDpSelStart&&_msDpSelEnd&&dt>_msDpSelStart&&dt<_msDpSelEnd)cls+=' in-range';
+    h+='<div class="'+cls+'" onclick="msDpClickDay(\'' + iso + '\')" >'+d+'</div>';
+  }
+  h+='</div>';el.innerHTML=h;
+}
+function msDpNav(dir){_msViewL=new Date(_msViewL.getFullYear(),_msViewL.getMonth()+dir,1);msDpRenderCals();}
+function msDpClickDay(iso){var p=iso.split('-').map(Number);var c=new Date(p[0],p[1]-1,p[2]);c.setHours(0,0,0,0);if(!_msDpSelStart||(_msDpSelStart&&_msDpSelEnd)){_msDpSelStart=c;_msDpSelEnd=null;}else{if(c<_msDpSelStart){_msDpSelEnd=_msDpSelStart;_msDpSelStart=c;}else{_msDpSelEnd=c;}}msDpRenderCals();}
+
+function metaPageRender() {
+  var d = window.livePlatforms && window.livePlatforms.meta;
+  var spend   = d && d.spend       ? d.spend       : 0;
+  var rev     = d && d.revenue     ? d.revenue     : 0;
+  var conv    = d && d.conversions ? d.conversions : 0;
+  var clicks  = d && d.clicks      ? d.clicks      : 0;
+  var impr    = d && d.impressions ? d.impressions : 0;
+  var roas    = spend > 0 ? rev     / spend : 0;
+  var cpa     = conv  > 0 ? spend   / conv  : 0;
+  var ctr     = impr  > 0 ? clicks  / impr * 100 : 0;
+  var cpc     = clicks> 0 ? spend   / clicks : 0;
+  var cpm     = impr  > 0 ? spend   / impr * 1000 : 0;
+  var cvr     = clicks> 0 ? conv    / clicks * 100 : 0;
+  var breakeven = 0.40 > 0 ? (1/0.40) : 0; // 40% margin → 2.5× breakeven
+
+  function mFmt(n) { if (!n) return '—'; var v=Math.abs(parseFloat(n)||0); return '$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function mPct(n) { return n > 0 ? n.toFixed(2)+'%' : '—'; }
+  function mX(n)   { return n > 0 ? n.toFixed(2)+'×' : '—'; }
+  function mEl(id, val) { var e=document.getElementById(id); if(e) e.textContent=val; }
+
+  // Update status bar
+  if (spend > 0) {
+    mEl('meta-page-status', '● LIVE — Meta Ads');
+    mEl('meta-page-subtitle', 'spend: '+mFmt(spend)+' · '+conv+' purchases · ROAS '+mX(roas));
+  }
+
+  // KPI strip
+  mEl('mp-spend',    mFmt(spend));
+  mEl('mp-spend-sub', spend > 0 ? 'this period' : 'awaiting data');
+  mEl('mp-revenue',  mFmt(rev));
+  mEl('mp-revenue-sub', rev > 0 ? 'attributed revenue' : 'awaiting data');
+  mEl('mp-roas',     mX(roas));
+  mEl('mp-cpa',      mFmt(cpa));
+  mEl('mp-conv',     conv > 0 ? conv.toLocaleString() : '—');
+  mEl('mp-conv-sub', conv > 0 ? 'purchases' : 'awaiting data');
+  mEl('mp-ctr',      mPct(ctr));
+  mEl('mp-cpc-sub',  'CPC: '+mFmt(cpc));
+
+  // Efficiency panel
+  mEl('mp-impressions', impr > 0 ? impr.toLocaleString() : '—');
+  mEl('mp-clicks',      clicks > 0 ? clicks.toLocaleString() : '—');
+  mEl('mp-cpm',         mFmt(cpm));
+  mEl('mp-cvr',         mPct(cvr));
+  mEl('mp-breakeven',   breakeven.toFixed(1)+'× (40% margin)');
+
+  // Performance scorecard
+  function mScore(id, good, warn, label) {
+    var e=document.getElementById(id); if(!e) return;
+    e.textContent=label;
+    if(good)      { e.style.background='rgba(90,158,114,0.15)'; e.style.color='var(--green)'; }
+    else if(warn) { e.style.background='rgba(212,135,74,0.15)'; e.style.color='var(--orange)'; }
+    else          { e.style.background='rgba(28,27,24,0.06)';   e.style.color='var(--c3)'; }
+  }
+  mScore('mp-roas-score', roas>=3.5, roas>=2.5, roas>0?(roas>=3.5?'✅ '+mX(roas):'⚠ '+mX(roas)):'—');
+  mScore('mp-ctr-score',  ctr>=1.5,  ctr>=0.9,  ctr>0?(ctr>=1.5?'✅ '+mPct(ctr):'⚠ '+mPct(ctr)):'—');
+  mScore('mp-cpa-score',  cpa>0&&cpa<38, cpa>0&&cpa<80, cpa>0?(cpa<38?'✅ '+mFmt(cpa):'⚠ '+mFmt(cpa)):'—');
+  // Frequency - would need separate API call; show placeholder
+  mScore('mp-freq-score', false, false, 'Check Ads Manager');
+
+  // Campaign table
+  var campaigns = (d && d.campaigns) || (window.livePlatforms && window.livePlatforms.metaCampaigns) || [];
+  var tbl = document.getElementById('mp-campaign-table');
+  if (tbl) {
+    if (campaigns.length > 0) {
+      tbl.innerHTML = campaigns.map(function(c) {
+        var cr = c.spend>0 ? (c.revenue/c.spend).toFixed(1)+'×' : '—';
+        var cc = c.conversions>0 ? mFmt(c.spend/c.conversions) : '—';
+        var ct = c.impressions>0 ? mPct(c.clicks/c.impressions*100) : '—';
+        var roasColor = c.spend>0&&(c.revenue/c.spend)>=3.5?'var(--green)':c.spend>0?'var(--gold)':'var(--c3)';
+        return '<div style="display:grid;grid-template-columns:1fr 80px 64px 64px 76px 60px;padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
+          '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:var(--ink)" title="'+c.name+'">'+c.name+'</div>' +
+          '<div style="text-align:right;color:#1877F2;font-weight:600">'+mFmt(c.spend)+'</div>' +
+          '<div style="text-align:right;font-weight:600;color:'+roasColor+'">'+cr+'</div>' +
+          '<div style="text-align:right;color:var(--ink)">'+( c.conversions||'—')+'</div>' +
+          '<div style="text-align:right;color:var(--c2)">'+cc+'</div>' +
+          '<div style="text-align:right;color:var(--c3)">'+ct+'</div>' +
+          '</div>';
+      }).join('');
+    } else {
+      tbl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:Inter,sans-serif;font-size:12px">'+(spend>0?'No campaign breakdown available':'Click REFRESH to load data')+'</div>';
+    }
+  }
+
+  // Daily trend chart
+  var daily = (d && d.daily) || [];
+  var chartEl = document.getElementById('mp-daily-chart');
+  if (chartEl) {
+    if (daily.length > 0) {
+      var maxSpend = Math.max.apply(null, daily.map(function(x){return x.spend||0;}));
+      var maxConv  = Math.max.apply(null, daily.map(function(x){return x.conversions||0;}));
+      chartEl.innerHTML = daily.map(function(day) {
+        var spendPct = maxSpend > 0 ? (day.spend/maxSpend*100) : 0;
+        var convPct  = maxConv  > 0 ? (day.conversions/maxConv*100) : 0;
+        var roasDay  = day.spend > 0 ? (day.revenue/day.spend).toFixed(1) : '—';
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-family:Inter,sans-serif">' +
+          '<div style="font-size:9px;color:var(--c3);width:42px;flex-shrink:0">'+day.date.slice(5)+'</div>' +
+          '<div style="flex:1;position:relative">' +
+          '<div style="height:4px;background:rgba(24,119,242,0.15);border-radius:2px"><div style="height:4px;width:'+spendPct+'%;background:#1877F2;border-radius:2px"></div></div>' +
+          '</div>' +
+          '<div style="font-size:9px;color:#1877F2;width:40px;text-align:right">'+mFmt(day.spend)+'</div>' +
+          '<div style="font-size:9px;color:var(--green);width:28px;text-align:right">'+( day.conversions||0)+'</div>' +
+          '<div style="font-size:9px;color:var(--gold);width:32px;text-align:right">'+roasDay+'×</div>' +
+          '</div>';
+      }).join('');
+    } else {
+      chartEl.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No daily data yet</div>';
+    }
+  }
+}
+
+function msRenderPage() {
+  var d=window.livePlatforms&&window.livePlatforms.ms;
+  var spend=d&&d.spend?d.spend:0, rev=d&&d.revenue?d.revenue:0;
+  var conv=d&&d.conversions?d.conversions:0, clicks=d&&d.clicks?d.clicks:0;
+  var impr=d&&d.impressions?d.impressions:0;
+  var roas=spend>0?rev/spend:0, cpa=conv>0?spend/conv:0;
+  var cpc=clicks>0?spend/clicks:0, ctr=impr>0?clicks/impr*100:0;
+  var cvr=clicks>0?conv/clicks*100:0;
+  function mF(n){if(!n)return '—';var v=Math.abs(parseFloat(n)||0);return '$'+v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function mP(n){return n>0?n.toFixed(2)+'%':'—';}
+  function mX(n){return n>0?n.toFixed(2)+'×':'—';}
+  function mE(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+  mE('ms-spend',    mF(spend));
+  mE('ms-spend-sub',spend>0?'this period':'awaiting API');
+  mE('ms-revenue',  mF(rev));
+  mE('ms-roas',     mX(roas));
+  mE('ms-cpa',      mF(cpa));
+  mE('ms-conv',     conv>0?conv.toLocaleString():'—');
+  mE('ms-conv-sub', conv>0?'purchases':'awaiting API');
+  mE('ms-cpc',      mF(cpc));
+  mE('ms-ctr-sub',  'CTR: '+mP(ctr));
+  mE('ms-impressions',impr>0?impr.toLocaleString():'—');
+  mE('ms-clicks',   clicks>0?clicks.toLocaleString():'—');
+  mE('ms-cvr',      mP(cvr));
+  // vs Google CPC savings
+  var googleCpc=window.livePlatforms&&window.livePlatforms.google&&window.livePlatforms.google.cpc?window.livePlatforms.google.cpc:0;
+  mE('ms-vs-google', googleCpc>0&&cpc>0?((1-cpc/googleCpc)*100).toFixed(0)+'% cheaper than Google':'30–40% cheaper');
+  // Update sidebar badge
+  var badge=document.getElementById('ms-roas-badge');
+  if(badge){badge.textContent=roas>0?mX(roas):'—';}
+  // Scorecard
+  function mSc(id,good,warn,label){
+    var e=document.getElementById(id);if(!e)return;
+    e.textContent=label;
+    if(good){e.style.background='rgba(90,158,114,0.15)';e.style.color='var(--green)';}
+    else if(warn){e.style.background='rgba(212,135,74,0.15)';e.style.color='var(--orange)';}
+    else{e.style.background='rgba(28,27,24,0.06)';e.style.color='var(--c3)';}
+  }
+  mSc('ms-roas-score',roas>=3,   roas>=2,   roas>0?(roas>=3?'✅ '+mX(roas):'⚠ '+mX(roas)):'—');
+  mSc('ms-ctr-score', ctr>=2.83, ctr>=1.5,  ctr>0?(ctr>=2.83?'✅ '+mP(ctr):'⚠ '+mP(ctr)):'—');
+  mSc('ms-cpa-score', cpa>0&&cpa<=41, cpa>0&&cpa<=60, cpa>0?(cpa<=41?'✅ '+mF(cpa):'⚠ '+mF(cpa)):'—');
+  mSc('ms-cvr-score', cvr>=2.94,cvr>=1.5,  cvr>0?(cvr>=2.94?'✅ '+mP(cvr):'⚠ '+mP(cvr)):'—');
+  // Campaign table
+  var tbl=document.getElementById('ms-campaign-table');
+  if(tbl&&d&&d.campaigns&&d.campaigns.length){
+    tbl.innerHTML=d.campaigns.map(function(c){
+      var cr=c.spend>0?(c.revenue/c.spend).toFixed(1)+'×':'—';
+      var cc=c.conversions>0?mF(c.spend/c.conversions):'—';
+      var ct=c.impressions>0?mP(c.clicks/c.impressions*100):'—';
+      var roasC=c.spend>0&&(c.revenue/c.spend)>=3?'var(--green)':c.spend>0?'var(--gold)':'var(--c3)';
+      return '<div style="display:grid;grid-template-columns:1fr 80px 64px 64px 80px 60px;padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">'+
+        '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500" title="'+c.name+'">'+c.name+'</div>'+
+        '<div style="text-align:right;color:#00A4EF;font-weight:600">'+mF(c.spend)+'</div>'+
+        '<div style="text-align:right;font-weight:600;color:'+roasC+'">'+cr+'</div>'+
+        '<div style="text-align:right">'+( c.conversions||'—')+'</div>'+
+        '<div style="text-align:right;color:var(--c2)">'+cc+'</div>'+
+        '<div style="text-align:right;color:var(--c3)">'+ct+'</div>'+
+        '</div>';
+    }).join('');
+  }
+}
+
+function _hideAllPages() {
+  // Hide main dashboard
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = 'none';
+  // Hide all PAGES report pages + reset nav highlights
+  Object.values(PAGES).forEach(function(p) {
+    var el = document.getElementById(p.mainId); if (el) el.style.display = 'none';
+    var nav = document.getElementById(p.navId); if (nav) { nav.style.background=''; nav.style.color=''; }
+  });
+  // Hide all three ad pages
+  ['pageGoogleAds','pageMetaAds','pageMsAds'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  activePage = null;
+}
+
+function _showMainDashboard() {
+  // Hide all ad pages first
+  ['pageGoogleAds','pageMetaAds','pageMsAds'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  document.querySelector('.main:not(.txfee-main):not(.report-main)').style.display = '';
+}
+
+function openGoogleAdsPage() {
+  _hideAllPages();
+  var p = document.getElementById('pageGoogleAds'); if (p) p.style.display = 'block';
+  // Sync picker label with global date
+  if(window.GLOBAL_FROM){_gaFromISO=window.GLOBAL_FROM;_gaToISO=window.GLOBAL_TO;}
+  var lbl=window.GLOBAL_LABEL||'Last 30 Days';
+  var el=document.getElementById('gaDpText');if(el)el.textContent=lbl;
+  gaRenderPage();
+}
+function closeGoogleAdsPage() { _showMainDashboard(); }
+
+function openMetaAdsPage() {
+  _hideAllPages();
+  var p = document.getElementById('pageMetaAds'); if (p) p.style.display = 'block';
+  if(window.GLOBAL_FROM){_metaFromISO=window.GLOBAL_FROM;_metaToISO=window.GLOBAL_TO;}
+  var lbl=window.GLOBAL_LABEL||'Last 30 Days';
+  var el=document.getElementById('metaDpText');if(el)el.textContent=lbl;
+  metaPageRender();
+}
+function closeMetaAdsPage() { _showMainDashboard(); }
+
+function openMsAdsPage() {
+  _hideAllPages();
+  var p = document.getElementById('pageMsAds'); if (p) p.style.display = 'block';
+  if(window.GLOBAL_FROM){_msFromISO=window.GLOBAL_FROM;_msToISO=window.GLOBAL_TO;}
+  var lbl=window.GLOBAL_LABEL||'Last 30 Days';
+  var el=document.getElementById('msDpText');if(el)el.textContent=lbl;
+  msRenderPage();
+}
+function closeMsAdsPage() { _showMainDashboard(); }
+
+
+// ── Google Ads Date Picker ────────────────────────────────────────────────
+var _gaDpOpen = false;
+var _gaDpSelStart = null, _gaDpSelEnd = null;
+var _gaFromISO = '', _gaToISO = '';
+var _gaViewL = null, _gaViewR = null;
+
+function _gaFmtISO(d) {
+  var y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0');
+  return y+'-'+mo+'-'+dy;
+}
+function _gaFmtDisp(d) { return d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}); }
+
+function gaApplyPreset(key) {
+  var _pLabels={today:"Today",yesterday:"Yesterday","7d":"Last 7 days","30d":"Last 30 days",thismonth:"This month",lastmonth:"Last month","90d":"Last 90 days",ytd:"This year",lastyear:"Last year"};
+  var _lt=document.getElementById('gaDpText');if(_lt)_lt.textContent=_pLabels[key]||key;
+  var now=new Date(); now.setHours(0,0,0,0);
+  var today=_gaFmtISO(now);
+  var s,e;
+  if(key==='today'){s=now;e=now;}
+  else if(key==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);s=y;e=y;}
+  else if(key==='7d'){var f=new Date(now);f.setDate(f.getDate()-6);s=f;e=now;}
+  else if(key==='30d'){var f=new Date(now);f.setDate(f.getDate()-29);s=f;e=now;}
+  else if(key==='thismonth'){s=new Date(now.getFullYear(),now.getMonth(),1);e=now;}
+  else if(key==='lastmonth'){var lm=new Date(now.getFullYear(),now.getMonth()-1,1);s=lm;e=new Date(now.getFullYear(),now.getMonth(),0);}
+  else if(key==='90d'){var f=new Date(now);f.setDate(f.getDate()-89);s=f;e=now;}
+  else if(key==='ytd'){s=new Date(now.getFullYear(),0,1);e=now;}
+  else if(key==='lastyear'){s=new Date(now.getFullYear()-1,0,1);e=new Date(now.getFullYear()-1,11,31);}
+  else {s=new Date(now);s.setDate(s.getDate()-29);e=now;}
+  _gaDpSelStart=s; _gaDpSelEnd=e;
+  _gaFromISO=_gaFmtISO(s); _gaToISO=_gaFmtISO(e);
+  document.querySelectorAll('#gaDpPanel .dp-preset').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('#gaDpPanel .dp-preset[onclick*="' + key + '"]');
+  if(btn) btn.classList.add('active');
+  gaDpRenderCals();
+}
+function gaDpToggle() {
+  _gaDpOpen=!_gaDpOpen;
+  document.getElementById('gaDpPanel').style.display=_gaDpOpen?'flex':'none';
+  document.getElementById('gaDpArrow').textContent=_gaDpOpen?'▲':'▼';
+  if(_gaDpOpen && !_gaDpSelStart) gaApplyPreset('30d');
+  if(_gaDpOpen) gaDpRenderCals();
+}
+function gaDpClose() {
+  _gaDpOpen=false;
+  document.getElementById('gaDpPanel').style.display='none';
+  document.getElementById('gaDpArrow').textContent='▼';
+}
+function gaDpDone() {
+  if(_gaDpSelStart && _gaDpSelEnd) {
+    _gaFromISO=_gaFmtISO(_gaDpSelStart); _gaToISO=_gaFmtISO(_gaDpSelEnd);
+    var lbl=_smartLabel(_gaFromISO,_gaToISO);
+    document.getElementById('gaDpText').textContent=lbl;
+    document.getElementById('gaDpFrom').value=_gaFromISO;
+    document.getElementById('gaDpTo').value=_gaToISO;
+    gaDpClose();
+    broadcastToReports(_gaFromISO,_gaToISO,lbl,'ga');
+  } else { gaDpClose(); }
+}
+function gaDpRenderCals() {
+  var now=new Date(); now.setHours(0,0,0,0);
+  if(!_gaViewL) { _gaViewL=new Date(now.getFullYear(),now.getMonth()-1,1); }
+  _gaViewR=new Date(_gaViewL.getFullYear(),_gaViewL.getMonth()+1,1);
+  gaDpRenderMonth('gaCalL',_gaViewL);
+  gaDpRenderMonth('gaCalR',_gaViewR);
+  if(_gaDpSelStart) document.getElementById('gaDpFrom').value=_gaFmtISO(_gaDpSelStart);
+  if(_gaDpSelEnd)   document.getElementById('gaDpTo').value=_gaFmtISO(_gaDpSelEnd);
+}
+function gaDpRenderMonth(elId, viewDate) {
+  var el=document.getElementById(elId); if(!el) return;
+  var y=viewDate.getFullYear(), m=viewDate.getMonth();
+  var today=new Date(); today.setHours(0,0,0,0);
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var html='<div class="dp-month-header"><button class="dp-nav-btn" onclick="gaDpNav(-1)">‹</button><span class="dp-month-title">'+months[m]+' '+y+'</span><button class="dp-nav-btn" onclick="gaDpNav(1)">›</button></div>';
+  html+='<div class="dp-grid"><div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div><div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>';
+  var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<first;i++) html+='<div class="dp-day dp-day-empty"></div>';
+  for(var d=1;d<=days;d++) {
+    var dt=new Date(y,m,d); dt.setHours(0,0,0,0);
+    var iso=_gaFmtISO(dt);
+    var cls='dp-day';
+    if(dt.getTime()===today.getTime()) cls+=' today';
+    if(_gaDpSelStart&&dt.getTime()===_gaDpSelStart.getTime()) cls+=' sel-start';
+    if(_gaDpSelEnd&&dt.getTime()===_gaDpSelEnd.getTime()) cls+=' sel-end';
+    if(_gaDpSelStart&&_gaDpSelEnd&&dt>_gaDpSelStart&&dt<_gaDpSelEnd) cls+=' in-range';
+    html+='<div class="'+cls+'" onclick="gaDpClickDay(\'' + iso + '\')" >'+d+'</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+function gaDpNav(dir) {
+  _gaViewL=new Date(_gaViewL.getFullYear(),_gaViewL.getMonth()+dir,1);
+  gaDpRenderCals();
+}
+function gaDpClickDay(iso) {
+  var parts=iso.split('-').map(Number);
+  var clicked=new Date(parts[0],parts[1]-1,parts[2]); clicked.setHours(0,0,0,0);
+  if(!_gaDpSelStart||(_gaDpSelStart&&_gaDpSelEnd)) { _gaDpSelStart=clicked; _gaDpSelEnd=null; }
+  else { if(clicked<_gaDpSelStart){_gaDpSelEnd=_gaDpSelStart;_gaDpSelStart=clicked;}else{_gaDpSelEnd=clicked;} }
+  gaDpRenderCals();
+}
+
+function gaRenderPage() {
+  const d = window.livePlatforms && window.livePlatforms.google;
+  const spend   = d && d.spend       ? d.spend       : 0;
+  const convVal = d && d.revenue     ? d.revenue     : 0;
+  const conv    = d && d.conversions ? d.conversions : 0;
+  const clicks  = d && d.clicks      ? d.clicks      : 0;
+  const impr    = d && d.impressions ? d.impressions : 0;
+  const roas    = spend > 0 ? convVal / spend : 0;
+  const cpa     = conv  > 0 ? spend   / conv  : 0;
+  const cpc     = clicks> 0 ? spend   / clicks: 0;
+  const ctr     = impr  > 0 ? clicks  / impr * 100 : 0;
+  const cvr     = clicks> 0 ? conv    / clicks* 100 : 0;
+
+  function gFmt(n) {
+    if (!n) return '—';
+    var abs = Math.abs(parseFloat(n)||0);
+    return '$' + abs.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function gPct(n) { return n > 0 ? n.toFixed(1)+'%' : '—'; }
+  function gX(n)   { return n > 0 ? n.toFixed(2)+'×' : '—'; }
+  function gEl(id, val) { var e=document.getElementById(id); if(e) e.textContent=val; }
+
+  gEl('ga-spend',       gFmt(spend));
+  gEl('ga-spend-sub',   spend > 0 ? 'total ad spend' : 'awaiting API');
+  gEl('ga-conv-value',  gFmt(convVal));
+  gEl('ga-roas',        gX(roas));
+  gEl('ga-cpa',         gFmt(cpa));
+  gEl('ga-conv',        conv > 0 ? conv.toLocaleString() : '—');
+  gEl('ga-conv-sub',    conv > 0 ? 'purchases' : 'awaiting API');
+  gEl('ga-cpc',         gFmt(cpc));
+  gEl('ga-ctr-sub',     'CTR: ' + gPct(ctr));
+
+  // Update sidebar badge
+  var badge = document.getElementById('ga-roas-badge');
+  if (badge) { badge.textContent = roas > 0 ? gX(roas) : '—'; }
+
+  // Impression share bars
+  function gBar(barId, pctId, val) {
+    var bar=document.getElementById(barId); if(bar) bar.style.width=Math.min(val*100,100)+'%';
+    var pct=document.getElementById(pctId); if(pct) pct.textContent=gPct(val*100);
+  }
+  gBar('ga-is-search', 'ga-is-search-pct', d&&d.impressionShare ||0);
+  gBar('ga-is-budget', 'ga-is-budget-pct', d&&d.lostISBudget    ||0);
+  gBar('ga-is-rank',   'ga-is-rank-pct',   d&&d.lostISRank      ||0);
+  gBar('ga-is-top',    'ga-is-top-pct',    d&&d.absTopIS        ||0);
+
+  // Scorecard
+  function gScore(id, good, warn, label) {
+    var e=document.getElementById(id); if(!e) return;
+    e.textContent=label;
+    if(good) { e.style.background='rgba(90,158,114,0.15)'; e.style.color='var(--green)'; }
+    else if(warn) { e.style.background='rgba(212,135,74,0.15)'; e.style.color='var(--orange)'; }
+    else { e.style.background='rgba(28,27,24,0.06)'; e.style.color='var(--c3)'; }
+  }
+  gScore('ga-roas-score', roas>=4, roas>=2, roas>0?(roas>=4?'✅ '+gX(roas):'⚠ '+gX(roas)):'—');
+  gScore('ga-ctr-score',  ctr>=3,  ctr>=1.5, ctr>0?(ctr>=3?'✅ '+gPct(ctr):'⚠ '+gPct(ctr)):'—');
+  gScore('ga-cvr-score',  cvr>=4,  cvr>=2,  cvr>0?(cvr>=4?'✅ '+gPct(cvr):'⚠ '+gPct(cvr)):'—');
+  gScore('ga-cpa-score',  cpa>0&&cpa<48, cpa>0&&cpa<120, cpa>0?(cpa<48?'✅ '+gFmt(cpa):'⚠ '+gFmt(cpa)):'—');
+
+  // Campaign table
+  var tbl = document.getElementById('ga-campaign-table');
+  if (tbl && d && d.campaigns && d.campaigns.length) {
+    tbl.innerHTML = d.campaigns.map(function(c) {
+      var cr = c.spend>0 ? (c.convValue/c.spend).toFixed(1)+'x' : '—';
+      var cc = c.conv>0  ? gFmt(c.spend/c.conv) : '—';
+      var ct = c.impr>0  ? gPct(c.clicks/c.impr*100) : '—';
+      return '<div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
+        '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500" title="'+c.name+'">'+c.name+'</div>' +
+        '<div style="text-align:right;color:#4285F4;font-weight:600">'+gFmt(c.spend)+'</div>' +
+        '<div style="text-align:right;color:var(--gold);font-weight:600">'+cr+'</div>' +
+        '<div style="text-align:right">'+( c.conv||'—')+'</div>' +
+        '<div style="text-align:right;color:var(--c2)">'+cc+'</div>' +
+        '<div style="text-align:right;color:var(--c3)">'+ct+'</div>' +
+        '</div>';
+    }).join('');
+  }
+}
+
+// ── Auto-sync on load: fetch Shopify data AND broadcast date to all pickers
+(function() {
+  var f = window.GLOBAL_FROM;
+  var t = window.GLOBAL_TO;
+  var lbl = window.GLOBAL_LABEL || 'Today';
+  // Seed ALL picker labels with the global date immediately
+  ['or','pl','ma','clv','pa','ga','meta','ms'].forEach(function(pid) {
+    var el = document.getElementById(pid + 'DpText');
+    if (el) el.textContent = lbl;
+    // Seed ad picker ISO vars directly
+    if (pid === 'ga')   { _gaFromISO   = f; _gaToISO   = t; }
+    if (pid === 'meta') { _metaFromISO = f; _metaToISO = t; }
+    if (pid === 'ms')   { _msFromISO   = f; _msToISO   = t; }
+  });
+  // Also seed main dashboard picker label
+  var mainLbl = document.getElementById('dpTriggerText');
+  if (mainLbl) mainLbl.textContent = lbl;
+  // Show loading toast so user knows sync is happening
+  setTimeout(function() { toast('⟳ Loading Shopify data...', 'ok'); }, 100);
+  // Seed IIFE STATE after it initialises (slight delay)
+  setTimeout(function() {
+    if (window._setDpState) {
+      ['or','pl','ma','clv','pa'].forEach(function(pid) {
+        window._setDpState(pid, f, t);
+      });
+    }
+  }, 50);
+  // Auto-fetch on load
+  doSync();
+})();
 </script>
 <!-- ══════════  SETTINGS MODAL  -->
 <div class="settings-overlay" id="settingsOverlay" onclick="handleOverlayClick(event)">
@@ -4754,7 +6146,7 @@ async function testConnection(platform) {
 }
 
 function clearAllData() {
-  if (!confirm('Reset all manual entries and reload sample data?')) return;
+  if (!confirm('Reset to sample/demo data?')) return;
   loadSampleData();
   renderAll();
   closeSettings();
@@ -4771,23 +6163,64 @@ let orSortKey     = 'date';
 let orSortDir     = -1;
 let orSelectedIds = new Set();
 
-async function orSync() { const r=window.orDpGetRange?.(); orSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function orSync() { orSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function orSetStatus(msg, isErr=false) {
-  const el = document.getElementById('or-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function orSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const orFmt$ = n => {
   const v = Math.abs(parseFloat(n)||0);
   const s = 'A$' + v.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
   return parseFloat(n) < 0 ? `(${s})` : s;
 };
+
+
+// ── Client-side transaction fee recalculation ─────────────────────────────
+// Uses saved fee rates from localStorage, matching exact gateway per order.
+// This runs after proxy data loads so rate changes apply instantly without
+// needing to redeploy the proxy.
+function orGetFeeRates() {
+  try { return JSON.parse(localStorage.getItem('fc_fee_rates') || '{}'); } catch(e) { return {}; }
+}
+
+function orCalcTxFee(gateway, subtotal) {
+  const rates = orGetFeeRates();
+  const gw = (gateway || 'other').toLowerCase().replace(/_/g,' ').replace(/-/g,' ').trim();
+  const KEYS = {
+    'shopify payments': { pct: parseFloat(rates.fee_shopify_pct  ?? 2.90), flat: parseFloat(rates.fee_shopify_flat ?? 0.31) },
+    'stripe':           { pct: parseFloat(rates.fee_stripe_pct   ?? 2.90), flat: parseFloat(rates.fee_stripe_flat  ?? 0.30) },
+    'paypal':           { pct: parseFloat(rates.fee_paypal_pct   ?? 4.40), flat: parseFloat(rates.fee_paypal_flat  ?? 0.30) },
+    'klarna':           { pct: parseFloat(rates.fee_klarna_pct   ?? 2.90), flat: parseFloat(rates.fee_klarna_flat  ?? 0.30) },
+    'afterpay':         { pct: parseFloat(rates.fee_afterpay_pct ?? 0.00), flat: parseFloat(rates.fee_afterpay_flat?? 0.00) },
+    'manual':           { pct: 0,                                           flat: 0 },
+    'other':            { pct: parseFloat(rates.fee_other_pct    ?? 2.90), flat: parseFloat(rates.fee_other_flat   ?? 0.30) },
+  };
+  const key   = Object.keys(KEYS).find(k => gw.includes(k) || k.includes(gw)) || 'other';
+  const r     = KEYS[key];
+  const gwFee = subtotal * (r.pct / 100) + r.flat;
+
+  if (key === 'shopify payments') {
+    // Shopify Payments AU: gateway fee + 10% GST + 2% currency conversion + 10% GST on conversion
+    const gstPct  = parseFloat(rates.fee_shopify_gst_pct  ?? 10.00) / 100;
+    const convPct = parseFloat(rates.fee_shopify_conv_pct ?? 2.00)  / 100;
+    const gwWithGst   = gwFee * (1 + gstPct);
+    const convWithGst = subtotal * convPct * (1 + gstPct);
+    return Math.round((gwWithGst + convWithGst) * 100) / 100;
+  }
+  // Other gateways: fee + Shopify 3rd-party platform fee (except manual)
+  const s3pct = parseFloat(rates.fee_shopify3rd_pct ?? 2.00) / 100;
+  const s3fee = key === 'manual' ? 0 : subtotal * s3pct;
+  return Math.round((gwFee + s3fee) * 100) / 100;
+}
+
+function orRecalcFee(o) {
+  // Use subtotal if available, otherwise revenue (proxy may not return subtotal yet)
+  const sub      = parseFloat(o.subtotal ?? o.revenue ?? 0);
+  const txFee    = orCalcTxFee(o.gateway, sub);
+  const gp       = Math.round((parseFloat(o.revenue) - parseFloat(o.cogs||0)) * 100) / 100;
+  const profit   = Math.round((parseFloat(o.revenue) - (o.cogs||0) - (o.shipping||0) - txFee) * 100) / 100;
+  const margin   = o.revenue > 0 ? Math.round(profit / o.revenue * 10000) / 100 : 0;
+  return { ...o, txFee, grossProfit: gp, profit, margin };
+}
 
 function orFilterAndRender() {
   const search  = (document.getElementById('or-search')?.value || '').toLowerCase();
@@ -4837,8 +6270,13 @@ function orRenderAll() {
 }
 
 function orRenderKPIs() {
-  // Use filtered set for KPIs
-  const orders = orFiltered;
+  // KPIs use the same filter as main dashboard: exclude cancelled, refunded, voided
+  // (Table still shows all orders for full visibility)
+  const orders = orFiltered.filter(o =>
+    !o.cancelled &&
+    o.status !== 'refunded' &&
+    o.status !== 'voided'
+  );
   const total     = orders.length;
   const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
@@ -4865,7 +6303,7 @@ function orRenderKPIs() {
 function orRenderTotalsRow() {
   const orders    = orFiltered;
   if (!orders.length) { document.getElementById('or-totals-row').style.display = 'none'; return; }
-  document.getElementById('or-totals-row').style.display = 'flex';
+  document.getElementById('or-totals-row').style.display = 'grid';
   const revenue   = orders.reduce((s,o)=>s+o.revenue,0);
   const discounts = orders.reduce((s,o)=>s+o.discounts,0);
   const shipping  = orders.reduce((s,o)=>s+o.shipping,0);
@@ -4873,13 +6311,18 @@ function orRenderTotalsRow() {
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
   const profit    = orders.reduce((s,o)=>s+o.profit,0);
   const items     = orders.reduce((s,o)=>s+o.items,0);
+  const grossProfitTotal = orders.reduce((s,o)=>s+(o.grossProfit||0),0);
+  const grossMarginTotal = revenue > 0 ? grossProfitTotal/revenue*100 : 0;
   document.getElementById('or-totals-label').textContent    = `Total from ${orders.length} orders`;
   document.getElementById('or-totals-items').textContent    = items;
   document.getElementById('or-totals-revenue').textContent  = orFmt$(revenue);
-  document.getElementById('or-totals-discounts').textContent= discounts>0?`(${orFmt$(discounts)})`:'—';
-  document.getElementById('or-totals-shipping').textContent = `(${orFmt$(shipping)})`;
-  document.getElementById('or-totals-cogs').textContent     = cogs>0?`(${orFmt$(cogs)})`:'—';
-  document.getElementById('or-totals-fees').textContent     = `(${orFmt$(fees)})`;
+  document.getElementById('or-totals-discounts').textContent= discounts>0?('('+orFmt$(discounts)+')'):'—';
+  document.getElementById('or-totals-cogs').textContent     = cogs>0?('('+orFmt$(cogs)+')'):'—';
+  const gpEl = document.getElementById('or-totals-grossprofit');
+  if(gpEl){ gpEl.textContent=orFmt$(grossProfitTotal); gpEl.style.color=grossProfitTotal>=0?'var(--green)':'var(--red)'; }
+  const gmEl = document.getElementById('or-totals-grossmargin');
+  if(gmEl) gmEl.textContent=grossMarginTotal.toFixed(1)+'%';
+  document.getElementById('or-totals-fees').textContent     = '('+orFmt$(fees)+')';
   const profEl = document.getElementById('or-totals-profit');
   profEl.textContent  = orFmt$(profit);
   profEl.style.color  = profit >= 0 ? 'var(--green)' : 'var(--red)';
@@ -4889,7 +6332,7 @@ function orRenderTable() {
   const el = document.getElementById('or-table-body');
   if (!el) return;
   if (!orFiltered.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">No orders match the current filters</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--c3);font-size:12px">No orders match the current filters</div>';
     return;
   }
   const perPage = parseInt(document.getElementById('or-per-page')?.value || 20);
@@ -4904,21 +6347,23 @@ function orRenderTable() {
   el.innerHTML = page.map(o => {
     const profitColor = o.profit >= 0 ? 'var(--green)' : 'var(--red)';
     const checked = orSelectedIds.has(o.id) ? 'checked' : '';
+    const gpColor = (o.grossProfit||0) >= 0 ? 'var(--green)' : 'var(--red)';
     return `<div class="or-row">
-      <div style="width:24px"><input type="checkbox" ${checked} onchange="orToggleOrder(${o.id},this)" style="cursor:pointer"></div>
-      <div class="or-cell" style="flex:1.2;min-width:0">
-        <a href="https://admin.shopify.com/store/${(typeof PROXY!='undefined'?'':'')}orders/${o.id}" target="_blank" style="color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;font-size:12px;text-decoration:none">${o.name}</a>
+      <div><input type="checkbox" ${checked} onchange="orToggleOrder(${o.id},this)" style="cursor:pointer"></div>
+      <div class="or-cell" style="min-width:0;overflow:hidden">
+        <a href="https://admin.shopify.com/store/orders/${o.id}" target="_blank" style="color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;font-size:12px;text-decoration:none;white-space:nowrap">${o.name}</a>
       </div>
-      <div class="or-cell" style="width:100px;color:var(--c3);font-family:'Inter',sans-serif;font-size:11px">${o.date}</div>
-      <div class="or-cell" style="width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--c2)" title="${o.customer}">${o.customer}</div>
-      <div class="or-cell" style="width:70px;text-align:center;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2)">${o.items} item${o.items!==1?'s':''}</div>
+      <div class="or-cell" style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;white-space:nowrap">${o.date}</div>
+      <div class="or-cell" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--c2)" title="${o.customer}">${o.customer}</div>
+      <div class="or-cell" style="text-align:center;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2)">${o.items}</div>
       <div class="or-cell-num" style="color:var(--gold);font-weight:600">${orFmt$(o.revenue)}</div>
-      <div class="or-cell-num" style="color:var(--red)">${o.discounts>0?`(${orFmt$(o.discounts)})`:'—'}</div>
-      <div class="or-cell-num" style="color:var(--c3)">${o.shipping>0?`(${orFmt$(o.shipping)})`:'(A$0.00)'}</div>
-      <div class="or-cell-num" style="color:#7E6DB5">${o.cogs>0?`(${orFmt$(o.cogs)})`:'<span style="color:var(--c3)">—</span>'}</div>
+      <div class="or-cell-num" style="color:var(--red)">${o.discounts>0?('('+orFmt$(o.discounts)+')'):'—'}</div>
+      <div class="or-cell-num" style="color:#7E6DB5">${o.cogs>0?('('+orFmt$(o.cogs)+')'):'—'}</div>
+      <div class="or-cell-num" style="color:${gpColor};font-weight:600">${orFmt$(o.grossProfit||0)}</div>
+      <div class="or-cell-num" style="color:var(--c3);font-size:11px">${(o.grossMargin||0).toFixed(1)}%</div>
       <div class="or-cell-num" style="color:var(--red)">(${orFmt$(o.txFee)})</div>
-      <div class="or-cell-num" style="color:${profitColor};font-weight:600">${orFmt$(o.profit)} <span style="font-weight:400;font-size:10px;color:var(--c3)">${o.margin.toFixed(0)}%</span></div>
-      <div class="or-cell" style="width:90px;text-align:center">${statusBadge(o.status)}</div>
+      <div class="or-cell-num" style="color:${profitColor};font-weight:600">${orFmt$(o.profit)}</div>
+      <div class="or-cell" style="text-align:center">${statusBadge(o.status)}</div>
     </div>`;
   }).join('');
 }
@@ -4996,17 +6441,9 @@ function orExportCSV() {
 }
 let clvData = null;
 
-async function clvSync() { const r=window.clvDpGetRange?.(); clvSyncWithRange(r?.from||new Date(Date.now()-364*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function clvSync() { clvSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function clvSetStatus(msg, isErr=false) {
-  const el = document.getElementById('clv-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function clvSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const clvFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -5231,7 +6668,7 @@ function clvExportCSV() {
 ══════════════════════════════════════════ */
 (function() {
   const STATE = {};
-  const _fmtISO  = d => d.toISOString().slice(0,10);
+  const _fmtISO  = d => { const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,'0'),dy=String(d.getDate()).padStart(2,'0'); return y+'-'+mo+'-'+dy; };
   const _fmtDisp = d => d.toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
   const _now  = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
   const _ago  = n => { const d=_now(); d.setDate(d.getDate()-n); return d; };
@@ -5239,6 +6676,8 @@ function clvExportCSV() {
   const _eom  = d => new Date(d.getFullYear(),d.getMonth()+1,0);
   const _solm = () => { const n=_now(); return new Date(n.getFullYear(),n.getMonth()-1,1); };
   const PRESETS = {
+    'today':     ()=>({from:_now(),                           to:_now(), label:'Today'}),
+    'yesterday': ()=>{ const y=_ago(1); return {from:y, to:y, label:'Yesterday'}; },
     '7d':        ()=>({from:_ago(6),                          to:_now(), label:'Last 7 Days'}),
     '30d':       ()=>({from:_ago(29),                         to:_now(), label:'Last 30 Days'}),
     '90d':       ()=>({from:_ago(89),                         to:_now(), label:'Last 90 Days'}),
@@ -5307,9 +6746,11 @@ function clvExportCSV() {
       s.viewLeft=new Date(s.viewLeft.getFullYear(),s.viewLeft.getMonth()+dir,1); render(pid);
     };
     window[`${pid}ClickDay`]=function(iso){
-      init(pid); const s=STATE[pid]; const clicked=new Date(iso); clicked.setHours(0,0,0,0);
+      init(pid); const s=STATE[pid]; const [_cy,_cm,_cd]=iso.split('-').map(Number);const clicked=new Date(_cy,_cm-1,_cd);clicked.setHours(0,0,0,0);
       if(!s.selStart||(s.selStart&&s.selEnd)){s.selStart=clicked;s.selEnd=null;}
       else{if(clicked<s.selStart){s.selEnd=s.selStart;s.selStart=clicked;}else{s.selEnd=clicked;}}
+      // Guard: render() destroys clicked element — prevent outside-click handler from closing
+      window._iifeDpClickGuard=true;
       render(pid);
     };
     window[`${pid}ApplyPreset`]=function(key){
@@ -5320,8 +6761,9 @@ function clvExportCSV() {
       s.viewLeft=new Date(res.from.getFullYear(),res.from.getMonth(),1);
       document.querySelectorAll(`#${pid}DpPanel .dp-preset`).forEach(b=>b.classList.remove('active'));
       if(event?.target) event.target.classList.add('active');
+      // Update label preview but do NOT close — wait for Done button
       const tx=document.getElementById(`${pid}DpText`); if(tx) tx.textContent=res.label;
-      render(pid); window[`${pid}DpClose`](); syncFn(s.fromISO,s.toISO);
+      render(pid);
     };
     window[`${pid}DpDone`]=function(){
       init(pid); const s=STATE[pid];
@@ -5329,12 +6771,20 @@ function clvExportCSV() {
       const end=s.selEnd||s.selStart;
       s.fromISO=_fmtISO(s.selStart); s.toISO=_fmtISO(end);
       const same=end.getTime()===s.selStart.getTime();
+      const _lbl=_smartLabel(s.fromISO, s.toISO);
       const tx=document.getElementById(`${pid}DpText`);
-      if(tx) tx.textContent=same?_fmtDisp(s.selStart):_fmtDisp(s.selStart)+' – '+_fmtDisp(end);
-      window[`${pid}DpClose`](); syncFn(s.fromISO,s.toISO);
+      if(tx) tx.textContent=_lbl;
+      window[`${pid}DpClose`]();
+      broadcastToReports(s.fromISO,s.toISO,_lbl,pid);
     };
     window[`${pid}DpGetRange`]=function(){ init(pid); return {from:STATE[pid].fromISO,to:STATE[pid].toISO}; };
   }
+  window._setDpState=function(pid,from,to){
+    init(pid);var s=STATE[pid];if(!s)return;
+    var f=new Date(from);f.setHours(0,0,0,0);
+    var t=new Date(to);t.setHours(0,0,0,0);
+    s.selStart=f;s.selEnd=t;s.fromISO=from;s.toISO=to;
+  };
 
   register('or',  (f,t)=>orSyncWithRange(f,t));
   register('pl',  (f,t)=>plSyncWithRange(f,t));
@@ -5343,10 +6793,20 @@ function clvExportCSV() {
   register('pa',  (f,t)=>paSyncWithRange(f,t));
 
   document.addEventListener('click',e=>{
+    // Guard: if a calendar day was just clicked, ignore this event
+    if(window._iifeDpClickGuard){window._iifeDpClickGuard=false;return;}
     ['or','pl','ma','clv','pa'].forEach(pid=>{
       if(!STATE[pid]?.open) return;
       const p=document.getElementById(`${pid}DpPanel`),t=document.getElementById(`${pid}DpTrigger`);
       if(p&&t&&!p.contains(e.target)&&!t.contains(e.target)) window[`${pid}DpClose`]();
+    });
+    // Outside-click close for ad page pickers
+    [['gaDpPanel','gaDpTrigger',function(){if(_gaDpOpen){_gaDpOpen=false;document.getElementById('gaDpPanel').style.display='none';document.getElementById('gaDpArrow').textContent='▼';}}],
+     ['metaDpPanel','metaDpTrigger',function(){if(_metaDpOpen){_metaDpOpen=false;document.getElementById('metaDpPanel').style.display='none';document.getElementById('metaDpArrow').textContent='▼';}}],
+     ['msDpPanel','msDpTrigger',function(){if(_msDpOpen){_msDpOpen=false;document.getElementById('msDpPanel').style.display='none';document.getElementById('msDpArrow').textContent='▼';}}]
+    ].forEach(function(x){
+      var p=document.getElementById(x[0]),t=document.getElementById(x[1]);
+      if(p&&t&&p.style.display!=='none'&&!p.contains(e.target)&&!t.contains(e.target))x[2]();
     });
     // Also close the old PA simple dropdown if somehow still open
     const pp=document.getElementById('paDpPanel');
@@ -5364,39 +6824,40 @@ async function orSyncWithRange(from,to){
     const r=await fetch(`${PROXY}?service=shopify&action=order-report&from=${from}&to=${to}&${feeParams}`);
     if(!r.ok){const e=await r.json().catch(()=>({}));orSetStatus(`✗ Error: ${e.error||r.status}`,true);return;}
     const data=await r.json();
-    orAllOrders=data.orders||[];
+    // Step 1: Load orders with client-side fee calc as initial estimate
+    orAllOrders=(data.orders||[]).map(orRecalcFee);
     const gws=[...new Set(orAllOrders.map(o=>o.gateway).filter(Boolean))];
     const gwSel=document.getElementById('or-gateway-filter');
     if(gwSel) gwSel.innerHTML='<option value="all">All Gateways</option>'+gws.map(g=>`<option value="${g}">${g.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</option>`).join('');
     orFilterAndRender();
     orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} (loading exact fees...)`);
-    // Step 2: Fetch ACTUAL Shopify Payments fees from Finance > Payouts
-    try{
-      const tf=await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}`);
-      if(tf.ok){
-        const td=await tf.json();
-        const fm=td.fees||{};
-        if(Object.keys(fm).length>0){
-          orAllOrders=orAllOrders.map(o=>{
-            const actual=fm[String(o.id)];
-            if(actual!=null){
-              const txFee=actual;
-              const profit=Math.round((parseFloat(o.revenue)-(o.cogs||0)-(o.shipping||0)-txFee)*100)/100;
-              const margin=o.revenue>0?Math.round(profit/o.revenue*10000)/100:0;
-              const grossProfit=Math.round((parseFloat(o.revenue)-(o.cogs||0))*100)/100;
-              return {...o,txFee,profit,margin,grossProfit};
-            }
-            return o;
-          });
-          orFilterAndRender();
-          orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} · fees from Shopify Payments`);
-        } else {
-          orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
-        }
+    // Step 2: Fetch ACTUAL transaction fees from Shopify GraphQL
+    try {
+      const feeParams=getFeeParams();
+      const tfRes=await fetch(`${PROXY}?service=shopify&action=tx-fees&from=${from}&to=${to}&${feeParams}`);
+      if(tfRes.ok){
+        const tfData=await tfRes.json();
+        const feeMap=tfData.fees||{};
+        // Step 3: Override txFee with actual Shopify data where available
+        let updated=false;
+        orAllOrders=orAllOrders.map(o=>{
+          const actual=feeMap[String(o.id)];
+          if(actual!=null && actual!==o.txFee){
+            updated=true;
+            const profit=Math.round((parseFloat(o.revenue)-(o.cogs||0)-(o.shipping||0)-actual)*100)/100;
+            const margin=o.revenue>0?Math.round(profit/o.revenue*10000)/100:0;
+            return {...o,txFee:actual,profit,margin};
+          }
+          return o;
+        });
+        if(updated) orFilterAndRender();
+        orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
       } else {
         orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
       }
-    }catch(e2){orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);}
+    } catch(e){
+      orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
+    }
   }catch(e){orSetStatus(`✗ ${e.message}`,true);}
   finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
 }
@@ -5452,17 +6913,9 @@ async function paSyncWithRange(from,to){
 let maSortKey  = 'spend';
 let maSortDir  = -1;
 
-async function maSync() { const r=window.maDpGetRange?.(); maSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function maSync() { maSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function maSetStatus(msg, isErr=false) {
-  const el = document.getElementById('ma-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function maSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const maFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
 const maFmtK = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n);
@@ -5690,17 +7143,9 @@ function maExportCSV() {
 let plData        = null;
 let plGranularity = 'daily'; // daily | weekly | monthly
 
-async function plSync() { const r=window.plDpGetRange?.(); plSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function plSync() { plSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function plSetStatus(msg, isErr=false) {
-  const el = document.getElementById('pl-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function plSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 function plSetGranularity(g) {
   plGranularity = g;
@@ -6047,17 +7492,9 @@ function paDpToggle() { window.paDpToggle?.(); }
 
 function paApplyPreset(key) { window.paApplyPreset?.(key); }
 
-async function paSync() { const r=window.paDpGetRange?.(); paSyncWithRange(r?.from||new Date(Date.now()-29*86400000).toISOString().slice(0,10), r?.to||new Date().toISOString().slice(0,10)); }
+async function paSync() { paSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); }
 
-function paSetStatus(msg, isErr=false) {
-  const el = document.getElementById('pa-status');
-  if (!el) return;
-  el.style.display = 'block';
-  el.style.color   = isErr ? 'var(--red)' : 'var(--green)';
-  el.style.borderColor = isErr ? 'rgba(217,84,84,0.2)' : 'rgba(90,158,114,0.2)';
-  el.style.background  = isErr ? 'rgba(217,84,84,0.04)' : 'rgba(90,158,114,0.04)';
-  el.textContent = msg;
-}
+function paSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 function paRender() {
   if (!paData) return;
@@ -6177,7 +7614,7 @@ function paRenderInventory() {
   if (!el || !paData) return;
   const items = paData.inventoryHealth.filter(i => i.totalStock !== null);
   if (!items.length) {
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px;font-family:'Inter',sans-serif">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--c3);font-size:11px">Inventory data unavailable — ensure inventory tracking is enabled in Shopify</div>';
     return;
   }
   const sorted = [...items].sort((a,b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
