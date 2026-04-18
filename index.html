@@ -3976,6 +3976,7 @@ function getRange(key) {
    MAIN SYNC — fetch all live data
 ══════════════════════════════════════════ */
 async function doSync() {
+  window.GLOBAL_TX_FEE = null; // reset until OR data loads
   const btn = document.getElementById('syncBtn');
   if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
 
@@ -4492,7 +4493,10 @@ function renderBreakdown() {
     return;
   }
 
-  const txFee = t.txFee > 0 ? t.txFee : +(t.rev * 0.057424).toFixed(2);
+  // Use Order Report total when available — exact same figure as OR table
+  const txFee = (window.GLOBAL_TX_FEE != null && window.GLOBAL_TX_FEE > 0)
+    ? window.GLOBAL_TX_FEE
+    : t.txFee > 0 ? t.txFee : +(t.rev * 0.057424).toFixed(2);
   const ship  = t.ship  > 0 ? t.ship  : 0;
   const cogs  = t.cogs  > 0 ? t.cogs  : 0;
   const ad    = t.ad    > 0 ? t.ad    : 0;
@@ -6885,6 +6889,9 @@ async function orSyncWithRange(from,to){
     orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} (loading exact fees...)`);
     // Async: fetch actual shipping label costs (non-blocking)
     orFetchShippingLabels(from, to);
+    // Sync tx fee total to main dashboard cost breakdown chart
+    window.GLOBAL_TX_FEE = orAllOrders.reduce((s,o)=>s+(o.txFee||0),0);
+    if(typeof renderBreakdown==="function") renderBreakdown();
     // Step 2: Fetch ACTUAL transaction fees from Shopify Payments Finance > Payouts
     try {
       console.log('[FoldifyCase] Fetching actual Shopify Payments fees...');
@@ -6907,7 +6914,7 @@ async function orSyncWithRange(from,to){
           }
           return o;
         });
-        if(updated){
+        if(updated){ window.GLOBAL_TX_FEE=orAllOrders.reduce((s,o)=>s+(o.txFee||0),0); if(typeof renderBreakdown==="function") renderBreakdown();
           orFilterAndRender();
           orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to} · fees synced from Shopify Payments`);
           console.log('[FoldifyCase] ✅ Fees updated from Shopify Payments payout data:', feeCount, 'orders');
