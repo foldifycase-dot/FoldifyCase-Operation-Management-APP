@@ -1220,7 +1220,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ platform: "meta", daily, total, campaigns });
   }
 
-  // ── Google Ads API ───────────────────────────────────────────────────────────
+  // ── Google Ads API ─────────────────────────────────────────────────────────
   if (service === "google-ads") {
     const DEV_TOKEN     = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
     const CLIENT_ID     = process.env.GOOGLE_ADS_CLIENT_ID;
@@ -1231,11 +1231,10 @@ module.exports = async function handler(req, res) {
     if (!DEV_TOKEN || !CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN || !CUSTOMER_ID) {
       return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "Google Ads env vars not configured" });
     }
-
     if (!from || !to) return res.status(400).json({ error: "from and to required" });
 
     try {
-      // Step 1: Get a fresh access token using the refresh token
+      // Step 1: Get fresh access token
       const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -1254,31 +1253,26 @@ module.exports = async function handler(req, res) {
       const ACCESS_TOKEN = tokenJson.access_token;
 
       // Step 2: Query Google Ads API using GAQL
-      const GAQL = `
-        SELECT
-          campaign.id,
-          campaign.name,
-          campaign.status,
-          segments.date,
-          metrics.cost_micros,
-          metrics.conversions_value,
-          metrics.conversions,
-          metrics.clicks,
-          metrics.impressions
-        FROM campaign
-        WHERE segments.date BETWEEN '${from}' AND '${to}'
-          AND campaign.status != 'REMOVED'
-        ORDER BY segments.date ASC
-      `;
+      const GAQL = [
+        "SELECT",
+        "  campaign.id, campaign.name, campaign.status,",
+        "  segments.date,",
+        "  metrics.cost_micros, metrics.conversions_value,",
+        "  metrics.conversions, metrics.clicks, metrics.impressions",
+        "FROM campaign",
+        "WHERE segments.date BETWEEN '" + from + "' AND '" + to + "'",
+        "  AND campaign.status != 'REMOVED'",
+        "ORDER BY segments.date ASC"
+      ].join(" ");
 
       const gaRes = await fetch(
-        \`https://googleads.googleapis.com/v18/customers/\${CUSTOMER_ID}/googleAds:search\`,
+        "https://googleads.googleapis.com/v18/customers/" + CUSTOMER_ID + "/googleAds:search",
         {
           method: "POST",
           headers: {
-            "Authorization":       \`Bearer \${ACCESS_TOKEN}\`,
-            "developer-token":     DEV_TOKEN,
-            "Content-Type":        "application/json",
+            "Authorization":   "Bearer " + ACCESS_TOKEN,
+            "developer-token": DEV_TOKEN,
+            "Content-Type":    "application/json",
           },
           body: JSON.stringify({ query: GAQL }),
         }
@@ -1287,36 +1281,34 @@ module.exports = async function handler(req, res) {
       if (!gaRes.ok) {
         const errText = await gaRes.text();
         console.error("[google-ads] API error:", errText);
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: \`Google Ads API error: \${gaRes.status}\` });
+        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "Google Ads API error: " + gaRes.status });
       }
 
       const gaJson = await gaRes.json();
       const rows = gaJson.results || [];
 
-      // Step 3: Aggregate by date and by campaign
+      // Step 3: Aggregate by date and campaign
       const round2 = n => Math.round(n * 100) / 100;
-      const byDate = {};     // date → { spend, revenue, conversions, clicks, impressions }
-      const byCampaign = {}; // campaign.id → { id, name, spend, revenue, conversions, clicks, impressions }
+      const byDate     = {};
+      const byCampaign = {};
 
-      rows.forEach(row => {
-        const date        = row.segments?.date || "";
-        const campId      = row.campaign?.id || "";
-        const campName    = row.campaign?.name || "Unknown";
-        const spend       = round2((parseInt(row.metrics?.cost_micros || 0)) / 1_000_000);
-        const revenue     = round2(parseFloat(row.metrics?.conversions_value || 0));
-        const conversions = round2(parseFloat(row.metrics?.conversions || 0));
-        const clicks      = parseInt(row.metrics?.clicks || 0);
-        const impressions = parseInt(row.metrics?.impressions || 0);
+      rows.forEach(function(row) {
+        const date        = (row.segments && row.segments.date) || "";
+        const campId      = (row.campaign && row.campaign.id)   || "";
+        const campName    = (row.campaign && row.campaign.name) || "Unknown";
+        const spend       = round2((parseInt((row.metrics && row.metrics.cost_micros) || 0)) / 1000000);
+        const revenue     = round2(parseFloat((row.metrics && row.metrics.conversions_value) || 0));
+        const conversions = round2(parseFloat((row.metrics && row.metrics.conversions)       || 0));
+        const clicks      = parseInt((row.metrics && row.metrics.clicks)      || 0);
+        const impressions = parseInt((row.metrics && row.metrics.impressions) || 0);
 
-        // By date
-        if (!byDate[date]) byDate[date] = { date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+        if (!byDate[date]) byDate[date] = { date: date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
         byDate[date].spend       = round2(byDate[date].spend + spend);
         byDate[date].revenue     = round2(byDate[date].revenue + revenue);
         byDate[date].conversions += conversions;
         byDate[date].clicks      += clicks;
         byDate[date].impressions += impressions;
 
-        // By campaign
         if (!byCampaign[campId]) byCampaign[campId] = { id: campId, name: campName, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
         byCampaign[campId].spend       = round2(byCampaign[campId].spend + spend);
         byCampaign[campId].revenue     = round2(byCampaign[campId].revenue + revenue);
@@ -1326,32 +1318,36 @@ module.exports = async function handler(req, res) {
       });
 
       // Step 4: Build sorted arrays
-      const daily = Object.values(byDate).sort((a,b) => a.date.localeCompare(b.date)).map(d => ({
-        ...d,
-        roas: d.spend > 0 ? round2(d.revenue / d.spend) : 0,
-        ctr:  d.impressions > 0 ? round2(d.clicks / d.impressions * 100) : 0,
-      }));
+      const daily = Object.values(byDate).sort(function(a,b){ return a.date.localeCompare(b.date); }).map(function(d) {
+        return Object.assign({}, d, {
+          roas: d.spend > 0 ? round2(d.revenue / d.spend) : 0,
+          ctr:  d.impressions > 0 ? round2(d.clicks / d.impressions * 100) : 0,
+        });
+      });
 
-      const campaigns = Object.values(byCampaign).sort((a,b) => b.spend - a.spend).map(c => ({
-        ...c,
-        roas: c.spend > 0 ? round2(c.revenue / c.spend) : 0,
-        ctr:  c.impressions > 0 ? round2(c.clicks / c.impressions * 100) : 0,
-        cpa:  c.conversions > 0 ? round2(c.spend / c.conversions) : 0,
-      }));
+      const campaigns = Object.values(byCampaign).sort(function(a,b){ return b.spend - a.spend; }).map(function(c) {
+        return Object.assign({}, c, {
+          roas: c.spend > 0 ? round2(c.revenue / c.spend) : 0,
+          ctr:  c.impressions > 0 ? round2(c.clicks / c.impressions * 100) : 0,
+          cpa:  c.conversions > 0 ? round2(c.spend / c.conversions) : 0,
+        });
+      });
 
       // Step 5: Grand totals
-      const total = daily.reduce((acc, d) => ({
-        spend:       round2(acc.spend + d.spend),
-        revenue:     round2(acc.revenue + d.revenue),
-        conversions: acc.conversions + d.conversions,
-        clicks:      acc.clicks + d.clicks,
-        impressions: acc.impressions + d.impressions,
-      }), { spend:0, revenue:0, conversions:0, clicks:0, impressions:0 });
+      const total = daily.reduce(function(acc, d) {
+        return {
+          spend:       round2(acc.spend + d.spend),
+          revenue:     round2(acc.revenue + d.revenue),
+          conversions: acc.conversions + d.conversions,
+          clicks:      acc.clicks + d.clicks,
+          impressions: acc.impressions + d.impressions,
+        };
+      }, { spend:0, revenue:0, conversions:0, clicks:0, impressions:0 });
       total.roas = total.spend > 0 ? round2(total.revenue / total.spend) : 0;
       total.cpa  = total.conversions > 0 ? round2(total.spend / total.conversions) : 0;
       total.ctr  = total.impressions > 0 ? round2(total.clicks / total.impressions * 100) : 0;
 
-      return res.status(200).json({ platform: "google", daily, total, campaigns });
+      return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns });
 
     } catch (err) {
       console.error("[google-ads] Unexpected error:", err.message);
