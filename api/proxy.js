@@ -1222,6 +1222,30 @@ module.exports = async function handler(req, res) {
 
   // ── Google Ads API ─────────────────────────────────────────────────────────
   if (service === "google-ads") {
+    const DEV_TOKEN_CHECK = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
+    const CLIENT_ID_CHECK = process.env.GOOGLE_ADS_CLIENT_ID;
+    const CLIENT_SECRET_CHECK = process.env.GOOGLE_ADS_CLIENT_SECRET;
+    const REFRESH_TOKEN_CHECK = process.env.GOOGLE_ADS_REFRESH_TOKEN;
+
+    // Diagnostic: list all accessible customer accounts
+    if (req.query.action === "list-accounts") {
+      try {
+        const trRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ client_id: CLIENT_ID_CHECK, client_secret: CLIENT_SECRET_CHECK, refresh_token: REFRESH_TOKEN_CHECK, grant_type: "refresh_token" }),
+        });
+        const trJson = await trRes.json();
+        if (!trJson.access_token) return res.status(200).json({ error: "Token failed", detail: trJson });
+        const listRes = await fetch("https://googleads.googleapis.com/v19/customers:listAccessibleCustomers", {
+          headers: { "Authorization": "Bearer " + trJson.access_token, "developer-token": DEV_TOKEN_CHECK }
+        });
+        const listJson = await listRes.json();
+        return res.status(200).json({ accessible_customers: listJson, token_ok: true });
+      } catch(e) {
+        return res.status(200).json({ error: e.message });
+      }
+    }
+
     const DEV_TOKEN     = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
     const CLIENT_ID     = process.env.GOOGLE_ADS_CLIENT_ID;
     const CLIENT_SECRET = process.env.GOOGLE_ADS_CLIENT_SECRET;
