@@ -1282,7 +1282,9 @@ module.exports = async function handler(req, res) {
         const errText = await gaRes.text();
         console.error("[google-ads] API error:", gaRes.status, errText.substring(0, 500));
         let errJson = {}; try { errJson = JSON.parse(errText); } catch(e) {}
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "API error " + gaRes.status + ": " + errText.substring(0, 300), debug: errJson });
+        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], 
+          error: "API error " + gaRes.status, 
+          debug: { endpoint_called: gaEndpoint, customer_id_used: cleanCID, login_id_used: cleanLOGIN, http_status: gaRes.status, response_preview: errText.substring(0, 200) } });
       }
 
       const gaJson = await gaRes.json();
