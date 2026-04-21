@@ -1244,9 +1244,10 @@ module.exports = async function handler(req, res) {
         const listRes = await fetch(listUrl, {
           method: "GET",
           headers: {
-            "Authorization": "Bearer " + accessToken,
-            "developer-token": devToken,
-            "Accept": "application/json",
+            "Authorization":     "Bearer " + accessToken,
+            "developer-token":   devToken,
+            "Accept":            "application/json",
+            "x-goog-api-client": "gl-node/18 grpc-node/1.0 gax/1.0 gapic/1.0",
           }
         });
         var rawText = await listRes.text();
@@ -1310,11 +1311,12 @@ module.exports = async function handler(req, res) {
       console.log("[google-ads] CID:", cleanCID, "LOGIN:", cleanLOGIN, "endpoint:", gaEndpoint);
 
       var gaHeaders = {
-        "Authorization":    "Bearer " + ACCESS_TOKEN,
-        "developer-token":  DEV_TOKEN,
-        "Content-Type":     "application/json",
-        "Accept":           "application/json",
-        "login-customer-id": cleanLOGIN,
+        "Authorization":       "Bearer " + ACCESS_TOKEN,
+        "developer-token":     DEV_TOKEN,
+        "Content-Type":        "application/json",
+        "Accept":              "application/json",
+        "login-customer-id":   cleanLOGIN,
+        "x-goog-api-client":   "gl-node/18 grpc-node/1.0 gax/1.0 gapic/1.0",
       };
 
       const gaRes = await fetch(
