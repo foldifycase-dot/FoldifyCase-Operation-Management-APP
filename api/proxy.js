@@ -1263,7 +1263,7 @@ module.exports = async function handler(req, res) {
       if (!cleanCID) {
         return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "GOOGLE_ADS_CUSTOMER_ID is missing or invalid: " + CUSTOMER_ID });
       }
-      var gaEndpoint = "https://googleads.googleapis.com/v18/customers/" + cleanCID + "/googleAds:search";
+      var gaEndpoint = "https://googleads.googleapis.com/v19/customers/" + cleanCID + "/googleAds:search";
       console.log("[google-ads] CID:", cleanCID, "LOGIN:", cleanLOGIN, "endpoint:", gaEndpoint);
 
       var gaHeaders = {
