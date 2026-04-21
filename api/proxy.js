@@ -1249,8 +1249,8 @@ module.exports = async function handler(req, res) {
       const tokenJson = await tokenRes.json();
       if (!tokenJson.access_token) {
         const errMsg = (tokenJson.error_description || tokenJson.error || "unknown token error");
-        console.error("[google-ads] Token error:", errMsg);
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "Token error: " + errMsg });
+        console.error("[google-ads] Token error:", errMsg, JSON.stringify(tokenJson));
+        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "Token error: " + errMsg, debug: tokenJson });
       }
       const ACCESS_TOKEN = tokenJson.access_token;
 
@@ -1285,7 +1285,8 @@ module.exports = async function handler(req, res) {
       if (!gaRes.ok) {
         const errText = await gaRes.text();
         console.error("[google-ads] API error:", gaRes.status, errText.substring(0, 500));
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "API error " + gaRes.status + ": " + errText.substring(0, 200) });
+        let errJson = {}; try { errJson = JSON.parse(errText); } catch(e) {}
+        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "API error " + gaRes.status + ": " + errText.substring(0, 300), debug: errJson });
       }
 
       const gaJson = await gaRes.json();
