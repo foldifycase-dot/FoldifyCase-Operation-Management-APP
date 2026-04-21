@@ -1284,7 +1284,16 @@ module.exports = async function handler(req, res) {
         let errJson = {}; try { errJson = JSON.parse(errText); } catch(e) {}
         return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], 
           error: "API error " + gaRes.status, 
-          debug: { endpoint_called: gaEndpoint, customer_id_used: cleanCID, login_id_used: cleanLOGIN, http_status: gaRes.status, response_preview: errText.substring(0, 200) } });
+          debug: { 
+            endpoint_called: gaEndpoint, 
+            customer_id_used: cleanCID, 
+            login_id_used: cleanLOGIN, 
+            http_status: gaRes.status,
+            has_access_token: !!ACCESS_TOKEN,
+            token_first_10: ACCESS_TOKEN ? ACCESS_TOKEN.substring(0, 10) + "..." : "MISSING",
+            request_headers_sent: { authorization: "Bearer " + (ACCESS_TOKEN ? ACCESS_TOKEN.substring(0,10)+"..." : "MISSING"), developer_token: DEV_TOKEN ? DEV_TOKEN.substring(0,8)+"..." : "MISSING", login_customer_id: cleanLOGIN },
+            response_preview: errText.substring(0, 200) 
+          } });
       }
 
       const gaJson = await gaRes.json();
