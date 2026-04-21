@@ -1278,7 +1278,7 @@ module.exports = async function handler(req, res) {
       }
 
       const gaRes = await fetch(
-        "https://googleads.googleapis.com/v18/customers/" + CUSTOMER_ID + "/googleAds:search",
+        gaEndpoint,
         { method: "POST", headers: gaHeaders, body: JSON.stringify({ query: GAQL }) }
       );
 
