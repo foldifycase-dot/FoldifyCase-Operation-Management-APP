@@ -1236,22 +1236,30 @@ module.exports = async function handler(req, res) {
         });
         const trJson = await trRes.json();
         if (!trJson.access_token) return res.status(200).json({ error: "Token failed", detail: trJson });
-        // Try listAccessibleCustomers - shows all accounts the token can access
-        var listHeaders = {
-          "Authorization": "Bearer " + trJson.access_token,
-          "developer-token": DEV_TOKEN_CHECK,
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "login-customer-id": (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || "").replace(/[^0-9]/g, "") || (process.env.GOOGLE_ADS_CUSTOMER_ID || "").replace(/[^0-9]/g, ""),
-        };
-        const listRes = await fetch("https://googleads.googleapis.com/v19/customers:listAccessibleCustomers", {
+        // listAccessibleCustomers - NO login-customer-id needed for this call
+        var accessToken = trJson.access_token;
+        var devToken = DEV_TOKEN_CHECK;
+        var listUrl = "https://googleads.googleapis.com/v19/customers:listAccessibleCustomers";
+        console.log("[google-ads list-accounts] token:", accessToken.substring(0,15), "devtoken:", devToken.substring(0,8));
+        const listRes = await fetch(listUrl, {
           method: "GET",
-          headers: listHeaders,
+          headers: {
+            "Authorization": "Bearer " + accessToken,
+            "developer-token": devToken,
+            "Accept": "application/json",
+          }
         });
-        const rawText = await listRes.text();
+        var rawText = await listRes.text();
+        console.log("[google-ads list-accounts] status:", listRes.status, "body:", rawText.substring(0, 200));
         var listJson = {};
-        try { listJson = JSON.parse(rawText); } catch(e) { listJson = { parse_error: e.message, raw_preview: rawText.substring(0, 500) }; }
-        return res.status(200).json({ accessible_customers: listJson, token_ok: true, http_status: listRes.status, headers_sent: { login_customer_id: listHeaders["login-customer-id"], developer_token: DEV_TOKEN_CHECK ? DEV_TOKEN_CHECK.substring(0,8)+"..." : "MISSING" } });
+        try { listJson = JSON.parse(rawText); } catch(e) { listJson = { parse_error: e.message, raw: rawText.substring(0, 500) }; }
+        return res.status(200).json({ 
+          accessible_customers: listJson, 
+          token_preview: accessToken.substring(0,15) + "...",
+          dev_token_preview: devToken.substring(0,8) + "...",
+          http_status: listRes.status,
+          url_called: listUrl
+        });
       } catch(e) {
         return res.status(200).json({ error: e.message });
       }
