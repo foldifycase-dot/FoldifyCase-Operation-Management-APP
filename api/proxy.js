@@ -1255,27 +1255,23 @@ module.exports = async function handler(req, res) {
       const ACCESS_TOKEN = tokenJson.access_token;
 
       // Step 2: Query Google Ads API v18 using GAQL
-      const GAQL = [
-        "SELECT",
-        "  campaign.id, campaign.name, campaign.status,",
-        "  segments.date,",
-        "  metrics.cost_micros, metrics.conversions_value,",
-        "  metrics.conversions, metrics.clicks, metrics.impressions",
-        "FROM campaign",
-        "WHERE segments.date BETWEEN '" + from + "' AND '" + to + "'",
-        "  AND campaign.status != 'REMOVED'",
-        "ORDER BY segments.date ASC"
-      ].join(" ");
+      var GAQL = "SELECT campaign.id, campaign.name, campaign.status, segments.date, metrics.cost_micros, metrics.conversions_value, metrics.conversions, metrics.clicks, metrics.impressions FROM campaign WHERE segments.date BETWEEN '" + from + "' AND '" + to + "' AND campaign.status != 'REMOVED' ORDER BY segments.date ASC";
 
-      const gaHeaders = {
+      // Clean customer IDs - digits only
+      var cleanCID   = CUSTOMER_ID.replace(/[^0-9]/g, "");
+      var cleanLOGIN = (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || "").replace(/[^0-9]/g, "") || cleanCID;
+      if (!cleanCID) {
+        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "GOOGLE_ADS_CUSTOMER_ID is missing or invalid: " + CUSTOMER_ID });
+      }
+      var gaEndpoint = "https://googleads.googleapis.com/v18/customers/" + cleanCID + "/googleAds:search";
+      console.log("[google-ads] CID:", cleanCID, "LOGIN:", cleanLOGIN, "endpoint:", gaEndpoint);
+
+      var gaHeaders = {
         "Authorization":    "Bearer " + ACCESS_TOKEN,
         "developer-token":  DEV_TOKEN,
         "Content-Type":     "application/json",
+        "login-customer-id": cleanLOGIN,
       };
-      // If using MCC (manager account), add login-customer-id header
-      if (LOGIN_CID && LOGIN_CID !== CUSTOMER_ID) {
-        gaHeaders["login-customer-id"] = LOGIN_CID.replace(/-/g, "");
-      }
 
       const gaRes = await fetch(
         gaEndpoint,
