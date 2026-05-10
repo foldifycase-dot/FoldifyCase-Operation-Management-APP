@@ -1220,191 +1220,127 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ platform: "meta", daily, total, campaigns });
   }
 
-  // ── Google Ads API ─────────────────────────────────────────────────────────
+  // ── Google Ads via Composio ────────────────────────────────────────────────
+  // Composio holds the OAuth refresh token for us, so this works without
+  // a Google Ads developer-token approval. Required Vercel env vars:
+  //   COMPOSIO_API_KEY                  — from app.composio.dev → Settings → API Keys
+  //   COMPOSIO_GOOGLE_ADS_ACCOUNT_ID    — connected account id (default: googleads_sorb-autist)
   if (service === "google-ads") {
-    const DEV_TOKEN_CHECK = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
-    const CLIENT_ID_CHECK = process.env.GOOGLE_ADS_CLIENT_ID;
-    const CLIENT_SECRET_CHECK = process.env.GOOGLE_ADS_CLIENT_SECRET;
-    const REFRESH_TOKEN_CHECK = process.env.GOOGLE_ADS_REFRESH_TOKEN;
+    const COMPOSIO_API_KEY  = process.env.COMPOSIO_API_KEY;
+    const COMPOSIO_ACCOUNT  = process.env.COMPOSIO_GOOGLE_ADS_ACCOUNT_ID || "googleads_sorb-autist";
+    const COMPOSIO_USER_ID  = process.env.COMPOSIO_USER_ID || "default";
 
-    // Diagnostic: list all accessible customer accounts
+    const emptyShape = {
+      platform: "google", daily: [], campaigns: [],
+      total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 },
+    };
+
+    if (!COMPOSIO_API_KEY) {
+      return res.status(200).json({ ...emptyShape, error: "COMPOSIO_API_KEY env var not set on Vercel" });
+    }
+    if (!from || !to) return res.status(400).json({ error: "from and to required" });
+
+    // Diagnostic: list accessible customer accounts via Composio
     if (req.query.action === "list-accounts") {
       try {
-        const trRes = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({ client_id: CLIENT_ID_CHECK, client_secret: CLIENT_SECRET_CHECK, refresh_token: REFRESH_TOKEN_CHECK, grant_type: "refresh_token" }),
-        });
-        const trJson = await trRes.json();
-        if (!trJson.access_token) return res.status(200).json({ error: "Token failed", detail: trJson });
-        // listAccessibleCustomers - NO login-customer-id needed for this call
-        var accessToken = trJson.access_token;
-        var devToken = DEV_TOKEN_CHECK;
-        var listUrl = "https://googleads.googleapis.com/v19/customers:listAccessibleCustomers";
-        console.log("[google-ads list-accounts] token:", accessToken.substring(0,15), "devtoken:", devToken.substring(0,8));
-        const listRes = await fetch(listUrl, {
-          method: "GET",
-          headers: {
-            "Authorization":     "Bearer " + accessToken,
-            "developer-token":   devToken,
-            "Accept":            "application/json",
-            "x-goog-api-client": "gl-node/18 grpc-node/1.0 gax/1.0 gapic/1.0",
-          }
-        });
-        var rawText = await listRes.text();
-        console.log("[google-ads list-accounts] status:", listRes.status, "body:", rawText.substring(0, 200));
-        var listJson = {};
-        try { listJson = JSON.parse(rawText); } catch(e) { listJson = { parse_error: e.message, raw: rawText.substring(0, 500) }; }
-        return res.status(200).json({ 
-          accessible_customers: listJson, 
-          token_preview: accessToken.substring(0,15) + "...",
-          dev_token_preview: devToken.substring(0,8) + "...",
-          http_status: listRes.status,
-          url_called: listUrl
-        });
-      } catch(e) {
+        const r = await callComposio("GOOGLEADS_LIST_ACCESSIBLE_CUSTOMERS", {}, COMPOSIO_API_KEY, COMPOSIO_ACCOUNT, COMPOSIO_USER_ID);
+        return res.status(200).json({ accessible_customers: r });
+      } catch (e) {
         return res.status(200).json({ error: e.message });
       }
     }
 
-    const DEV_TOKEN     = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
-    const CLIENT_ID     = process.env.GOOGLE_ADS_CLIENT_ID;
-    const CLIENT_SECRET = process.env.GOOGLE_ADS_CLIENT_SECRET;
-    const REFRESH_TOKEN = process.env.GOOGLE_ADS_REFRESH_TOKEN;
-    const CUSTOMER_ID   = (process.env.GOOGLE_ADS_CUSTOMER_ID || "").replace(/-/g, "");
-    const LOGIN_CID     = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || CUSTOMER_ID;
+    const GAQL =
+      "SELECT campaign.id, campaign.name, campaign.status, segments.date, " +
+      "metrics.cost_micros, metrics.conversions_value, metrics.conversions, " +
+      "metrics.clicks, metrics.impressions " +
+      "FROM campaign " +
+      "WHERE segments.date BETWEEN '" + from + "' AND '" + to + "' " +
+      "AND campaign.status != 'REMOVED' " +
+      "ORDER BY segments.date ASC";
 
-    if (!DEV_TOKEN || !CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN || !CUSTOMER_ID) {
-      return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "Google Ads env vars not configured" });
-    }
-    if (!from || !to) return res.status(400).json({ error: "from and to required" });
-
+    let composioResp;
     try {
-      // Step 1: Get fresh access token via OAuth2 refresh
-      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          client_id:     CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-          refresh_token: REFRESH_TOKEN,
-          grant_type:    "refresh_token",
-        }),
-      });
-      const tokenJson = await tokenRes.json();
-      if (!tokenJson.access_token) {
-        const errMsg = (tokenJson.error_description || tokenJson.error || "unknown token error");
-        console.error("[google-ads] Token error:", errMsg, JSON.stringify(tokenJson));
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "Token error: " + errMsg, debug: tokenJson });
-      }
-      const ACCESS_TOKEN = tokenJson.access_token;
-
-      // Step 2: Query Google Ads API v18 using GAQL
-      var GAQL = "SELECT campaign.id, campaign.name, campaign.status, segments.date, metrics.cost_micros, metrics.conversions_value, metrics.conversions, metrics.clicks, metrics.impressions FROM campaign WHERE segments.date BETWEEN '" + from + "' AND '" + to + "' AND campaign.status != 'REMOVED' ORDER BY segments.date ASC";
-
-      // Clean customer IDs - digits only
-      var cleanCID   = CUSTOMER_ID.replace(/[^0-9]/g, "");
-      var cleanLOGIN = (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || "").replace(/[^0-9]/g, "") || cleanCID;
-      if (!cleanCID) {
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: "GOOGLE_ADS_CUSTOMER_ID is missing or invalid: " + CUSTOMER_ID });
-      }
-      var gaEndpoint = "https://googleads.googleapis.com/v19/customers/" + cleanCID + "/googleAds:search";
-      console.log("[google-ads] CID:", cleanCID, "LOGIN:", cleanLOGIN, "endpoint:", gaEndpoint);
-
-      var gaHeaders = {
-        "Authorization":       "Bearer " + ACCESS_TOKEN,
-        "developer-token":     DEV_TOKEN,
-        "Content-Type":        "application/json",
-        "Accept":              "application/json",
-        "login-customer-id":   cleanLOGIN,
-        "x-goog-api-client":   "gl-node/18 grpc-node/1.0 gax/1.0 gapic/1.0",
-      };
-
-      const gaRes = await fetch(
-        gaEndpoint,
-        { method: "POST", headers: gaHeaders, body: JSON.stringify({ query: GAQL }) }
+      composioResp = await callComposio(
+        "GOOGLEADS_SEARCH_STREAM_GAQL",
+        { query: GAQL },
+        COMPOSIO_API_KEY, COMPOSIO_ACCOUNT, COMPOSIO_USER_ID
       );
-
-      if (!gaRes.ok) {
-        const errText = await gaRes.text();
-        console.error("[google-ads] API error:", gaRes.status, errText.substring(0, 500));
-        let errJson = {}; try { errJson = JSON.parse(errText); } catch(e) {}
-        return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], 
-          error: "API error " + gaRes.status, 
-          debug: { 
-            endpoint_called: gaEndpoint, 
-            customer_id_used: cleanCID, 
-            login_id_used: cleanLOGIN, 
-            http_status: gaRes.status,
-            has_access_token: !!ACCESS_TOKEN,
-            token_first_10: ACCESS_TOKEN ? ACCESS_TOKEN.substring(0, 10) + "..." : "MISSING",
-            request_headers_sent: { authorization: "Bearer " + (ACCESS_TOKEN ? ACCESS_TOKEN.substring(0,10)+"..." : "MISSING"), developer_token: DEV_TOKEN ? DEV_TOKEN.substring(0,8)+"..." : "MISSING", login_customer_id: cleanLOGIN },
-            response_preview: errText.substring(0, 200) 
-          } });
-      }
-
-      const gaJson = await gaRes.json();
-      const rows = gaJson.results || [];
-      console.log("[google-ads] rows returned:", rows.length, "from:", from, "to:", to);
-
-      // Step 3: Aggregate by date and campaign
-      const round2 = n => Math.round(n * 100) / 100;
-      const byDate     = {};
-      const byCampaign = {};
-
-      rows.forEach(function(row) {
-        var date        = (row.segments && row.segments.date) || "";
-        var campId      = (row.campaign && String(row.campaign.id)) || "";
-        var campName    = (row.campaign && row.campaign.name)       || "Unknown";
-        var spend       = round2(parseInt((row.metrics && row.metrics.costMicros) || 0) / 1000000);
-        var revenue     = round2(parseFloat((row.metrics && row.metrics.conversionsValue) || 0));
-        var conversions = round2(parseFloat((row.metrics && row.metrics.conversions)      || 0));
-        var clicks      = parseInt((row.metrics && row.metrics.clicks)      || 0);
-        var impressions = parseInt((row.metrics && row.metrics.impressions) || 0);
-
-        if (!byDate[date]) byDate[date] = { date: date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
-        byDate[date].spend       = round2(byDate[date].spend + spend);
-        byDate[date].revenue     = round2(byDate[date].revenue + revenue);
-        byDate[date].conversions = round2(byDate[date].conversions + conversions);
-        byDate[date].clicks      += clicks;
-        byDate[date].impressions += impressions;
-
-        if (!byCampaign[campId]) byCampaign[campId] = { id: campId, name: campName, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
-        byCampaign[campId].spend       = round2(byCampaign[campId].spend + spend);
-        byCampaign[campId].revenue     = round2(byCampaign[campId].revenue + revenue);
-        byCampaign[campId].conversions = round2(byCampaign[campId].conversions + conversions);
-        byCampaign[campId].clicks      += clicks;
-        byCampaign[campId].impressions += impressions;
-      });
-
-      // Step 4: Build sorted daily + campaign arrays
-      var daily = Object.values(byDate).sort(function(a,b){ return a.date < b.date ? -1 : 1; }).map(function(d) {
-        return { date:d.date, spend:d.spend, revenue:d.revenue, conversions:d.conversions, clicks:d.clicks, impressions:d.impressions,
-          roas: d.spend > 0 ? round2(d.revenue / d.spend) : 0,
-          ctr:  d.impressions > 0 ? round2(d.clicks / d.impressions * 100) : 0 };
-      });
-
-      var campaigns = Object.values(byCampaign).sort(function(a,b){ return b.spend - a.spend; }).map(function(c) {
-        return { id:c.id, name:c.name, spend:c.spend, revenue:c.revenue, conversions:c.conversions, clicks:c.clicks, impressions:c.impressions,
-          roas: c.spend > 0 ? round2(c.revenue / c.spend) : 0,
-          ctr:  c.impressions > 0 ? round2(c.clicks / c.impressions * 100) : 0,
-          cpa:  c.conversions > 0 ? round2(c.spend / c.conversions) : 0 };
-      });
-
-      // Step 5: Grand totals
-      var total = daily.reduce(function(acc, d) {
-        return { spend: round2(acc.spend+d.spend), revenue: round2(acc.revenue+d.revenue),
-          conversions: round2(acc.conversions+d.conversions), clicks: acc.clicks+d.clicks, impressions: acc.impressions+d.impressions };
-      }, { spend:0, revenue:0, conversions:0, clicks:0, impressions:0 });
-      total.roas = total.spend > 0 ? round2(total.revenue / total.spend) : 0;
-      total.cpa  = total.conversions > 0 ? round2(total.spend / total.conversions) : 0;
-      total.ctr  = total.impressions > 0 ? round2(total.clicks / total.impressions * 100) : 0;
-
-      return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns });
-
     } catch (err) {
-      console.error("[google-ads] Unexpected error:", err.message);
-      return res.status(200).json({ platform: "google", daily: [], total: { spend:0, revenue:0, conversions:0, clicks:0, impressions:0, roas:0, cpa:0, ctr:0 }, campaigns: [], error: err.message });
+      console.error("[google-ads] Composio call failed:", err.message);
+      return res.status(200).json({ ...emptyShape, error: "Composio request failed: " + err.message });
     }
+
+    if (!composioResp.successful) {
+      return res.status(200).json({ ...emptyShape, error: composioResp.error || "Composio returned not-successful", debug: composioResp });
+    }
+
+    // Composio v3 response shape: { successful, data: { results: [...] } }
+    // Some shapes nest under data.data.results — handle both.
+    const payload = composioResp.data || {};
+    const rows =
+      (Array.isArray(payload.results) && payload.results) ||
+      (payload.data && Array.isArray(payload.data.results) && payload.data.results) ||
+      (Array.isArray(payload) && payload[0] && payload[0].results) ||
+      [];
+
+    console.log("[google-ads] rows returned:", rows.length, "from:", from, "to:", to);
+
+    // Aggregate by date and campaign
+    const round2 = n => Math.round(n * 100) / 100;
+    const byDate     = {};
+    const byCampaign = {};
+
+    rows.forEach(function(row) {
+      var date        = (row.segments && row.segments.date) || "";
+      var campId      = (row.campaign && String(row.campaign.id)) || "";
+      var campName    = (row.campaign && row.campaign.name)       || "Unknown";
+      // Composio returns metric numbers as either strings or numbers — coerce safely.
+      var costMicros  = (row.metrics && (row.metrics.costMicros ?? row.metrics.cost_micros)) || 0;
+      var convValue   = (row.metrics && (row.metrics.conversionsValue ?? row.metrics.conversions_value)) || 0;
+      var spend       = round2(parseInt(costMicros, 10) / 1000000);
+      var revenue     = round2(parseFloat(convValue));
+      var conversions = round2(parseFloat((row.metrics && row.metrics.conversions) || 0));
+      var clicks      = parseInt((row.metrics && row.metrics.clicks)      || 0, 10);
+      var impressions = parseInt((row.metrics && row.metrics.impressions) || 0, 10);
+
+      if (!byDate[date]) byDate[date] = { date: date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      byDate[date].spend       = round2(byDate[date].spend + spend);
+      byDate[date].revenue     = round2(byDate[date].revenue + revenue);
+      byDate[date].conversions = round2(byDate[date].conversions + conversions);
+      byDate[date].clicks      += clicks;
+      byDate[date].impressions += impressions;
+
+      if (!byCampaign[campId]) byCampaign[campId] = { id: campId, name: campName, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      byCampaign[campId].spend       = round2(byCampaign[campId].spend + spend);
+      byCampaign[campId].revenue     = round2(byCampaign[campId].revenue + revenue);
+      byCampaign[campId].conversions = round2(byCampaign[campId].conversions + conversions);
+      byCampaign[campId].clicks      += clicks;
+      byCampaign[campId].impressions += impressions;
+    });
+
+    var daily = Object.values(byDate).sort(function(a,b){ return a.date < b.date ? -1 : 1; }).map(function(d) {
+      return { date:d.date, spend:d.spend, revenue:d.revenue, conversions:d.conversions, clicks:d.clicks, impressions:d.impressions,
+        roas: d.spend > 0 ? round2(d.revenue / d.spend) : 0,
+        ctr:  d.impressions > 0 ? round2(d.clicks / d.impressions * 100) : 0 };
+    });
+
+    var campaigns = Object.values(byCampaign).sort(function(a,b){ return b.spend - a.spend; }).map(function(c) {
+      return { id:c.id, name:c.name, spend:c.spend, revenue:c.revenue, conversions:c.conversions, clicks:c.clicks, impressions:c.impressions,
+        roas: c.spend > 0 ? round2(c.revenue / c.spend) : 0,
+        ctr:  c.impressions > 0 ? round2(c.clicks / c.impressions * 100) : 0,
+        cpa:  c.conversions > 0 ? round2(c.spend / c.conversions) : 0 };
+    });
+
+    var total = daily.reduce(function(acc, d) {
+      return { spend: round2(acc.spend+d.spend), revenue: round2(acc.revenue+d.revenue),
+        conversions: round2(acc.conversions+d.conversions), clicks: acc.clicks+d.clicks, impressions: acc.impressions+d.impressions };
+    }, { spend:0, revenue:0, conversions:0, clicks:0, impressions:0 });
+    total.roas = total.spend > 0 ? round2(total.revenue / total.spend) : 0;
+    total.cpa  = total.conversions > 0 ? round2(total.spend / total.conversions) : 0;
+    total.ctr  = total.impressions > 0 ? round2(total.clicks / total.impressions * 100) : 0;
+
+    return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns });
   }
 
   if (service === "ms-ads")     return res.status(200).json({ platform: "microsoft", daily: [], total: { spend:0, revenue:0, roas:0 } });
@@ -1413,3 +1349,46 @@ module.exports = async function handler(req, res) {
 
   return res.status(400).json({ error: "Unknown service", received: service });
 };
+
+// ── Composio v3 REST helper ───────────────────────────────────────────────
+// Tries the v3 endpoint first (current contract: tool slug in path, x-api-key header).
+// Falls back to the v1 shape on 404 in case the user's account is on an older API.
+async function callComposio(toolSlug, args, apiKey, connectedAccountId, userId) {
+  const body = {
+    arguments: args,
+    user_id: userId,
+    connected_account_id: connectedAccountId,
+  };
+
+  const attempts = [
+    {
+      url: "https://backend.composio.dev/api/v3/tools/execute/" + toolSlug,
+      headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    {
+      url: "https://backend.composio.dev/api/v1/actions/" + toolSlug + "/execute",
+      headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({ input: args, connectedAccountId, userId }),
+    },
+  ];
+
+  let lastErr;
+  for (const a of attempts) {
+    try {
+      const r = await fetch(a.url, { method: "POST", headers: a.headers, body: a.body });
+      const text = await r.text();
+      let j; try { j = JSON.parse(text); } catch (_) { j = { raw: text }; }
+      if (r.status === 404) { lastErr = "404 from " + a.url; continue; }
+      if (!r.ok) {
+        return { successful: false, error: "HTTP " + r.status, debug: { url: a.url, body: text.substring(0, 500) } };
+      }
+      // Normalise: v3 returns { successful, data }; v1 returns { response_data, ... }
+      if (j && typeof j === "object" && "successful" in j) return j;
+      return { successful: true, data: j };
+    } catch (e) {
+      lastErr = e.message;
+    }
+  }
+  throw new Error("All Composio endpoints failed: " + (lastErr || "unknown"));
+}
