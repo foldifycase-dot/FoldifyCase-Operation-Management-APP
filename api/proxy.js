@@ -1259,6 +1259,16 @@ module.exports = async function handler(req, res) {
       "AND campaign.status != 'REMOVED' " +
       "ORDER BY segments.date ASC";
 
+    // Debug: surface key length/prefix to detect whitespace or wrong key in env var.
+    // Safe to expose: prefix is already in Composio's error responses, length is non-sensitive.
+    const keyDebug = {
+      key_len: COMPOSIO_API_KEY.length,
+      key_prefix: COMPOSIO_API_KEY.substring(0, 8),
+      key_has_whitespace: /\s/.test(COMPOSIO_API_KEY),
+      key_first_char_code: COMPOSIO_API_KEY.charCodeAt(0),
+      key_last_char_code: COMPOSIO_API_KEY.charCodeAt(COMPOSIO_API_KEY.length - 1),
+    };
+
     let composioResp;
     try {
       composioResp = await callComposio(
@@ -1268,11 +1278,11 @@ module.exports = async function handler(req, res) {
       );
     } catch (err) {
       console.error("[google-ads] Composio call failed:", err.message);
-      return res.status(200).json({ ...emptyShape, error: "Composio request failed: " + err.message });
+      return res.status(200).json({ ...emptyShape, error: "Composio request failed: " + err.message, key_debug: keyDebug });
     }
 
     if (!composioResp.successful) {
-      return res.status(200).json({ ...emptyShape, error: composioResp.error || "Composio returned not-successful", debug: composioResp });
+      return res.status(200).json({ ...emptyShape, error: composioResp.error || "Composio returned not-successful", debug: composioResp, key_debug: keyDebug });
     }
 
     // Composio v3 response shape: { successful, data: { results: [...] } }
