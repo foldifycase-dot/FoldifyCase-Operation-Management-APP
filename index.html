@@ -612,6 +612,37 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
 .ma-camp-num { text-align:right;font-family:'Inter',sans-serif;font-size:12px;color:var(--c2);flex-shrink:0;width:80px; }
 .ma-camp-name { font-size:12px;font-weight:500;color:var(--ink);flex:3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px; }
 
+/* Channel Comparison table (Marketing Attribution redesign) */
+.ma-ch-head, .ma-ch-row {
+  display:grid;
+  grid-template-columns: minmax(0, 1.4fr) 90px 96px 64px 64px 80px 60px 64px;
+  column-gap: 8px;
+  padding:10px 16px; align-items:center;
+}
+.ma-ch-head {
+  background:rgba(28,27,24,0.03);
+  border-bottom:1px solid rgba(28,27,24,0.06);
+  font-family:'Inter',sans-serif; font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; color:var(--c3);
+}
+.ma-ch-row {
+  border-bottom:1px solid rgba(28,27,24,0.04);
+  font-family:'Inter',sans-serif; font-size:12px;
+}
+.ma-ch-row:last-child { border-bottom:none; }
+.ma-ch-row > * { min-width: 0; }
+.ma-ch-num { text-align:right; font-variant-numeric: tabular-nums; white-space:nowrap; }
+.ma-ch-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  font-weight:700; color:var(--ink);
+}
+.ma-ch-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.ma-ch-share-bar {
+  height:6px; background:rgba(28,27,24,0.06); border-radius:3px;
+  margin-top:3px; overflow:hidden;
+}
+.ma-ch-share-fill { height:100%; border-radius:3px; }
+
 /* Allocation bars */
 .ma-alloc-row { margin-bottom:10px; }
 .ma-alloc-label { display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px; }
@@ -3101,230 +3132,81 @@ body.nav-open .sidebar-backdrop { display: block; opacity: 1; }
         </div>
       <div style="display:flex;gap:8px;margin-left:auto">
         <button onclick="maSync()" id="maSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
-        <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
 
 
-    <!-- ── SECTION 1: KPI Strip ────────────────────────────────────────── -->
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 28px 20px">
-      <div class="ma-kpi" style="border-top:3px solid var(--gold)">
+    <!-- ── SECTION 1: KPI Strip (4 cards) ──────────────────────────────── -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 28px 20px">
+      <div class="ma-kpi" style="border-top:3px solid var(--red)">
         <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--red)"></span>Total Ad Spend</div>
         <div class="ma-kpi-val" id="ma-spend">—</div>
-        <div class="ma-kpi-sub" id="ma-spend-sub">all channels</div>
+        <div class="ma-kpi-sub" id="ma-spend-sub">all platforms combined</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid var(--green)">
         <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--green)"></span>Attributed Revenue</div>
-        <div class="ma-kpi-val" id="ma-revenue" style="color:var(--green)">—</div>
+        <div class="ma-kpi-val" id="ma-revenue">—</div>
         <div class="ma-kpi-sub" id="ma-revenue-sub">platform-reported</div>
       </div>
-      <div class="ma-kpi" style="border-top:3px solid #4A7FC1">
+      <div class="ma-kpi" style="border-top:3px solid var(--gold)">
         <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--gold)"></span>Blended ROAS</div>
-        <div class="ma-kpi-val" id="ma-roas" style="color:#4A7FC1">—</div>
-        <div class="ma-kpi-sub">revenue ÷ spend</div>
+        <div class="ma-kpi-val" id="ma-roas">—</div>
+        <div class="ma-kpi-sub">attributed rev ÷ spend</div>
       </div>
       <div class="ma-kpi" style="border-top:3px solid #7E6DB5">
-        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#4A7FC1"></span>MER</div>
-        <div class="ma-kpi-val" id="ma-mer" style="color:#7E6DB5">—</div>
-        <div class="ma-kpi-sub">store rev ÷ ad spend</div>
-      </div>
-      <div class="ma-kpi" style="border-top:3px solid var(--red)">
-        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#7E6DB5"></span>Blended CPA</div>
-        <div class="ma-kpi-val" id="ma-cpa" style="color:var(--red)">—</div>
-        <div class="ma-kpi-sub" id="ma-cpa-sub">per conversion</div>
-      </div>
-      <div class="ma-kpi">
-        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:var(--green)"></span>Total Conversions</div>
-        <div class="ma-kpi-val" id="ma-conv">—</div>
-        <div class="ma-kpi-sub" id="ma-conv-sub">across all channels</div>
+        <div class="ma-kpi-lbl"><span class="ma-kpi-dot" style="background:#7E6DB5"></span>MER</div>
+        <div class="ma-kpi-val" id="ma-mer">—</div>
+        <div class="ma-kpi-sub" id="ma-mer-sub">store rev ÷ ad spend</div>
       </div>
     </div>
 
-    <!-- ── SECTION 2: Channel Comparison ──────────────────────────────── -->
+    <!-- ── SECTION 2: Channel Comparison table (all three platforms) ──── -->
     <div style="margin:0 28px 20px">
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Channel Comparison</div>
-            <div style="font-size:11px;color:var(--c3);margin-top:2px">Platform-reported metrics side by side</div>
-          </div>
-          <div style="display:flex;gap:8px;font-size:11px;font-family:'Inter',sans-serif">
-            <span style="padding:3px 8px;background:rgba(24,119,242,.1);color:#1877F2;border-radius:4px;font-weight:700">● Meta</span>
-            <span style="padding:3px 8px;background:rgba(66,133,244,.1);color:#4285F4;border-radius:4px;font-weight:700">● Google</span>
-            <span style="padding:3px 8px;background:rgba(0,114,206,.1);color:#0072CE;border-radius:4px;font-weight:700">● Microsoft</span>
-          </div>
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Channel Comparison</div>
+          <div style="font-size:11px;color:var(--c3);margin-top:2px">One row per platform · spend, revenue, conversions and key ratios</div>
         </div>
-        <!-- Channel cards -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(28,27,24,0.06)">
-          <!-- Meta -->
-          <div id="ma-ch-meta" class="ma-ch-card" style="border-right:1px solid rgba(28,27,24,0.06)">
-            <div class="ma-ch-header" style="background:rgba(24,119,242,.06)">
-              <div class="ma-ch-name" style="color:#1877F2">Meta Ads</div>
-              <div id="ma-meta-badge" class="ma-ch-badge" style="background:rgba(24,119,242,.12);color:#1877F2">LIVE</div>
-            </div>
-            <div class="ma-ch-metrics" id="ma-meta-metrics">
-              <div class="ma-ch-metric"><span>Spend</span><span id="ma-meta-spend" class="ma-ch-val">—</span></div>
-              <div class="ma-ch-metric"><span>Revenue</span><span id="ma-meta-rev" class="ma-ch-val green">—</span></div>
-              <div class="ma-ch-metric"><span>ROAS</span><span id="ma-meta-roas" class="ma-ch-val blue">—</span></div>
-              <div class="ma-ch-metric"><span>CPA</span><span id="ma-meta-cpa" class="ma-ch-val red">—</span></div>
-              <div class="ma-ch-metric"><span>Conversions</span><span id="ma-meta-conv" class="ma-ch-val">—</span></div>
-              <div class="ma-ch-metric"><span>Clicks</span><span id="ma-meta-clicks" class="ma-ch-val">—</span></div>
-              <div class="ma-ch-metric"><span>Impressions</span><span id="ma-meta-impr" class="ma-ch-val">—</span></div>
-              <div class="ma-ch-metric"><span>CTR</span><span id="ma-meta-ctr" class="ma-ch-val">—</span></div>
-            </div>
-          </div>
-          <!-- Google -->
-          <div id="ma-ch-google" class="ma-ch-card" style="border-right:1px solid rgba(28,27,24,0.06)">
-            <div class="ma-ch-header" style="background:rgba(66,133,244,.06)">
-              <div class="ma-ch-name" style="color:#4285F4">Google Ads</div>
-              <div class="ma-ch-badge" style="background:rgba(66,133,244,.12);color:#4285F4">PENDING</div>
-            </div>
-            <div class="ma-ch-metrics">
-              <div class="ma-ch-metric"><span>Spend</span><span id="ma-google-spend" class="ma-ch-val">—</span></div>
-              <div class="ma-ch-metric"><span>Revenue</span><span class="ma-ch-val" style="color:var(--c3)">API pending</span></div>
-              <div class="ma-ch-metric"><span>ROAS</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>CPA</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Conversions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Clicks</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Impressions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>CTR</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-            </div>
-          </div>
-          <!-- Microsoft -->
-          <div id="ma-ch-ms" class="ma-ch-card">
-            <div class="ma-ch-header" style="background:rgba(0,114,206,.06)">
-              <div class="ma-ch-name" style="color:#0072CE">Microsoft Ads</div>
-              <div class="ma-ch-badge" style="background:rgba(0,114,206,.12);color:#0072CE">PENDING</div>
-            </div>
-            <div class="ma-ch-metrics">
-              <div class="ma-ch-metric"><span>Spend</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Revenue</span><span class="ma-ch-val" style="color:var(--c3)">API pending</span></div>
-              <div class="ma-ch-metric"><span>ROAS</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>CPA</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Conversions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Clicks</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>Impressions</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-              <div class="ma-ch-metric"><span>CTR</span><span class="ma-ch-val" style="color:var(--c3)">—</span></div>
-            </div>
-          </div>
+        <div class="ma-ch-head">
+          <div>Platform</div>
+          <div class="ma-ch-num">Spend</div>
+          <div class="ma-ch-num">Revenue</div>
+          <div class="ma-ch-num">Conv.</div>
+          <div class="ma-ch-num">ROAS</div>
+          <div class="ma-ch-num">CPA</div>
+          <div class="ma-ch-num">CTR</div>
+          <div class="ma-ch-num">Share</div>
+        </div>
+        <div id="ma-channel-table">
+          <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load</div>
         </div>
       </div>
     </div>
 
-    <!-- ── SECTION 3+4: Spend vs Revenue Chart + Spend Allocation ─────── -->
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin:0 28px 20px">
+    <!-- ── SECTION 3: Daily trend + Allocation/Insights ──────────────── -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin:0 28px 28px">
 
-      <!-- Spend vs Revenue Trend -->
+      <!-- Daily trend: store revenue line + per-platform ad spend lines -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Spend vs Store Revenue</div>
-            <div style="font-size:11px;color:var(--c3);margin-top:2px">Daily — the gap is your profit zone</div>
-          </div>
-          <div style="display:flex;gap:14px;font-size:11px;font-family:'Inter',sans-serif">
-            <span><span style="display:inline-block;width:16px;height:3px;background:var(--gold);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Revenue</span>
-            <span><span style="display:inline-block;width:16px;height:3px;background:var(--red);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Ad Spend</span>
+        <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Daily Spend vs Store Revenue</div>
+            <div style="font-size:10px;color:var(--c3);margin-top:2px">The gap between revenue and total ad spend is your contribution before COGS &amp; fees</div>
           </div>
         </div>
-        <div style="padding:20px 24px 12px">
-          <div id="ma-trend-chart" style="height:150px;position:relative">
-            <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:55px 0">Click REFRESH to load</div>
-          </div>
+        <div id="ma-trend-chart" style="padding:14px 16px;min-height:260px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:40px 0">No data yet</div>
         </div>
       </div>
 
-      <!-- Spend Allocation + MER Gauge -->
+      <!-- Allocation bars + insight -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Budget Allocation</div>
-          <div style="font-size:11px;color:var(--c3);margin-top:2px">Share of total spend by channel</div>
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Budget Allocation</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:2px">Share of total spend &amp; top performer</div>
         </div>
-        <div id="ma-allocation" style="padding:16px">
-          <div style="text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px;padding:20px 0">Click REFRESH to load</div>
-        </div>
-        <!-- MER Gauge -->
-        <div style="border-top:1px solid rgba(28,27,24,0.06);padding:14px 16px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:8px">MER Health</div>
-          <div id="ma-mer-gauge" style="text-align:center;padding:8px 0">
-            <div style="font-size:28px;font-weight:800;font-family:'Inter',sans-serif" id="ma-mer-big">—</div>
-            <div style="font-size:10px;color:var(--c3);font-family:'Inter',sans-serif;margin-top:2px">Good MER ≥ 3.0 (industry benchmark)</div>
-            <div id="ma-mer-bar-wrap" style="height:6px;background:rgba(28,27,24,0.08);border-radius:3px;margin-top:8px;overflow:hidden">
-              <div id="ma-mer-bar" style="height:100%;width:0%;background:var(--green);border-radius:3px;transition:width .5s ease"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── SECTION 5: Campaign Performance ────────────────────────────── -->
-    <div style="margin:0 28px 20px">
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Meta Campaign Performance</div>
-            <div style="font-size:11px;color:var(--c3);margin-top:2px">Per-campaign breakdown — click column to sort</div>
-          </div>
-          <div style="display:flex;gap:6px">
-            <button onclick="maSort('spend')"   id="ma-sort-spend"   class="pa-view-btn pa-view-active">Spend</button>
-            <button onclick="maSort('revenue')" id="ma-sort-revenue" class="pa-view-btn">Revenue</button>
-            <button onclick="maSort('roas')"    id="ma-sort-roas"    class="pa-view-btn">ROAS</button>
-          </div>
-        </div>
-        <div class="ma-camp-head">
-          <div style="flex:3">Campaign</div>
-          <div class="ma-camp-num">Spend</div>
-          <div class="ma-camp-num">Revenue</div>
-          <div class="ma-camp-num">ROAS</div>
-          <div class="ma-camp-num">CPA</div>
-          <div class="ma-camp-num">Conv.</div>
-          <div class="ma-camp-num">Clicks</div>
-          <div class="ma-camp-num">CTR</div>
-        </div>
-        <div id="ma-campaign-table" style="max-height:360px;overflow-y:auto">
-          <div style="padding:40px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load campaign data</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── SECTION 6+7: Daily Table + Benchmarks ──────────────────────── -->
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin:0 28px 28px">
-
-      <!-- Daily Spend Breakdown -->
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Daily Breakdown</div>
-          <div style="font-size:11px;color:var(--c3);margin-top:2px">Meta spend · store revenue · MER per day</div>
-        </div>
-        <div style="overflow-x:auto">
-          <div id="ma-daily-table" style="max-height:320px;overflow-y:auto;min-width:600px">
-            <div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">Click REFRESH to load</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Benchmarks -->
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Industry Benchmarks</div>
-          <div style="font-size:11px;color:var(--c3);margin-top:2px">2025 data — DTC ecommerce</div>
-        </div>
-        <div style="padding:16px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin-bottom:8px">META ADS</div>
-          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">1.86×</span></div>
-          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$38.19</span></div>
-          <div class="ma-bench-row"><span>Avg CPM</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$20.48</span></div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin:14px 0 8px">GOOGLE ADS</div>
-          <div class="ma-bench-row"><span>Median ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">3.68×</span></div>
-          <div class="ma-bench-row"><span>Median CPA</span><span style="color:var(--c2);font-family:'Inter',sans-serif">$23.74</span></div>
-          <div class="ma-bench-row"><span>Search ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif">5.17×</span></div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c3);margin:14px 0 8px">BLENDED</div>
-          <div class="ma-bench-row"><span>Avg eComm ROAS</span><span style="color:var(--c2);font-family:'Inter',sans-serif;font-weight:600">2.87×</span></div>
-          <div class="ma-bench-row"><span>Good MER target</span><span style="color:var(--green);font-family:'Inter',sans-serif;font-weight:600">≥ 3.0</span></div>
-          <div class="ma-bench-row"><span>LTV:CAC target</span><span style="color:var(--c2);font-family:'Inter',sans-serif">3:1</span></div>
-          <div style="margin-top:14px;padding:10px 12px;background:var(--gold-bg);border-radius:8px;border-left:3px solid var(--gold)">
-            <div style="font-size:10px;font-weight:700;color:var(--gold);margin-bottom:4px">ROAS CONTEXT</div>
-            <div style="font-size:11px;color:var(--c2);line-height:1.5">ROAS alone doesn't show profitability. A 1.86× Meta ROAS can be profitable at 70% gross margin but loss-making at 30% margin. Always pair with MER and contribution margin.</div>
-          </div>
+        <div id="ma-allocation" style="padding:14px 16px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
         </div>
       </div>
     </div>
@@ -4616,6 +4498,8 @@ function renderAll() {
     if (pm && pm.style.display !== 'none' && typeof metaPageRender === 'function') metaPageRender();
     var ps = document.getElementById('pageMsAds');
     if (ps && ps.style.display !== 'none' && typeof msRenderPage === 'function') msRenderPage();
+    var pmk = document.getElementById('pageMarketing');
+    if (pmk && pmk.style.display !== 'none' && typeof maRender === 'function') maRender();
   } catch(e) { console.warn('[renderAll] ad-page re-render failed:', e.message); }
 }
 
@@ -7765,18 +7649,24 @@ async function plSyncWithRange(from,to){
   finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
 }
 async function maSyncWithRange(from,to){
+  // Redesigned page reads from window.livePlatforms (populated by doSync).
+  // Triggering doSync ensures all three platforms (Google/Meta/MS) refresh.
   const btn=document.getElementById('maSyncBtn');
   if(btn){btn.classList.add('is-spinning');btn.disabled=true;}
-  maSetStatus(`⟳ Fetching marketing data ${from} → ${to}...`);
-  try{
-    const metaRes=await fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`);
-    let mj={platform:'meta',daily:[],total:{spend:0,revenue:0,roas:0,cpa:0,conversions:0,clicks:0,impressions:0,ctr:0},campaigns:[]};
-    if(metaRes.ok){const d=await metaRes.json();if(!d.error) mj=d;}
-    const srv={};rows.forEach(r=>{srv[r.date]=(srv[r.date]||0)+r.revenue;});
-    maData={meta:mj,storeRevByDate:srv,totalStoreRev:rows.reduce((s,r)=>s+r.revenue,0),from,to};
-    maRender(); maSetStatus(`✓ Meta: ${mj.campaigns.length} campaigns · ${from} → ${to}`);
-  }catch(e){maSetStatus(`✗ ${e.message}`,true);}
-  finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
+  const done = function(){
+    if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}
+    if(typeof maRender==='function') maRender();
+  };
+  try {
+    if (typeof doSync === 'function') {
+      const r = doSync();
+      if (r && typeof r.then === 'function') { await r; }
+    }
+    done();
+  } catch (e) {
+    console.warn('[maSync] doSync failed:', e.message);
+    done();
+  }
 }
 async function clvSyncWithRange(from,to){
   const btn=document.getElementById('clvSyncBtn');
@@ -7825,225 +7715,248 @@ const maFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFract
 const maFmtK = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n);
 
 function maRender() {
-  if (!maData) return;
+  // The redesigned Marketing Attribution tab pulls live data straight from
+  // window.livePlatforms (populated by doSync), so it always reflects the
+  // same numbers as the dashboard cards. The legacy maData object is
+  // ignored — kept for backwards-compatibility of other callers.
   maRenderKPIs();
   maRenderChannels();
   maRenderTrend();
   maRenderAllocation();
-  maRenderCampaigns();
-  maRenderDailyTable();
+}
+
+/* Shared: list of platforms with non-null data, plus a small total helper. */
+function _maPlatforms() {
+  var lp = window.livePlatforms || {};
+  return [
+    { key:'google', name:'Google Ads',    color:'#4285F4', data: lp.google },
+    { key:'meta',   name:'Meta Ads',      color:'#E1306C', data: lp.meta },
+    { key:'ms',     name:'Microsoft Ads', color:'#00A4EF', data: lp.ms },
+  ].filter(function(p){ return p.data && (p.data.spend > 0 || p.data.impressions > 0 || p.data.clicks > 0); });
+}
+function _maTotals(platforms) {
+  return platforms.reduce(function(a, p){
+    a.spend       += +p.data.spend       || 0;
+    a.revenue     += +p.data.revenue     || 0;
+    a.conversions += +p.data.conversions || 0;
+    a.clicks      += +p.data.clicks      || 0;
+    a.impressions += +p.data.impressions || 0;
+    return a;
+  }, { spend:0, revenue:0, conversions:0, clicks:0, impressions:0 });
 }
 
 function maRenderKPIs() {
-  const t   = maData.meta.total;
-  const rev = maData.totalStoreRev || 0;
-  const mer = t.spend > 0 ? (rev / t.spend) : 0;
+  var platforms = _maPlatforms();
+  var t = _maTotals(platforms);
+  var storeRev = (typeof rows !== 'undefined' && rows.length)
+    ? rows.reduce(function(s,r){ return s + (+r.revenue||0); }, 0)
+    : 0;
+  var roas = t.spend > 0 ? t.revenue / t.spend : 0;
+  var mer  = t.spend > 0 ? storeRev / t.spend  : 0;
 
-  document.getElementById('ma-spend').textContent    = maFmt$(t.spend);
-  document.getElementById('ma-spend-sub').textContent = `Meta: ${maFmt$(t.spend)}`;
-  document.getElementById('ma-revenue').textContent   = maFmt$(t.revenue);
-  document.getElementById('ma-revenue-sub').textContent = 'Meta-attributed';
-  document.getElementById('ma-roas').textContent      = t.roas > 0 ? t.roas.toFixed(2)+'×' : '—';
-  document.getElementById('ma-roas').style.color      = t.roas >= 3 ? 'var(--green)' : t.roas >= 2 ? '#4A7FC1' : 'var(--red)';
-  document.getElementById('ma-mer').textContent       = mer > 0 ? mer.toFixed(2)+'×' : '—';
-  document.getElementById('ma-mer').style.color       = mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
-  document.getElementById('ma-cpa').textContent       = t.cpa > 0 ? maFmt$(t.cpa) : '—';
-  document.getElementById('ma-cpa-sub').textContent   = `${t.conversions} conversions`;
-  document.getElementById('ma-conv').textContent      = t.conversions.toLocaleString();
-  document.getElementById('ma-conv-sub').textContent  = `${t.clicks.toLocaleString()} clicks`;
+  var set = function(id, text, color) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+    if (color) el.style.color = color;
+  };
+  set('ma-spend',      t.spend > 0 ? maFmt$(t.spend) : '—', 'var(--c1)');
+  set('ma-revenue',    t.revenue > 0 ? maFmt$(t.revenue) : '—', t.revenue > 0 ? 'var(--green)' : 'var(--c3)');
+  set('ma-roas',       roas > 0 ? roas.toFixed(2) + '×' : '—', roas >= 3 ? 'var(--green)' : roas >= 2 ? 'var(--gold)' : roas > 0 ? 'var(--red)' : 'var(--c3)');
+  set('ma-mer',        mer  > 0 ? mer.toFixed(2)  + '×' : '—', mer  >= 3 ? 'var(--green)' : mer  >= 2 ? '#7E6DB5' : mer > 0 ? 'var(--red)' : 'var(--c3)');
 
-  // MER gauge
-  const merBig = document.getElementById('ma-mer-big');
-  const merBar = document.getElementById('ma-mer-bar');
-  if (merBig) {
-    merBig.textContent  = mer > 0 ? mer.toFixed(2)+'×' : '—';
-    merBig.style.color  = mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
+  var spendSubEl = document.getElementById('ma-spend-sub');
+  if (spendSubEl) {
+    spendSubEl.textContent = platforms.length
+      ? platforms.map(function(p){ return p.name.split(' ')[0] + ' ' + maFmt$(p.data.spend||0); }).join(' · ')
+      : 'all platforms combined';
   }
-  if (merBar) {
-    const pct = Math.min(mer / 6 * 100, 100);
-    merBar.style.width      = pct + '%';
-    merBar.style.background = mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
+  var merSubEl = document.getElementById('ma-mer-sub');
+  if (merSubEl) {
+    merSubEl.textContent = storeRev > 0
+      ? 'store rev ' + maFmt$(storeRev) + ' ÷ spend ' + maFmt$(t.spend || 0)
+      : 'store rev ÷ ad spend';
+  }
+  var revSubEl = document.getElementById('ma-revenue-sub');
+  if (revSubEl) {
+    revSubEl.textContent = t.conversions > 0
+      ? Math.round(t.conversions).toLocaleString() + ' conversions'
+      : 'platform-reported';
   }
 }
 
 function maRenderChannels() {
-  const t = maData.meta.total;
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('ma-meta-spend',  maFmt$(t.spend));
-  set('ma-meta-rev',    t.revenue > 0 ? maFmt$(t.revenue) : '—');
-  set('ma-meta-roas',   t.roas > 0 ? t.roas.toFixed(2)+'×' : '—');
-  set('ma-meta-cpa',    t.cpa > 0 ? maFmt$(t.cpa) : '—');
-  set('ma-meta-conv',   t.conversions.toLocaleString());
-  set('ma-meta-clicks', maFmtK(t.clicks));
-  set('ma-meta-impr',   maFmtK(t.impressions));
-  set('ma-meta-ctr',    t.ctr > 0 ? t.ctr.toFixed(2)+'%' : t.impressions > 0 ? (t.clicks/t.impressions*100).toFixed(2)+'%' : '—');
-
-  // Google stub — use rows data
-  const googleSpend = rows.reduce((s,r) => s + (r.google||0), 0);
-  set('ma-google-spend', googleSpend > 0 ? maFmt$(googleSpend) : '—');
+  var el = document.getElementById('ma-channel-table');
+  if (!el) return;
+  var platforms = _maPlatforms();
+  if (!platforms.length) {
+    el.innerHTML = '<div style="padding:30px;text-align:center;color:var(--c3);font-family:Inter,sans-serif;font-size:12px">No platform data yet — click REFRESH</div>';
+    return;
+  }
+  var totalSpend = platforms.reduce(function(s,p){ return s + (+p.data.spend||0); }, 0);
+  el.innerHTML = platforms.map(function(p){
+    var d = p.data;
+    var spend = +d.spend || 0;
+    var rev   = +d.revenue || 0;
+    var conv  = +d.conversions || 0;
+    var clicks = +d.clicks || 0;
+    var impr  = +d.impressions || 0;
+    var roas  = d.roas != null ? +d.roas : (spend > 0 ? rev / spend : 0);
+    var cpa   = d.cpa  != null ? +d.cpa  : (conv > 0 ? spend / conv : 0);
+    var ctr   = d.ctr  != null ? +d.ctr  : (impr > 0 ? clicks / impr * 100 : 0);
+    var share = totalSpend > 0 ? spend / totalSpend * 100 : 0;
+    return '<div class="ma-ch-row">' +
+      '<div class="ma-ch-pill"><span class="ma-ch-dot" style="background:'+p.color+'"></span>'+p.name+'</div>' +
+      '<div class="ma-ch-num" style="color:#4285F4;font-weight:700">'+(spend>0?maFmt$(spend):'—')+'</div>' +
+      '<div class="ma-ch-num" style="color:var(--green);font-weight:700">'+(rev>0?maFmt$(rev):'—')+'</div>' +
+      '<div class="ma-ch-num" style="color:var(--ink);font-weight:600">'+(conv>0?(Number.isInteger(conv)?conv:conv.toFixed(2)):'—')+'</div>' +
+      '<div class="ma-ch-num" style="color:'+(roas>=3?'var(--green)':roas>0?'var(--gold)':'var(--c2)')+';font-weight:700">'+(roas>0?roas.toFixed(2)+'×':'—')+'</div>' +
+      '<div class="ma-ch-num" style="color:var(--ink)">'+(cpa>0?maFmt$(cpa):'—')+'</div>' +
+      '<div class="ma-ch-num" style="color:var(--ink)">'+(ctr>0?ctr.toFixed(2)+'%':'—')+'</div>' +
+      '<div class="ma-ch-num" style="color:var(--c2);font-weight:600">'+share.toFixed(1)+'%' +
+        '<div class="ma-ch-share-bar"><div class="ma-ch-share-fill" style="width:'+Math.min(share,100)+'%;background:'+p.color+'"></div></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 
 function maRenderTrend() {
-  const el = document.getElementById('ma-trend-chart');
-  if (!el || !maData) return;
-  const daily    = maData.meta.daily;
-  const storeRev = maData.storeRevByDate;
-  if (!daily.length && !Object.keys(storeRev).length) {
-    el.innerHTML = '<div style="text-align:center;color:var(--c3);font-size:12px;padding:55px 0">No data available</div>';
+  var el = document.getElementById('ma-trend-chart');
+  if (!el) return;
+  var platforms = _maPlatforms();
+
+  // Build per-date series: total ad spend (sum across platforms) + store revenue.
+  var spendByDate = {};
+  platforms.forEach(function(p){
+    var daily = (p.data && Array.isArray(p.data.daily)) ? p.data.daily : [];
+    daily.forEach(function(r){
+      var d = r.date; if (!d) return;
+      spendByDate[d] = (spendByDate[d] || 0) + (+r.spend || 0);
+    });
+  });
+  var revByDate = {};
+  if (typeof rows !== 'undefined') {
+    rows.forEach(function(r){ if (r.date) revByDate[r.date] = (+r.revenue || 0); });
+  }
+  var dates = Array.from(new Set([].concat(Object.keys(spendByDate), Object.keys(revByDate)))).sort();
+  if (!dates.length) {
+    el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:40px 0">No data for this period — click REFRESH</div>';
     return;
   }
+  var W = el.clientWidth || 600;
+  var H = 260;
+  var padL = 56, padR = 16, padT = 18, padB = 38;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var spendVals = dates.map(function(d){ return spendByDate[d] || 0; });
+  var revVals   = dates.map(function(d){ return revByDate[d]   || 0; });
+  var maxV = Math.max.apply(null, spendVals.concat(revVals));
+  if (!isFinite(maxV) || maxV <= 0) maxV = 1;
 
-  // Merge all dates from both sources
-  const allDates = [...new Set([...daily.map(d=>d.date), ...Object.keys(storeRev)])].sort();
-  if (!allDates.length) return;
-  const spendMap = {};
-  daily.forEach(d => { spendMap[d.date] = d.spend; });
-
-  const H = 140, W = el.offsetWidth || 700, pad = 24;
-  const vals     = allDates.map(d => ({ date:d, rev: storeRev[d]||0, spend: spendMap[d]||0 }));
-  const maxVal   = Math.max(...vals.map(v => Math.max(v.rev, v.spend)), 1);
-  const xPos     = (i) => pad + (i / Math.max(vals.length-1, 1)) * (W - pad*2);
-  const yPos     = (v) => H - 12 - (v / maxVal) * (H - 24);
-
-  const path = (key, color) => {
-    const pts = vals.map((v,i) => `${i===0?'M':'L'} ${xPos(i).toFixed(1)} ${yPos(v[key]).toFixed(1)}`).join(' ');
-    const fill = `${pts} L ${xPos(vals.length-1).toFixed(1)} ${H} L ${xPos(0).toFixed(1)} ${H} Z`;
-    return `<path d="${fill}" fill="${color}" opacity="0.07"/>
-            <path d="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
-  };
-
-  // Date labels
-  const step = Math.max(1, Math.floor(vals.length / 7));
-  const labels = vals.filter((_,i) => i % step === 0 || i === vals.length-1).map((v,_,arr) => {
-    const i   = vals.indexOf(v);
-    const lbl = v.date.slice(5); // MM-DD
-    return `<text x="${xPos(i).toFixed(1)}" y="${H+4}" text-anchor="middle" font-size="9" font-family="monospace" fill="#aaa">${lbl}</text>`;
+  function niceTicks(max, count) {
+    if (max <= 0) return [0];
+    var raw = max / (count - 1);
+    var pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    var mult = raw / pow;
+    var step = (mult < 1.5 ? 1 : mult < 3 ? 2 : mult < 7 ? 5 : 10) * pow;
+    var ticks = []; for (var v = 0; v <= max + step*0.001; v += step) ticks.push(v);
+    return ticks;
+  }
+  var yTicks = niceTicks(maxV, 5);
+  var yMax = yTicks[yTicks.length - 1];
+  function xCoord(i){ return padL + (dates.length === 1 ? iw/2 : (i / (dates.length - 1)) * iw); }
+  function yCoord(v){ return padT + ih - (v / yMax) * ih; }
+  var grid = yTicks.map(function(t){
+    var y = yCoord(t);
+    return '<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(padL+iw).toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="rgba(28,27,24,0.07)"/>'
+         + '<text x="'+(padL-6).toFixed(1)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-size="9" fill="#999">$'+t.toLocaleString('en-AU',{maximumFractionDigits:0})+'</text>';
   }).join('');
-
-  el.innerHTML = `<svg width="100%" height="${H+16}" viewBox="0 0 ${W} ${H+16}" preserveAspectRatio="none">
-    ${path('rev',   '#C8A96E')}
-    ${path('spend', '#D95454')}
-    ${labels}
-  </svg>`;
+  var xLabelCount = Math.min(dates.length, 8);
+  var xStep = Math.max(1, Math.floor(dates.length / xLabelCount));
+  var xLabels = '';
+  for (var i = 0; i < dates.length; i += xStep) {
+    var lbl = new Date(dates[i]+'T00:00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+    xLabels += '<text x="'+xCoord(i).toFixed(1)+'" y="'+(padT+ih+16)+'" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#999">'+lbl+'</text>';
+  }
+  function buildSeries(vals, color, fillOpacity) {
+    var d = vals.map(function(v,i){ return (i===0?'M':'L') + xCoord(i).toFixed(1) + ',' + yCoord(v).toFixed(1); }).join(' ');
+    var area = fillOpacity > 0
+      ? '<path d="'+d+' L'+xCoord(dates.length-1).toFixed(1)+','+(padT+ih).toFixed(1)+' L'+xCoord(0).toFixed(1)+','+(padT+ih).toFixed(1)+' Z" fill="'+color+'" opacity="'+fillOpacity+'"/>'
+      : '';
+    var dots = vals.map(function(v,i){ return '<circle cx="'+xCoord(i).toFixed(1)+'" cy="'+yCoord(v).toFixed(1)+'" r="2.5" fill="'+color+'"/>'; }).join('');
+    return area + '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' + dots;
+  }
+  var revSvg   = buildSeries(revVals,   '#C8A96E', 0.12);
+  var spendSvg = buildSeries(spendVals, '#D95454', 0.10);
+  var hovers = dates.map(function(d,i){
+    var w  = dates.length > 1 ? (iw / (dates.length - 1)) : iw;
+    var cx = xCoord(i);
+    var dl = new Date(d+'T00:00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+    return '<rect x="'+(cx-w/2).toFixed(1)+'" y="'+padT+'" width="'+w.toFixed(1)+'" height="'+ih+'" fill="transparent">' +
+           '<title>'+dl+'\nStore revenue: '+maFmt$(revVals[i])+'\nAd spend: '+maFmt$(spendVals[i])+'</title></rect>';
+  }).join('');
+  var totalRev = revVals.reduce(function(a,b){return a+b;},0);
+  var totalSpd = spendVals.reduce(function(a,b){return a+b;},0);
+  el.innerHTML =
+    '<div style="display:flex;gap:14px;margin-bottom:6px;font-family:Inter,sans-serif;font-size:11px;font-weight:600">' +
+      '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#C8A96E"></span><span style="color:var(--c2)">Store revenue</span><span style="color:var(--ink);font-weight:700">'+maFmt$(totalRev)+'</span></span>' +
+      '<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#D95454"></span><span style="color:var(--c2)">Ad spend</span><span style="color:var(--ink);font-weight:700">'+maFmt$(totalSpd)+'</span></span>' +
+    '</div>' +
+    '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block">' +
+      grid + revSvg + spendSvg + xLabels + hovers +
+    '</svg>';
 }
 
 function maRenderAllocation() {
-  const el = document.getElementById('ma-allocation');
-  if (!el || !maData) return;
-  const t           = maData.meta.total;
-  const googleSpend = rows.reduce((s,r) => s + (r.google||0), 0);
-  const msSpend     = rows.reduce((s,r) => s + (r.ms||0), 0);
-  const totalSpend  = t.spend + googleSpend + msSpend || 1;
-
-  const channels = [
-    { name:'Meta Ads',      spend:t.spend,     color:'#1877F2' },
-    { name:'Google Ads',    spend:googleSpend, color:'#4285F4' },
-    { name:'Microsoft Ads', spend:msSpend,     color:'#0072CE' },
-  ].filter(c => c.spend > 0 || c.name === 'Meta Ads');
-
-  el.innerHTML = channels.map(c => {
-    const pct = (c.spend / totalSpend * 100).toFixed(1);
-    return `<div class="ma-alloc-row">
-      <div class="ma-alloc-label">
-        <span class="ma-alloc-name" style="color:${c.color}">${c.name}</span>
-        <span class="ma-alloc-pct">${pct}% · ${maFmt$(c.spend)}</span>
-      </div>
-      <div class="ma-alloc-bar-wrap">
-        <div class="ma-alloc-bar" style="width:${pct}%;background:${c.color}"></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function maSort(key) {
-  if (maSortKey === key) maSortDir *= -1;
-  else { maSortKey = key; maSortDir = -1; }
-  ['spend','revenue','roas'].forEach(k => {
-    document.getElementById(`ma-sort-${k}`)?.classList.toggle('pa-view-active', k === key);
-  });
-  maRenderCampaigns();
-}
-
-function maRenderCampaigns() {
-  const el = document.getElementById('ma-campaign-table');
-  if (!el || !maData) return;
-  const camps = [...(maData.meta.campaigns || [])].sort((a,b) => (a[maSortKey]-b[maSortKey]) * maSortDir);
-
-  if (!camps.length) {
-    el.innerHTML = `<div style="padding:30px;text-align:center;color:var(--c3);font-family:'Inter',sans-serif;font-size:12px">
-      No campaign data — Meta Ads API may need campaign-level access or the account has no active campaigns in this period.
-    </div>`;
+  var el = document.getElementById('ma-allocation');
+  if (!el) return;
+  var platforms = _maPlatforms();
+  var totalSpend = platforms.reduce(function(s,p){ return s + (+p.data.spend||0); }, 0);
+  if (totalSpend <= 0) {
+    el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No spend in this period</div>';
     return;
   }
+  var bars = platforms
+    .slice()
+    .sort(function(a,b){ return (b.data.spend||0) - (a.data.spend||0); })
+    .map(function(p){
+      var spend = +p.data.spend || 0;
+      var pct = totalSpend > 0 ? (spend / totalSpend * 100) : 0;
+      return '<div style="margin-bottom:12px">' +
+        '<div style="display:flex;justify-content:space-between;font-family:Inter,sans-serif;font-size:11px;margin-bottom:4px">' +
+          '<span style="color:var(--ink);font-weight:600">'+p.name+'</span>' +
+          '<span style="color:var(--c2);font-weight:600">'+maFmt$(spend)+' · '+pct.toFixed(1)+'%</span>' +
+        '</div>' +
+        '<div style="height:8px;background:rgba(28,27,24,0.06);border-radius:4px;overflow:hidden">' +
+          '<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+p.color+'"></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
 
-  el.innerHTML = camps.map(c => {
-    const roasColor = c.roas >= 3 ? 'var(--green)' : c.roas >= 1.86 ? 'var(--gold)' : 'var(--red)';
-    const ctrPct    = c.impressions > 0 ? (c.clicks/c.impressions*100).toFixed(2)+'%' : c.ctr > 0 ? c.ctr.toFixed(2)+'%' : '—';
-    return `<div class="ma-camp-row">
-      <div class="ma-camp-name" title="${c.name}">${c.name}</div>
-      <div class="ma-camp-num" style="color:var(--red)">${maFmt$(c.spend)}</div>
-      <div class="ma-camp-num" style="color:var(--green)">${c.revenue > 0 ? maFmt$(c.revenue) : '—'}</div>
-      <div class="ma-camp-num" style="color:${roasColor};font-weight:600">${c.roas > 0 ? c.roas.toFixed(2)+'×' : '—'}</div>
-      <div class="ma-camp-num">${c.cpa > 0 ? maFmt$(c.cpa) : '—'}</div>
-      <div class="ma-camp-num">${c.conversions || '—'}</div>
-      <div class="ma-camp-num">${maFmtK(c.clicks)}</div>
-      <div class="ma-camp-num">${ctrPct}</div>
-    </div>`;
-  }).join('');
+  // Top-performer insight
+  var withSpend = platforms.filter(function(p){ return (p.data.spend||0) > 0; });
+  var topRoas = withSpend.slice().filter(function(p){
+    var r = p.data.roas != null ? +p.data.roas : (p.data.spend > 0 ? (p.data.revenue||0)/p.data.spend : 0);
+    p.__roas = r;
+    return r > 0;
+  }).sort(function(a,b){ return b.__roas - a.__roas; })[0];
+  var insight = '';
+  if (topRoas) {
+    insight = '<div style="margin-top:14px;padding:10px 12px;background:rgba(90,158,114,0.08);border-radius:8px;border-left:3px solid var(--green)">' +
+      '<div style="font-size:9px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase">Top ROAS Channel</div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--ink);margin-top:2px">'+topRoas.name+' · '+topRoas.__roas.toFixed(2)+'×</div>' +
+      '<div style="font-size:10px;color:var(--c2);margin-top:2px">Spent '+maFmt$(topRoas.data.spend||0)+', returned '+maFmt$(topRoas.data.revenue||0)+'</div>' +
+    '</div>';
+  }
+  el.innerHTML = bars + insight;
 }
 
-function maRenderDailyTable() {
-  const el = document.getElementById('ma-daily-table');
-  if (!el || !maData) return;
-  const daily    = maData.meta.daily;
-  const storeRev = maData.storeRevByDate;
-  const allDates = [...new Set([...daily.map(d=>d.date), ...Object.keys(storeRev)])].sort().reverse();
-  const spendMap = {};
-  daily.forEach(d => { spendMap[d.date] = d; });
-
-  el.innerHTML = `<div class="ma-daily-head">
-    <div>Date</div>
-    <div style="text-align:right">Meta Spend</div>
-    <div style="text-align:right">Store Revenue</div>
-    <div style="text-align:right">MER</div>
-    <div style="text-align:right">Conv.</div>
-  </div>
-  ${allDates.map(date => {
-    const d   = spendMap[date] || { spend:0, conversions:0 };
-    const rev = storeRev[date] || 0;
-    const mer = d.spend > 0 ? (rev / d.spend) : null;
-    const merColor = !mer ? 'var(--c3)' : mer >= 3 ? 'var(--green)' : mer >= 2 ? '#7E6DB5' : 'var(--red)';
-    return `<div class="ma-daily-row">
-      <div style="color:var(--c2)">${date}</div>
-      <div style="text-align:right;color:var(--red)">${d.spend > 0 ? maFmt$(d.spend) : '—'}</div>
-      <div style="text-align:right;color:var(--gold)">${rev > 0 ? maFmt$(rev) : '—'}</div>
-      <div style="text-align:right;font-weight:600;color:${merColor}">${mer !== null ? mer.toFixed(2)+'×' : '—'}</div>
-      <div style="text-align:right;color:var(--c3)">${d.conversions || '—'}</div>
-    </div>`;
-  }).join('')}`;
-}
-
-function maExportCSV() {
-  if (!maData) { toast('No data to export', 'err'); return; }
-  // Daily export
-  let csv = 'Date,Meta Spend,Meta Revenue,Meta ROAS,Meta CPA,Meta Conversions,Meta Clicks,Store Revenue,MER\n';
-  const daily    = maData.meta.daily;
-  const storeRev = maData.storeRevByDate;
-  const allDates = [...new Set([...daily.map(d=>d.date), ...Object.keys(storeRev)])].sort();
-  const spendMap = {};
-  daily.forEach(d => { spendMap[d.date] = d; });
-  allDates.forEach(date => {
-    const d   = spendMap[date] || { spend:0, revenue:0, roas:0, cpa:0, conversions:0, clicks:0 };
-    const rev = storeRev[date] || 0;
-    const mer = d.spend > 0 ? (rev/d.spend).toFixed(2) : '';
-    csv += `${date},${d.spend},${d.revenue},${d.roas},${d.cpa},${d.conversions},${d.clicks},${rev},${mer}\n`;
-  });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-  a.download = `marketing-attribution-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  toast('Marketing data exported', 'ok');
-}
+// Legacy callbacks — the redesigned Marketing Attribution page no longer
+// contains a per-campaign table, daily breakdown table, or CSV export.
+// Kept as no-ops in case any stale reference fires (e.g. cached HTML).
+function maSort(_key) { /* no-op */ }
+function maRenderCampaigns() { /* no-op */ }
+function maRenderDailyTable() { /* no-op */ }
+function maExportCSV() { toast('Marketing CSV export retired — use the per-platform tabs', 'err'); }
 let plData        = null;
 let plGranularity = 'daily'; // daily | weekly | monthly
 
