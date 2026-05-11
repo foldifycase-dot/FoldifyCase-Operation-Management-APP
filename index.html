@@ -1199,12 +1199,16 @@ svg.spark { width:100%; height:100%; }
 .meta   .ad-pip { background:#1877F2; }
 .ms     .ad-pip { background:#00A4EF; }
 
+/* Headline spend number on each ad-platform card.
+   Uses Inter (same family as the sidebar Stats and Cost Breakdown legend
+   amounts) so all dashboard numbers share one typeface. */
 .ad-spend {
-  font-family:var(--dis); font-weight:800;
-  font-size:22px; color:var(--c1); letter-spacing:-0.02em;
+  font-family:'Inter', sans-serif; font-weight:800;
+  font-size:24px; color:var(--c1); letter-spacing:-0.02em;
   line-height:1; margin-bottom:2px;
+  font-variant-numeric: tabular-nums;
 }
-.ad-spend-sub { font-size:10px; color:var(--c3); margin-bottom:12px; }
+.ad-spend-sub { font-family:'Inter', sans-serif; font-size:10px; color:var(--c3); margin-bottom:12px; }
 
 .ad-mets {
   display:grid; grid-template-columns:1fr 1fr;
