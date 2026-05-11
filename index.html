@@ -3583,32 +3583,32 @@ body.nav-open .sidebar-backdrop { display: block; opacity: 1; }
       <!-- Right Panel -->
       <div style="display:flex;flex-direction:column;gap:16px">
 
-        <!-- Impression Share -->
+        <!-- Engagement Stats -->
         <div class="card" style="padding:16px">
-          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Impression Share</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">Engagement Stats</div>
           <div style="display:flex;flex-direction:column;gap:10px">
             <div class="ga-is-row">
-              <div class="ga-is-label">Search IS</div>
-              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-search" style="width:0%;background:#4285F4"></div></div>
-              <div class="ga-is-pct" id="ga-is-search-pct">—</div>
+              <div class="ga-is-label">CTR</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-eng-ctr" style="width:0%;background:#4285F4"></div></div>
+              <div class="ga-is-pct" id="ga-eng-ctr-val">—</div>
             </div>
             <div class="ga-is-row">
-              <div class="ga-is-label">Lost (Budget)</div>
-              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-budget" style="width:0%;background:var(--red)"></div></div>
-              <div class="ga-is-pct" id="ga-is-budget-pct">—</div>
+              <div class="ga-is-label">Conv. Rate</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-eng-cvr" style="width:0%;background:var(--green)"></div></div>
+              <div class="ga-is-pct" id="ga-eng-cvr-val">—</div>
             </div>
             <div class="ga-is-row">
-              <div class="ga-is-label">Lost (Rank)</div>
-              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-rank" style="width:0%;background:var(--orange)"></div></div>
-              <div class="ga-is-pct" id="ga-is-rank-pct">—</div>
+              <div class="ga-is-label">CPM</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-eng-cpm" style="width:0%;background:var(--gold)"></div></div>
+              <div class="ga-is-pct" id="ga-eng-cpm-val">—</div>
             </div>
             <div class="ga-is-row">
-              <div class="ga-is-label">Abs. Top IS</div>
-              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-is-top" style="width:0%;background:var(--green)"></div></div>
-              <div class="ga-is-pct" id="ga-is-top-pct">—</div>
+              <div class="ga-is-label">Avg CPC</div>
+              <div class="ga-is-bar-wrap"><div class="ga-is-bar" id="ga-eng-cpc" style="width:0%;background:var(--orange)"></div></div>
+              <div class="ga-is-pct" id="ga-eng-cpc-val">—</div>
             </div>
           </div>
-          <div style="font-size:10px;color:var(--c3);margin-top:8px;font-family:'Inter',sans-serif">IS = impressions ÷ eligible impressions</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:8px;font-family:'Inter',sans-serif">Bars scale against typical e-com benchmarks (CTR 6%, CVR 8%, CPM $40, CPC $4)</div>
         </div>
 
         <!-- Performance Scorecard -->
@@ -6021,15 +6021,22 @@ function gaRenderPage() {
   var badge = document.getElementById('ga-roas-badge');
   if (badge) { badge.textContent = roas > 0 ? gX(roas) : '—'; }
 
-  // Impression share bars
-  function gBar(barId, pctId, val) {
-    var bar=document.getElementById(barId); if(bar) bar.style.width=Math.min(val*100,100)+'%';
-    var pct=document.getElementById(pctId); if(pct) pct.textContent=gPct(val*100);
+  // Engagement Stats — always derivable from totals, no extra API field.
+  // Each bar fills as a fraction of a typical e-com benchmark.
+  var ctrVal = impr > 0 ? clicks / impr * 100 : 0;          // %
+  var cvrVal = clicks > 0 ? conv / clicks * 100 : 0;        // %
+  var cpmVal = impr > 0 ? spend / impr * 1000 : 0;          // $
+  var cpcVal = clicks > 0 ? spend / clicks : 0;             // $
+  function setEng(barId, valId, raw, benchmark, formatter) {
+    var bar = document.getElementById(barId);
+    var val = document.getElementById(valId);
+    if (bar) bar.style.width = Math.min((raw / benchmark) * 100, 100) + '%';
+    if (val) val.textContent = raw > 0 ? formatter(raw) : '—';
   }
-  gBar('ga-is-search', 'ga-is-search-pct', d&&d.impressionShare ||0);
-  gBar('ga-is-budget', 'ga-is-budget-pct', d&&d.lostISBudget    ||0);
-  gBar('ga-is-rank',   'ga-is-rank-pct',   d&&d.lostISRank      ||0);
-  gBar('ga-is-top',    'ga-is-top-pct',    d&&d.absTopIS        ||0);
+  setEng('ga-eng-ctr', 'ga-eng-ctr-val', ctrVal, 6,  function(n){ return n.toFixed(2) + '%'; });
+  setEng('ga-eng-cvr', 'ga-eng-cvr-val', cvrVal, 8,  function(n){ return n.toFixed(2) + '%'; });
+  setEng('ga-eng-cpm', 'ga-eng-cpm-val', cpmVal, 40, function(n){ return '$' + n.toFixed(2); });
+  setEng('ga-eng-cpc', 'ga-eng-cpc-val', cpcVal, 4,  function(n){ return '$' + n.toFixed(2); });
 
   // Scorecard
   function gScore(id, good, warn, label) {
