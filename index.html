@@ -1990,6 +1990,30 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
 
       </div>
+
+      <!-- ── Platform comparison chart ── -->
+      <div class="card" style="padding:0;overflow:hidden;margin-top:16px">
+        <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Platform Comparison</div>
+            <div style="font-size:10px;color:var(--c3);margin-top:2px">Daily trend by platform · pick a metric</div>
+          </div>
+          <select id="apcMetric" onchange="renderAdPlatformCompare()" class="ga-chart-select">
+            <option value="spend">Cost</option>
+            <option value="conversions">Conversions</option>
+            <option value="revenue">Conv. value</option>
+            <option value="clicks">Clicks</option>
+            <option value="impressions">Impressions</option>
+            <option value="roas">ROAS</option>
+            <option value="cpa">Cost / conversion</option>
+            <option value="ctr">CTR</option>
+            <option value="cpc">Avg. CPC</option>
+          </select>
+        </div>
+        <div id="ad-platform-compare" style="padding:14px 16px;min-height:260px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:40px 0">No data yet</div>
+        </div>
+      </div>
     </div>
 
     <!-- ── 4. AD SPEND BY CHANNEL ── -->
@@ -4399,6 +4423,7 @@ function renderAll() {
   renderBreakdown();
   renderAdChannel();
   renderAdSummary();
+  renderAdPlatformCompare();
   // If an ad-platform page is currently visible, re-render it too so its
   // chart/cards reflect the latest livePlatforms data after a doSync().
   try {
@@ -4490,6 +4515,133 @@ function renderAdChannel() {
         </div>
       </div>`;
   }).join('');
+}
+
+/* ── Platform Comparison chart (Google / Meta / MS daily lines for one metric) ── */
+function renderAdPlatformCompare() {
+  var el = document.getElementById('ad-platform-compare');
+  if (!el) return;
+  var metric = (document.getElementById('apcMetric')||{value:'spend'}).value;
+
+  var platforms = [
+    { key:'google', name:'Google Ads',    color:'#4285F4', daily: (window.livePlatforms && window.livePlatforms.google && window.livePlatforms.google.daily) || [] },
+    { key:'meta',   name:'Meta Ads',      color:'#E1306C', daily: (window.livePlatforms && window.livePlatforms.meta   && window.livePlatforms.meta.daily)   || [] },
+    { key:'ms',     name:'Microsoft Ads', color:'#00A4EF', daily: (window.livePlatforms && window.livePlatforms.ms     && window.livePlatforms.ms.daily)     || [] },
+  ].filter(function(p){ return p.daily && p.daily.length; });
+
+  if (!platforms.length) {
+    el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:40px 0">No platform data yet — click Refresh Data</div>';
+    return;
+  }
+
+  var metricDef = {
+    spend:       { label:'Cost',              fmt:function(v){return '$'+(+v||0).toFixed(2);},          get:function(r){return +r.spend||0;},                                                  ratio:false },
+    conversions: { label:'Conversions',       fmt:function(v){return (+v||0).toFixed(2);},               get:function(r){return +r.conversions||0;},                                            ratio:false },
+    revenue:     { label:'Conv. value',       fmt:function(v){return '$'+(+v||0).toFixed(2);},          get:function(r){return +r.revenue||0;},                                                ratio:false },
+    clicks:      { label:'Clicks',            fmt:function(v){return (+v||0).toLocaleString();},         get:function(r){return +r.clicks||0;},                                                 ratio:false },
+    impressions: { label:'Impressions',       fmt:function(v){return (+v||0).toLocaleString();},         get:function(r){return +r.impressions||0;},                                            ratio:false },
+    roas:        { label:'ROAS',              fmt:function(v){return (+v||0).toFixed(2)+'×';},           get:function(r){return (+r.spend||0) > 0 ? (+r.revenue||0) / (+r.spend||1) : 0;},     ratio:true  },
+    cpa:         { label:'Cost / conversion', fmt:function(v){return '$'+(+v||0).toFixed(2);},          get:function(r){return (+r.conversions||0) > 0 ? (+r.spend||0) / (+r.conversions||1) : 0;}, ratio:true },
+    ctr:         { label:'CTR',               fmt:function(v){return (+v||0).toFixed(2)+'%';},           get:function(r){return (+r.impressions||0) > 0 ? (+r.clicks||0) / (+r.impressions||1) * 100 : 0;}, ratio:true },
+    cpc:         { label:'Avg. CPC',          fmt:function(v){return '$'+(+v||0).toFixed(2);},          get:function(r){return (+r.clicks||0) > 0 ? (+r.spend||0) / (+r.clicks||1) : 0;},     ratio:true  },
+  };
+  var def = metricDef[metric] || metricDef.spend;
+
+  // Union of all dates across platforms, sorted
+  var dateSet = {};
+  platforms.forEach(function(p){ p.daily.forEach(function(r){ if (r.date) dateSet[r.date] = true; }); });
+  var dates = Object.keys(dateSet).sort();
+  if (!dates.length) {
+    el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:40px 0">No daily data for this period</div>';
+    return;
+  }
+
+  // Per-platform per-date value series
+  var series = platforms.map(function(p){
+    var byDate = {};
+    p.daily.forEach(function(r){ byDate[r.date] = r; });
+    return {
+      key: p.key, name: p.name, color: p.color,
+      values: dates.map(function(d){ return byDate[d] ? +def.get(byDate[d]) || 0 : 0; }),
+    };
+  });
+
+  // Chart geometry
+  var W = el.clientWidth || 600;
+  var H = 280;
+  var padL = 56, padR = 16, padT = 18, padB = 38;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var allVals = [].concat.apply([], series.map(function(s){ return s.values; }));
+  var maxV = Math.max.apply(null, allVals);
+  if (!isFinite(maxV) || maxV <= 0) maxV = 1;
+
+  function niceTicks(max, count) {
+    if (max <= 0) return [0];
+    var raw = max / (count - 1);
+    var pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    var mult = raw / pow;
+    var step = (mult < 1.5 ? 1 : mult < 3 ? 2 : mult < 7 ? 5 : 10) * pow;
+    var ticks = [];
+    for (var v = 0; v <= max + step*0.001; v += step) ticks.push(v);
+    return ticks;
+  }
+  var yTicks = niceTicks(maxV, 5);
+  var yMax = yTicks[yTicks.length - 1];
+
+  function xCoord(i){ return padL + (dates.length === 1 ? iw/2 : (i / (dates.length - 1)) * iw); }
+  function yCoord(v){ return padT + ih - (v / yMax) * ih; }
+
+  // Y gridlines + labels
+  var grid = yTicks.map(function(t){
+    var y = yCoord(t);
+    return '<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(padL+iw).toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="rgba(28,27,24,0.07)" stroke-width="1"/>'
+         + '<text x="'+(padL-6).toFixed(1)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-size="9" fill="#999">'+def.fmt(t)+'</text>';
+  }).join('');
+
+  // X tick labels
+  var xLabelCount = Math.min(dates.length, 8);
+  var xStep = Math.max(1, Math.floor(dates.length / xLabelCount));
+  var xLabels = '';
+  for (var i = 0; i < dates.length; i += xStep) {
+    var dt = new Date(dates[i] + 'T00:00:00').toLocaleDateString('en-AU', { day:'2-digit', month:'short' });
+    xLabels += '<text x="'+xCoord(i).toFixed(1)+'" y="'+(padT+ih+16)+'" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#999">'+dt+'</text>';
+  }
+
+  // Series paths
+  var seriesSvg = series.map(function(s){
+    var d = s.values.map(function(v,i){ return (i===0?'M':'L') + xCoord(i).toFixed(1) + ',' + yCoord(v).toFixed(1); }).join(' ');
+    var dots = s.values.map(function(v,i){ return '<circle cx="'+xCoord(i).toFixed(1)+'" cy="'+yCoord(v).toFixed(1)+'" r="2.5" fill="'+s.color+'"/>'; }).join('');
+    return '<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' + dots;
+  }).join('');
+
+  // Hover targets — combined tooltip across all platforms per date
+  var hovers = dates.map(function(d, i){
+    var w = dates.length > 1 ? (iw / (dates.length - 1)) : iw;
+    var cx = xCoord(i);
+    var dateLabel = new Date(d+'T00:00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+    var lines = series.map(function(s){ return s.name + ': ' + def.fmt(s.values[i]); }).join('\n');
+    return '<rect x="'+(cx-w/2).toFixed(1)+'" y="'+padT+'" width="'+w.toFixed(1)+'" height="'+ih+'" fill="transparent">' +
+           '<title>'+dateLabel+'\n'+lines+'</title></rect>';
+  }).join('');
+
+  // Legend pills above chart
+  var legend = series.map(function(s){
+    var total = s.values.reduce(function(a,b){ return a + b; }, 0);
+    var display = def.ratio
+      ? def.fmt(total / s.values.filter(function(v){ return v > 0; }).length || 0)
+      : def.fmt(total);
+    return '<span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px">' +
+      '<span style="width:10px;height:10px;border-radius:50%;background:'+s.color+';display:inline-block"></span>' +
+      '<span style="font-family:Inter,sans-serif;font-size:11px;color:var(--c2);font-weight:600">'+s.name+'</span>' +
+      '<span style="font-family:Inter,sans-serif;font-size:11px;color:var(--ink);font-weight:700">'+display+'</span>' +
+    '</span>';
+  }).join('');
+
+  el.innerHTML =
+    '<div style="margin-bottom:8px">'+legend+'</div>' +
+    '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block">' +
+      grid + seriesSvg + xLabels + hovers +
+    '</svg>';
 }
 
 /* ── Ad Spend Summary panel ── */
