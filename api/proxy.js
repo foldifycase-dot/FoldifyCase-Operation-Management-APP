@@ -1251,8 +1251,8 @@ module.exports = async function handler(req, res) {
     }
 
     const GAQL =
-      "SELECT campaign.id, campaign.name, campaign.status, segments.date, " +
-      "metrics.cost_micros, metrics.conversions_value, metrics.conversions, " +
+      "SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, " +
+      "segments.date, metrics.cost_micros, metrics.conversions_value, metrics.conversions, " +
       "metrics.clicks, metrics.impressions " +
       "FROM campaign " +
       "WHERE segments.date BETWEEN '" + from + "' AND '" + to + "' " +
@@ -1305,6 +1305,7 @@ module.exports = async function handler(req, res) {
       var date        = (row.segments && row.segments.date) || "";
       var campId      = (row.campaign && String(row.campaign.id)) || "";
       var campName    = (row.campaign && row.campaign.name)       || "Unknown";
+      var campType    = (row.campaign && (row.campaign.advertisingChannelType || row.campaign.advertising_channel_type)) || "OTHER";
       // Composio returns metric numbers as either strings or numbers — coerce safely.
       var costMicros  = (row.metrics && (row.metrics.costMicros ?? row.metrics.cost_micros)) || 0;
       var convValue   = (row.metrics && (row.metrics.conversionsValue ?? row.metrics.conversions_value)) || 0;
@@ -1321,7 +1322,8 @@ module.exports = async function handler(req, res) {
       byDate[date].clicks      += clicks;
       byDate[date].impressions += impressions;
 
-      if (!byCampaign[campId]) byCampaign[campId] = { id: campId, name: campName, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      if (!byCampaign[campId]) byCampaign[campId] = { id: campId, name: campName, type: campType, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      byCampaign[campId].type = campType;
       byCampaign[campId].spend       = round2(byCampaign[campId].spend + spend);
       byCampaign[campId].revenue     = round2(byCampaign[campId].revenue + revenue);
       byCampaign[campId].conversions = round2(byCampaign[campId].conversions + conversions);
@@ -1367,11 +1369,60 @@ module.exports = async function handler(req, res) {
     } catch (e) { console.warn("[google-ads] campaign-list fallback failed:", e.message); }
 
     var campaigns = Object.values(byCampaign).sort(function(a,b){ return b.spend - a.spend; }).map(function(c) {
-      return { id:c.id, name:c.name, status: c.status || "", spend:c.spend, revenue:c.revenue, conversions:c.conversions, clicks:c.clicks, impressions:c.impressions,
+      return { id:c.id, name:c.name, status: c.status || "", type: c.type || "OTHER",
+        spend:c.spend, revenue:c.revenue, conversions:c.conversions, clicks:c.clicks, impressions:c.impressions,
         roas: c.spend > 0 ? round2(c.revenue / c.spend) : 0,
         ctr:  c.impressions > 0 ? round2(c.clicks / c.impressions * 100) : 0,
         cpa:  c.conversions > 0 ? round2(c.spend / c.conversions) : 0 };
     });
+
+    // Aggregate campaigns into byType buckets (Search/Shopping/PMax/Display/etc.)
+    var byTypeMap = {};
+    campaigns.forEach(function(c) {
+      var t = c.type || "OTHER";
+      if (!byTypeMap[t]) byTypeMap[t] = { type: t, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      byTypeMap[t].spend       = round2(byTypeMap[t].spend + c.spend);
+      byTypeMap[t].revenue     = round2(byTypeMap[t].revenue + c.revenue);
+      byTypeMap[t].conversions = round2(byTypeMap[t].conversions + c.conversions);
+      byTypeMap[t].clicks      += c.clicks;
+      byTypeMap[t].impressions += c.impressions;
+    });
+    var byType = Object.values(byTypeMap).map(function(t) {
+      return { ...t,
+        roas: t.spend > 0 ? round2(t.revenue / t.spend) : 0,
+        ctr:  t.impressions > 0 ? round2(t.clicks / t.impressions * 100) : 0 };
+    }).sort(function(a,b){ return b.spend - a.spend; });
+
+    // Fetch device-breakdown via separate GAQL (segments.device fan-outs rows
+    // per device so we can't reuse the main query). Non-fatal on failure.
+    var byDevice = [];
+    try {
+      const devGAQL = "SELECT segments.device, metrics.cost_micros, metrics.conversions_value, metrics.conversions, metrics.clicks, metrics.impressions FROM campaign WHERE segments.date BETWEEN '" + from + "' AND '" + to + "' AND campaign.status != 'REMOVED'";
+      const devResp = await callComposio("GOOGLEADS_SEARCH_STREAM_GAQL", { query: devGAQL }, COMPOSIO_API_KEY, COMPOSIO_ACCOUNT, COMPOSIO_USER_ID);
+      if (devResp && devResp.successful) {
+        const dp = devResp.data || {};
+        const devRows =
+          (Array.isArray(dp.results) && dp.results) ||
+          (dp.data && Array.isArray(dp.data.results) && dp.data.results) || [];
+        const devMap = {};
+        devRows.forEach(function(row) {
+          var dev = (row.segments && row.segments.device) || "UNKNOWN";
+          if (!devMap[dev]) devMap[dev] = { device: dev, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+          var cm = (row.metrics && (row.metrics.costMicros ?? row.metrics.cost_micros)) || 0;
+          var cv = (row.metrics && (row.metrics.conversionsValue ?? row.metrics.conversions_value)) || 0;
+          devMap[dev].spend       = round2(devMap[dev].spend + parseInt(cm,10)/1000000);
+          devMap[dev].revenue     = round2(devMap[dev].revenue + parseFloat(cv));
+          devMap[dev].conversions = round2(devMap[dev].conversions + parseFloat((row.metrics && row.metrics.conversions) || 0));
+          devMap[dev].clicks      += parseInt((row.metrics && row.metrics.clicks) || 0, 10);
+          devMap[dev].impressions += parseInt((row.metrics && row.metrics.impressions) || 0, 10);
+        });
+        byDevice = Object.values(devMap).map(function(d) {
+          return { ...d,
+            roas: d.spend > 0 ? round2(d.revenue / d.spend) : 0,
+            ctr:  d.impressions > 0 ? round2(d.clicks / d.impressions * 100) : 0 };
+        }).sort(function(a,b){ return b.spend - a.spend; });
+      }
+    } catch(e) { console.warn("[google-ads] device-breakdown failed:", e.message); }
 
     var total = daily.reduce(function(acc, d) {
       return { spend: round2(acc.spend+d.spend), revenue: round2(acc.revenue+d.revenue),
@@ -1381,7 +1432,7 @@ module.exports = async function handler(req, res) {
     total.cpa  = total.conversions > 0 ? round2(total.spend / total.conversions) : 0;
     total.ctr  = total.impressions > 0 ? round2(total.clicks / total.impressions * 100) : 0;
 
-    return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns });
+    return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns, byType: byType, byDevice: byDevice });
   }
 
   if (service === "ms-ads")     return res.status(200).json({ platform: "microsoft", daily: [], total: { spend:0, revenue:0, roas:0 } });

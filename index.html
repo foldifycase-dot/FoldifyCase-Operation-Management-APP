@@ -3531,13 +3531,13 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
 
-      <div class="card" style="padding:16px;background:linear-gradient(135deg,rgba(66,133,244,0.04),rgba(66,133,244,0.01))">
-        <div style="font-size:12px;font-weight:700;color:#4285F4;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">🔌 Google Ads via Composio</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div class="ga-step"><div class="ga-step-num">1</div><div class="ga-step-text">Connect Google Ads at <strong>app.composio.dev</strong> (already done ✓)</div></div>
-          <div class="ga-step"><div class="ga-step-num">2</div><div class="ga-step-text">Add <code>COMPOSIO_API_KEY</code> to Vercel env vars (Settings → API Keys on Composio)</div></div>
-          <div class="ga-step"><div class="ga-step-num">3</div><div class="ga-step-text">Optional: <code>COMPOSIO_GOOGLE_ADS_ACCOUNT_ID</code> — defaults to <code>googleads_sorb-autist</code></div></div>
-          <div class="ga-step"><div class="ga-step-num">4</div><div class="ga-step-text">Track: Spend · ROAS · CPA · CTR · Conv. Rate · Impression Share</div></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
+          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Quick Insights</div>
+          <div style="font-size:10px;color:var(--c3);margin-top:2px">Top & bottom performers for the period</div>
+        </div>
+        <div id="ga-insights" style="padding:14px 16px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
         </div>
       </div>
     </div>
@@ -5790,8 +5790,7 @@ function gaRenderPage() {
     });
     if (!filtered.length) {
       tbl.innerHTML = '<div style="padding:32px;text-align:center;color:var(--c3);font-family:Inter,sans-serif;font-size:12px">No ' + (filter === 'live' ? 'live' : filter === 'paused' ? 'paused' : '') + ' campaigns to show</div>';
-      return;
-    }
+    } else {
     tbl.innerHTML = filtered.map(function(c) {
       var spend       = +c.spend       || 0;
       var revenue     = +c.revenue     || 0;
@@ -5831,7 +5830,96 @@ function gaRenderPage() {
         '<div style="text-align:right;color:var(--ink)">'+ctrDisp+'</div>' +
         '</div>';
     }).join('');
+    }
   }
+  // Populate the right-rail cards (By Campaign Type, By Device, Quick Insights)
+  if (typeof gaRenderBreakdowns === 'function') gaRenderBreakdowns();
+}
+
+// Render the By-Campaign-Type, By-Device, and Quick-Insights cards. Called
+// at the end of gaRenderPage via the wrapper below.
+function gaRenderBreakdowns() {
+  var d = window.livePlatforms && window.livePlatforms.google;
+  if (!d) return;
+  var typeLabels = {
+    SEARCH: 'Search', SHOPPING: 'Shopping', PERFORMANCE_MAX: 'PMax',
+    DISPLAY: 'Display', VIDEO: 'Video', DEMAND_GEN: 'Demand Gen',
+    DISCOVERY: 'Discovery', LOCAL: 'Local', SMART: 'Smart', HOTEL: 'Hotel',
+    MULTI_CHANNEL: 'Multi-channel', OTHER: 'Other', UNKNOWN: 'Unknown',
+  };
+  var typeColors = {
+    SEARCH: '#4285F4', SHOPPING: '#34A853', PERFORMANCE_MAX: '#A142F4',
+    DISPLAY: '#FBBC05', VIDEO: '#EA4335', DEMAND_GEN: '#FF6D00',
+    DISCOVERY: '#00ACC1', OTHER: '#8E8E93', UNKNOWN: '#8E8E93',
+  };
+  var devLabels  = { MOBILE: 'Mobile', DESKTOP: 'Desktop', TABLET: 'Tablet', CONNECTED_TV: 'Connected TV', OTHER: 'Other', UNKNOWN: 'Unknown' };
+  var devColors  = { MOBILE: '#4285F4', DESKTOP: '#34A853', TABLET: '#FBBC05', CONNECTED_TV: '#A142F4', OTHER: '#8E8E93', UNKNOWN: '#8E8E93' };
+
+  function fmt$(n) { return '$' + (Math.abs(+n)||0).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+  function renderBars(containerId, items, labelMap, colorMap, keyField) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    if (!items || !items.length) {
+      el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>';
+      return;
+    }
+    var totalSpend = items.reduce(function(s,i){ return s + (+i.spend||0); }, 0);
+    if (totalSpend <= 0) {
+      el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No spend in this period</div>';
+      return;
+    }
+    el.innerHTML = items.map(function(it) {
+      var raw   = it[keyField] || 'OTHER';
+      var label = labelMap[raw] || raw.replace(/_/g,' ');
+      var color = colorMap[raw] || '#8E8E93';
+      var pct   = totalSpend > 0 ? ((+it.spend||0) / totalSpend * 100) : 0;
+      return '<div style="margin-bottom:10px">' +
+        '<div style="display:flex;justify-content:space-between;font-family:Inter,sans-serif;font-size:11px;margin-bottom:3px">' +
+          '<span style="color:var(--ink);font-weight:600">'+label+'</span>' +
+          '<span style="color:var(--c2);font-weight:600">'+fmt$(it.spend)+' · '+pct.toFixed(1)+'%</span>' +
+        '</div>' +
+        '<div style="height:6px;background:rgba(28,27,24,0.06);border-radius:3px;overflow:hidden">' +
+          '<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+color+'"></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  renderBars('ga-type-breakdown',   d.byType   || [], typeLabels, typeColors, 'type');
+  renderBars('ga-device-breakdown', d.byDevice || [], devLabels,  devColors,  'device');
+
+  // Quick Insights: top ROAS, biggest spender, attention-needed (high spend / no conv)
+  var insEl = document.getElementById('ga-insights');
+  if (!insEl) return;
+  var camps = (d.campaigns || []).filter(function(c){ return (c.status||'').toUpperCase() === 'ENABLED'; });
+  if (!camps.length) {
+    insEl.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No live campaigns to summarise</div>';
+    return;
+  }
+  var withSpend = camps.filter(function(c){ return c.spend > 0; });
+  var topRoas = withSpend.slice().filter(function(c){ return c.roas > 0; }).sort(function(a,b){ return b.roas - a.roas; })[0];
+  var bigSpend = withSpend.slice().sort(function(a,b){ return b.spend - a.spend; })[0];
+  var attention = withSpend.filter(function(c){ return c.conversions === 0 && c.spend >= 5; }).sort(function(a,b){ return b.spend - a.spend; })[0];
+
+  function row(emoji, label, name, detail, color) {
+    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(28,27,24,0.05)">' +
+      '<div style="font-size:14px;line-height:1;flex-shrink:0;margin-top:1px">'+emoji+'</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:9px;font-weight:700;color:var(--c3);letter-spacing:.06em;text-transform:uppercase">'+label+'</div>' +
+        '<div style="font-size:11px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px" title="'+name+'">'+name+'</div>' +
+        '<div style="font-size:10px;color:'+(color||'var(--c2)')+';margin-top:1px">'+detail+'</div>' +
+      '</div>' +
+    '</div>';
+  }
+  var html = '';
+  if (topRoas) html += row('🏆', 'Top ROAS', topRoas.name, topRoas.roas.toFixed(2) + '× · ' + fmt$(topRoas.spend) + ' spent', 'var(--green)');
+  if (bigSpend) html += row('💰', 'Biggest Spender', bigSpend.name, fmt$(bigSpend.spend) + ' · ROAS ' + (bigSpend.roas>0?bigSpend.roas.toFixed(2)+'×':'—'));
+  if (attention) html += row('⚠️', 'Needs Attention', attention.name, fmt$(attention.spend) + ' spent · 0 conversions', 'var(--orange)');
+  if (!html) html = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No active campaigns with spend yet</div>';
+  // Remove bottom border on the last row visually
+  html = html.replace(/(border-bottom:1px solid rgba\(28,27,24,0\.05\))(?![\s\S]*\1)/, 'border-bottom:none');
+  insEl.innerHTML = html;
 }
 
 // Google Ads campaign-table status filter (Live / Paused / All). Default: Live.
