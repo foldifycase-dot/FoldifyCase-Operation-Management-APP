@@ -5747,20 +5747,29 @@ function gaRenderPage() {
   gScore('ga-cvr-score',  cvr>=4,  cvr>=2,  cvr>0?(cvr>=4?'✅ '+gPct(cvr):'⚠ '+gPct(cvr)):'—');
   gScore('ga-cpa-score',  cpa>0&&cpa<48, cpa>0&&cpa<120, cpa>0?(cpa<48?'✅ '+gFmt(cpa):'⚠ '+gFmt(cpa)):'—');
 
-  // Campaign table
+  // Campaign table — use proxy field names (revenue/conversions/impressions)
+  // and pre-computed roas/cpa/ctr where available.
   var tbl = document.getElementById('ga-campaign-table');
   if (tbl && d && d.campaigns && d.campaigns.length) {
     tbl.innerHTML = d.campaigns.map(function(c) {
-      var cr = c.spend>0 ? (c.convValue/c.spend).toFixed(1)+'x' : '—';
-      var cc = c.conv>0  ? gFmt(c.spend/c.conv) : '—';
-      var ct = c.impr>0  ? gPct(c.clicks/c.impr*100) : '—';
+      var spend       = +c.spend       || 0;
+      var revenue     = +c.revenue     || 0;
+      var conversions = +c.conversions || 0;
+      var clicks      = +c.clicks      || 0;
+      var impressions = +c.impressions || 0;
+      var roas = c.roas != null ? +c.roas : (spend > 0 ? revenue / spend : 0);
+      var cpa  = c.cpa  != null ? +c.cpa  : (conversions > 0 ? spend / conversions : 0);
+      var ctr  = c.ctr  != null ? +c.ctr  : (impressions > 0 ? clicks / impressions * 100 : 0);
+      var convDisp = conversions > 0
+        ? (Number.isInteger(conversions) ? conversions : conversions.toFixed(2))
+        : '—';
       return '<div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
         '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500" title="'+c.name+'">'+c.name+'</div>' +
-        '<div style="text-align:right;color:#4285F4;font-weight:600">'+gFmt(c.spend)+'</div>' +
-        '<div style="text-align:right;color:var(--gold);font-weight:600">'+cr+'</div>' +
-        '<div style="text-align:right">'+( c.conv||'—')+'</div>' +
-        '<div style="text-align:right;color:var(--c2)">'+cc+'</div>' +
-        '<div style="text-align:right;color:var(--c3)">'+ct+'</div>' +
+        '<div style="text-align:right;color:#4285F4;font-weight:600">'+gFmt(spend)+'</div>' +
+        '<div style="text-align:right;color:var(--gold);font-weight:600">'+gX(roas)+'</div>' +
+        '<div style="text-align:right">'+convDisp+'</div>' +
+        '<div style="text-align:right;color:var(--c2)">'+gFmt(cpa)+'</div>' +
+        '<div style="text-align:right;color:var(--c3)">'+gPct(ctr)+'</div>' +
         '</div>';
     }).join('');
   }
