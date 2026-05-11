@@ -1621,6 +1621,28 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   justify-content: center;
   gap: 7px;
 }
+/* Google Ads campaign-table status filter pills (Live / Paused / All) */
+.ga-camp-filter-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--c2);
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .08s ease;
+  letter-spacing: .02em;
+}
+.ga-camp-filter-btn:hover { color: var(--ink); }
+.ga-camp-filter-btn:active { transform: scale(.95); }
+.ga-camp-filter-btn.is-active {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
 </style>
 </head>
 <body>
@@ -3418,11 +3440,18 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
       <!-- Campaign Table -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07)">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
-          <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA · CTR by campaign</div>
+        <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;gap:16px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Campaign Performance</div>
+            <div style="font-size:11px;color:var(--c3);margin-top:2px">Spend · ROAS · Conversions · CPA · CTR by campaign</div>
+          </div>
+          <div class="ga-camp-filter" style="display:inline-flex;background:rgba(28,27,24,0.05);border-radius:7px;padding:2px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600">
+            <button id="gaCampFilterLive"   onclick="gaSetCampaignFilter('live')"   class="ga-camp-filter-btn is-active">Live</button>
+            <button id="gaCampFilterPaused" onclick="gaSetCampaignFilter('paused')" class="ga-camp-filter-btn">Paused</button>
+            <button id="gaCampFilterAll"    onclick="gaSetCampaignFilter('all')"    class="ga-camp-filter-btn">All</button>
+          </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
+        <div style="display:grid;grid-template-columns:1fr 90px 70px 70px 80px 60px;padding:8px 16px;background:rgba(28,27,24,0.03);border-bottom:1px solid rgba(28,27,24,0.08);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--c3)">
           <div>Campaign</div>
           <div style="text-align:right">Spend</div>
           <div style="text-align:right">ROAS</div>
@@ -5751,7 +5780,19 @@ function gaRenderPage() {
   // and pre-computed roas/cpa/ctr where available.
   var tbl = document.getElementById('ga-campaign-table');
   if (tbl && d && d.campaigns && d.campaigns.length) {
-    tbl.innerHTML = d.campaigns.map(function(c) {
+    // Filter by current status pill (Live / Paused / All). Default: Live.
+    var filter = window._gaCampaignFilter || 'live';
+    var filtered = d.campaigns.filter(function(c) {
+      var s = (c.status || '').toUpperCase();
+      if (filter === 'live')   return s === 'ENABLED';
+      if (filter === 'paused') return s === 'PAUSED';
+      return true; // 'all'
+    });
+    if (!filtered.length) {
+      tbl.innerHTML = '<div style="padding:32px;text-align:center;color:var(--c3);font-family:Inter,sans-serif;font-size:12px">No ' + (filter === 'live' ? 'live' : filter === 'paused' ? 'paused' : '') + ' campaigns to show</div>';
+      return;
+    }
+    tbl.innerHTML = filtered.map(function(c) {
       var spend       = +c.spend       || 0;
       var revenue     = +c.revenue     || 0;
       var conversions = +c.conversions || 0;
@@ -5791,6 +5832,19 @@ function gaRenderPage() {
         '</div>';
     }).join('');
   }
+}
+
+// Google Ads campaign-table status filter (Live / Paused / All). Default: Live.
+window._gaCampaignFilter = window._gaCampaignFilter || 'live';
+function gaSetCampaignFilter(filter) {
+  if (filter !== 'live' && filter !== 'paused' && filter !== 'all') return;
+  window._gaCampaignFilter = filter;
+  var map = { live: 'gaCampFilterLive', paused: 'gaCampFilterPaused', all: 'gaCampFilterAll' };
+  Object.keys(map).forEach(function(k) {
+    var el = document.getElementById(map[k]);
+    if (el) el.classList.toggle('is-active', k === filter);
+  });
+  if (typeof gaRenderPage === 'function') gaRenderPage();
 }
 
 // ── Auto-sync on load: fetch Shopify data AND broadcast date to all pickers
