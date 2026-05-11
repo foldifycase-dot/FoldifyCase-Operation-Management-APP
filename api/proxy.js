@@ -1364,11 +1364,15 @@ module.exports = async function handler(req, res) {
 // Tries v3.1 and v3 endpoints. Falls back to v1 only on 404 (endpoint missing).
 // Reports per-attempt status/body so we can diagnose path/auth issues.
 async function callComposio(toolSlug, args, apiKey, connectedAccountId, userId) {
-  const body = {
-    arguments: args,
-    user_id: userId,
-    connected_account_id: connectedAccountId,
-  };
+  // Composio: if connected_account_id is provided, user_id must match its owner.
+  // Easiest: when we have a connection id, skip user_id and let Composio resolve.
+  // Only send user_id when no connection id is given (e.g. routing by user only).
+  const body = { arguments: args };
+  if (connectedAccountId) {
+    body.connected_account_id = connectedAccountId;
+  } else if (userId) {
+    body.user_id = userId;
+  }
 
   const attempts = [
     {
