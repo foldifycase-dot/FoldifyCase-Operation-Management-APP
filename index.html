@@ -4777,20 +4777,22 @@ function openPage(key) {
 }
 
 function closePage() {
-  if (!activePage) return;
-  const page = PAGES[activePage];
-
-  // Hide active page
-  const mainEl = document.getElementById(page.mainId);
-  if (mainEl) mainEl.style.display = 'none';
-
-  // Reset nav highlight
-  const navEl = document.getElementById(page.navId);
-  if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
-
-  // Restore dashboard (hides all ad pages too)
+  // If a Reports/Configuration page is active, reset its nav highlight and
+  // hide it. (Ad-platform pages — Google/Meta/MS — don't set activePage,
+  // so the original early-return here used to swallow clicks on Dashboard
+  // when an ad page was open.)
+  if (activePage) {
+    const page = PAGES[activePage];
+    if (page) {
+      const mainEl = document.getElementById(page.mainId);
+      if (mainEl) mainEl.style.display = 'none';
+      const navEl = document.getElementById(page.navId);
+      if (navEl) { navEl.style.background = ''; navEl.style.color = ''; }
+    }
+    activePage = null;
+  }
+  // Always restore dashboard — also hides ad-platform pages.
   _showMainDashboard();
-  activePage = null;
 }
 
 // Keep old aliases working
