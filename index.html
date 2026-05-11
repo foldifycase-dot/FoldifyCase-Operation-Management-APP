@@ -1671,12 +1671,191 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 }
 .ga-chart-select:hover { border-color: rgba(28,27,24,0.35); }
 .ga-chart-select:focus { border-color: #4285F4; box-shadow: 0 0 0 2px rgba(66,133,244,.15); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   RESPONSIVE LAYER — desktop layout untouched.
+   Activates only at <=1024px (tablet) and <=640px (mobile).
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Hamburger button — hidden on desktop, shown on tablet+mobile. */
+.nav-toggle {
+  display: none;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  width: 36px; height: 36px;
+  margin-left: 14px;
+  cursor: pointer;
+  padding: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background .15s ease;
+}
+.nav-toggle:hover { background: rgba(200,169,110,0.2); }
+.nav-toggle span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 1px;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+/* Backdrop — hidden until nav opened on mobile/tablet. */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: var(--topbar-h) 0 0 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 150;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+body.nav-open .sidebar-backdrop { display: block; opacity: 1; }
+
+/* ───── TABLET & SMALLER (≤1024px) ───── */
+@media (max-width: 1024px) {
+  .nav-toggle { display: inline-flex; }
+
+  /* Sidebar becomes off-canvas drawer */
+  .sidebar {
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    width: min(282px, 80vw);
+    height: calc(100vh - var(--topbar-h));
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 160;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.25);
+  }
+  body.nav-open .sidebar { transform: translateX(0); }
+
+  /* Main content gets full width */
+  .main { width: 100%; min-width: 0; }
+
+  /* Inline grid layouts → reduce columns. The dashboard uses many inline
+     grid-template-columns; collapse the most common patterns. */
+  [style*="grid-template-columns:1fr 320px"],
+  [style*="grid-template-columns: 1fr 320px"],
+  [style*="grid-template-columns:1fr 300px"],
+  [style*="grid-template-columns: 1fr 300px"],
+  [style*="grid-template-columns:2fr 1fr"],
+  [style*="grid-template-columns: 2fr 1fr"],
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Class-based grids */
+  .two-col   { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* KPI strip — 5 → 2 cols */
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+  /* Reduce horizontal padding inside pages */
+  .pad { padding: 0 16px 16px; }
+
+  /* Trim the page header padding */
+  .page-hd { padding: 14px 16px !important; }
+
+  /* Main controls bar wraps cleanly */
+  .main-controls { flex-wrap: wrap; gap: 10px; padding: 0 16px 14px !important; }
+
+  /* Long table rows allow horizontal scroll instead of clipping */
+  .pa-tbl-head, .pa-tbl-row,
+  .pa-inv-row, .pa-inv-head,
+  .pa-var-row { min-width: 640px; }
+  #pa-product-table, #pa-inventory-table, #pa-variant-table { overflow-x: auto; }
+
+  /* Inline grids inside ad-platform pages and report pages — let very dense
+     header rows scroll horizontally to avoid cramming */
+  .report-main .card { min-width: 0; }
+
+  /* Date-picker panels widen to viewport on smaller screens */
+  .dp-panel { width: min(560px, 92vw) !important; }
+}
+
+/* ───── MOBILE (≤640px) ───── */
+@media (max-width: 640px) {
+  /* Tighter topbar */
+  .topbar { padding: 0; }
+  .topbar-logo { padding: 0 14px; gap: 10px; }
+  .logo-icon-wrap { width: 32px; height: 32px; }
+  .logo-wordmark { font-size: 13px; letter-spacing: 0.08em; }
+
+  /* Collapse ALL grids to single column. Bigger hammer than tablet rules. */
+  [style*="display:grid"], [style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+
+  /* KPI strip — 2 cols (some cards stay readable) */
+  .kpi-strip { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+  /* Squeeze inner card padding */
+  .card { padding: 12px; }
+
+  /* Page header */
+  .page-title { font-size: 18px !important; }
+  .page-hd { padding: 12px 14px !important; }
+
+  /* Section labels & padding */
+  .pad { padding: 0 12px 14px; }
+  .sec { font-size: 10px; margin-bottom: 10px; }
+
+  /* Ad-platform headline numbers a touch smaller so they don't overflow */
+  .ad-spend { font-size: 20px; }
+  .ad-mets  { grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  /* Refresh buttons full-width inside their container so they're easy to tap */
+  .main-controls .refresh-btn { flex: 1 1 auto; min-width: 100px; }
+
+  /* Larger tap targets in the sidebar nav */
+  .sb-nav-item { padding: 12px 14px !important; }
+
+  /* Stop tiny 9-11px labels from being unreadable */
+  .am-l, .sb-stat-label, .ga-kpi-lbl { font-size: 10px; }
+  .am-v, .sb-stat-val { font-size: 14px; }
+
+  /* Bump base font slightly for body text */
+  body { font-size: 14px; }
+
+  /* Date picker becomes nearly full screen */
+  .dp-panel {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+  .dp-presets { display: none !important; } /* hide preset side rail */
+
+  /* Tables: allow horizontal scroll for any dense grid header/row */
+  .pa-tbl-head, .pa-tbl-row,
+  .pa-inv-row, .pa-inv-head,
+  .pa-var-row { min-width: 560px; }
+
+  /* Hide the campaign-table filter pills border container's gap squeeze */
+  .ga-camp-filter { font-size: 10px; }
+  .ga-camp-filter-btn { padding: 4px 8px; }
+
+  /* The performance-chart header (Google Ads tab) — selectors stack */
+  .ga-chart-select { min-width: 100px; }
+}
 </style>
 </head>
 <body>
 
 <!-- ══════════  TOPBAR  -->
 <div class="topbar">
+  <!-- Hamburger button: visible only on mobile/tablet via responsive CSS -->
+  <button class="nav-toggle" id="navToggle" onclick="toggleSidebar()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
   <div class="topbar-logo">
     <div class="logo-icon-wrap">
       <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAH0AfQDASIAAhEBAxEB/8QAHQABAQEAAgMBAQAAAAAAAAAAAAkIBQcBBAYDAv/EAEQQAAEDAgMEBQgGCgIDAQEAAAABAgMEBQYHERIhMUEIGCJWYRMVUVVik9HTFjJScaXSCRQjM0JygYKRkheUJEOj1KH/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AxkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHZ3RvwZgvMHH7cJYvu9ztUlbGqW6ekfGjXzJvWJ221d7k12V3b003q5AOsQby6kuAe9mJv8AMHyx1JcA97MTf5g+WBg0G8upLgHvZib/ADB8sL0JcA8sWYm/zB8sDBoN49SXAfe3Ev8A8PyDqS4D724l/wDh+QDBwN4dSTAne7En+IPyDqSYE73Yk/xB+QDB4N4dSTAve7En+IfyDqSYF73Yk/xD+QDB4N39STA3e/Ef+sP5B1JMDd78R/6w/kAwgDd/UkwP3vxH/rD+QdSTA/e/EX+sP5QMIA3d1JMD98MRf6w/lHUkwR3wxF/pD+UDCIN3dSPBHfDEP+kP5Tx1I8E98cQ/6Q/lAwkDdvUjwT3xxD/pD+UdSPBXfHEPu4fygYSBu3qR4K744g93D+U8dSPBffLEHu4fygYTBuzqR4L75Yg93D+UdSPBnfK/+6h/KBhMG6+pHgzvnf8A3UPwHUjwb3zv/uofgBhQG6+pFg3vnf8A3UPwPHUiwd3zv3uYvgBhUG6upFg7vpfvcxfAdSLB/fS/e5i+AGFQbq6kWD++l99zF8Dx1IsH99b77iL4AYWBoTpR5IYJyesVuWixRdble7lMqQUkzI2tbC368jtE14q1qJzVV9CmewAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH0WWuE7hjnHdnwnbE0qblUti29NUiZxfIqehrUc5fuPnTa/6O3Lj9Xt1yzMuVP+0qtqgtSuThGi/tpE+9yIxF9h6cwPi+mhkLbsCUFsxhgugdDY2xR0VxhRVd5GVE2WTKvofwcv2tObzMVFVVFFWwVtHPJBU08jZYZY3bLo3tXVrkXkqKiLqWBxPZLZiTD1fYLzSsqrfXwOgqInfxNcmn9FTii8UVEUlbnbl7c8scxLhhW47UkcTvK0dSrdEqad2uxInjuVFTk5rk5AUS6MuadPmrlpTXaV8bb1RaUt2hbu2ZkTdIicmvTtJyRdpP4TtElx0Zc06jKrMumu0r5HWWt0pbtC3ftQqu6RE5uYvaTmqbSfxFQaKqp62igraOeOemqI2ywyxu2myMcmrXIvNFRUXUD9gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9e5VtJbbdU3GvqI6akpYnTTzSLo2NjUVXOVfQiIqnsGUP0gmaPmfDdNlraKjZrbs1Ki5uYu+OmRezH4K9yar7LdF3OAyln1mHWZnZm3PFE6yMpHu8hb4HL+5pmKuw3711Vy+05x8GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHOYAwxccZ40tOFrU3WrudS2BiqmqMRV7T18GtRXL4IpWbBuH7dhTCtsw3aIvJ0NtpmU8KLxVGpptL6VVdVVeaqpkv9HZlxo255m3Kn47VBaVcnL/3Sp//ABiL/OhsoAdI9MHKNuZuXb6y106OxLZWvqKDZTtVDNNZIPHaRNW+0icEVTu4ARoc1zXK1yK1yLoqKm9FNw9AHNvzpZ35X32q1raBjprO97t8sHF8O/irFXVE+yq8mHW3Tsyi+iOMEx5Y6XZsl8mX9bYxOzTVi6q77myb3J7SP4bjPGF75c8M4ioMQWapdTXC3ztnp5U5Oauu9OaLwVOaKqAWGB8bkxj+2Zl5eW3Flt2WLUM2KunR2q09Q395Gv3LvRebVavM+yAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADhsc4lteDsI3TE95l8lQW2ndPKvN2nBrfS5yqjUTmqoSgzGxZdMc43uuK7w/aq7jULKrUXVI28GRt9lrURqeCGm/wBITmglddqTLC0VGsFCrau7qx250yprFEv8rV2lT0ubzaZEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcvgvD1xxbiy14atMe3W3KqZTxapuarl0Vy+yiaqq8kRTiDYn6OzLjy1Zc8zblT9iDaoLUrk/jVP20ifcioxF9p6cgNdYEw1bsHYOtOF7SzZo7ZSsp41VNFfom96+05dXL4qpzQAAAAcFmBhS0Y4wdc8LXyHytDcIVjfp9Zi8Wvb6HNciOTxQlRmbgy75f44ueE73HpVUMuykiJo2aNd7JG+y5qovhwXeildDOnTgyi+nOB/pfZaXbxDYYnPc1je1VUiaufH4ubve3+5E3uQDNPQzzcXLjMJtou9TsYbvr2Q1SvXs003CObwTVdl3srqv1UKQkZyh3QfzcTHOBfojearbxDYImsRz3dqqpE0ayTxVu5jv7VXe4DRQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8Xnbj2iy1y1uuLKvYfLTx7FHA5dPL1Dt0bPu13rpwajl5H2hPTp15orjHMX6IWuo2rLhx7on7K9mas4SO8dj6ieKP5KBn693OuvV4rLvc6l9TXVs76iomfxfI9Vc5V+9VPTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADk8KWO4YmxLbcPWmLytdcallNA3ltPciIq+hE11VeSIqlZsucK2/BGBrRhS1p/wCLbaZsKO00WR3F718XOVzl8VMg/o7suP129XHMu5U+sNBrQ2tXJuWZzf2sifysVGovtu9Bt0AAAAAAAACcXTQyi/46zAW92em2MN317pqdGN7NNPxkh8E37TfBVRPqqdV5W41u2XuO7ZiyzP8A/IoZdXxK7Rs8S7nxu8HN1Tw3Km9EKiZvYEtWZGALlhO7IjWVTNqCfZ1dTzN3skb4ovFOaKqcFJV4xw7dsJYouOG75TLTXG3zuhnZy1Tg5F5tVNFReaKigVnwNie04ywlbcT2OdJqC4QJNEvNuvFjvQ5qorVTkqKc0YK6BWbf0bxU7Lu91Wzab1LtW973boKxU02fBJERE/mRv2lU3qAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8OVGtVzlRERNVVeQHVHSozPZlflXWXClma2+XHWjtTeaSuTtS6ehjdXejXZReJMGR75JHSSPc97lVznOXVVVeKqp290tMz/8Ak3NaqqKGdZLFataK2Ii9l7UXtzJ/O7fr9lGJyOnwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACj/AEHMZWDEWSdBYrZBFRXCwa01dTNXe5XOc5J/TpJq5V9pHJwRDvklPkDmVX5WZkUOJKbblolXyFypmr+/pnKm0n8yaI5vi1OWpUyyXSgvdno7xaqqOroa2Fk9PNGurZGOTVqp/RQPcAAAAAAAAMrdPXKH6QYdTMqxUu1dLTFsXONib56VP/Z4uj13+wq/ZQ1SfxPFFPC+GaNksUjVa9j01a5qpoqKi8UAjbDJJDKyWKR0cjHI5j2rorVTeiovJTf2TXSuy/q8vbcmYeIVteJIG+Qq2/qFRKk6t3JMixRuRNpNFVN2jtrdpoZf6V+U8mVmZEsVDE76PXXaqbW/kxNe3Aq+liqifyq1eKqdPAUy60eRPfn8JrfkjrR5E9+fwmt+STNAFMutHkT35/Ca35I60eRPfn8JrfkkzQBTLrR5E9+fwmt+SOtHkT35/Ca35JM0AUy60eRPfn8JrfkjrR5E9+fwmt+STNAFMutHkT35/Ca35I60eRPfn8JrfkkzQBTLrR5E9+fwmt+SOtHkT35/Ca35JM0AUy60eRPfn8JrfkjrR5E9+fwmt+STNAFMutHkT35/Ca35I60eRPfn8JrfkkzQBTLrR5E9+fwmt+SOtHkT35/Ca35JM0AUy60eRPfn8JrfkjrR5E9+fwmt+STNAFMutHkT35/Ca35J1j0mek5gq45W1thy3xA+4XW6/wDizStpJ4P1anci+UciyMbq5ydhNOG0q7tEMNgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbG6AOb3kZ3ZVX6q/ZyK+axyPX6rt7pINfHe9vjtJzRDHJ7Nrrqy13KmuVvqZKaspZWzQTRro6N7VRWuRfSioigWPB1t0csz6TNXLWkvqLHHdafSmulO3d5OdqJq5E+y5NHJ9+nFFOyQAAAAAAAAOv8/8taDNPLiuw3U+Tirmp5e21Lk/cVDUXZX+Vd7XeDl56Es73bK+y3istF0pZKWuo5nQVEMiaOje1dFRf6oWMMc9P/KJZYm5q2GlVXxoyC9xxt4t+rHUf03Md4bC8lUDFoBu3oH5j2zFWFX4Av0FHJerNHtUUksTVdU0muiJqqb3RqqJ/KrfQqgYSBYvzTavVlF7hvwHmm1erKL3DfgBHQFi/NNq9WUXuG/AeabV6sovcN+AEdAWL802r1ZRe4b8B5ptXqyi9w34AR0BYvzTavVlF7hvwHmm1erKL3DfgBHQFi/NNq9WUXuG/AeabV6sovcN+AEdAWL802r1ZRe4b8B5ptXqyi9w34AR0BYvzTavVlF7hvwHmm1erKL3DfgBHQFi/NNq9WUXuG/AeabV6sovcN+AEdAWL802r1ZRe4b8B5ptXqyi9w34AR0BYvzTavVlF7hvwHmm1erKL3DfgBHQFi/NNq9WUXuG/AeabV6sovcN+AEdAWL802r1ZRe4b8B5ptXqyi9w34AR0BYvzTavVlF7hvwHmm1erKL3DfgBHQFi/NNq9WUXuG/AeabV6sovcN+AEdAWL802r1ZRe4b8B5ptXqyi9w34AR0BYvzTavVlF7hvwPUvbMOWWz1l3udLb6ahooH1FRM+BujI2IrnKu7kiAR/B9dnDjWfMHMW7YolgbTQ1MuzS0zWoiQQN3Rs0TdrsoiqvNVVeZ8iAAAAAAAAAAAAAAAAAAAAAAAAB2t0X81Z8qsyqe4zyPdYrhs012hTVf2SrulRObmKuqelNpP4in1JUQVdLFVUs0c8EzGyRSRuRzXtVNUcipxRUXXUjWbj6AmbvnW0Oyvv1VrW0DFlsz3u3ywJvfD4qzinsqqcGAa1AAAAAAAAPWulBR3S21VtuNNHU0dXC6GeGRNWyMcio5qp6FRVQ9kASw6RuWFZlVmTV2JySSWqo1qbVUO3+UgVV0RV+01eyv3a8FQ+RwHii7YLxfbMUWObyNfbp0ljVfquTg5jvS1zVVqp6FUpN0ocqYM1stp6CnjjbfrftVNpmdu/aadqJV5NeiaL6FRq8iYdVTz0lVLS1UMkM8L1jljkarXMci6K1UXgqKmmgFbssMZ2nMDA1sxZZX601dEjnRquroZE3Pjd7TXap48U3Kh9KTz6Dmbf0Ix0uEL1VbFgv8rWNc92jaar4Mf4I/cx39iruapQwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGRP0hOaC0NppMsLRUaT1yNq7urHb2wouscS/zOTaVPQ1vJxpzMXFdswPgm7Yru79KS3U7pXNRdFkdwZG32nOVrU8VJQY5xLdMY4uumJ7zL5WvuVQ6eVU4N14Nb6GtREaickRAOFAAAAAAAAAAAAAAAAAAAAAAAAAAA5HDF7ueG8Q0F/s1U+luFBO2enlb/C5q6/1ReCpwVFVDjgBWPJPMK2ZnZd27FVu2Y5JW+SradF1WmqGom3GvhvRUXm1WrzPtSa3Q+zcdlnmI2iutQrcNXpzYK5HO7NO/XSOfw2VXR3sqvFUQpS1UciOaqKi70VOYAAAAAAAAAw50/MovNN3bmhYqbSiuEiRXiNjd0VQu5s27gj+Cr9pEXi83Gcbiix2zEuHa/D95pm1NvuEDoKiJebXJpuXkqcUXkqIoEeSkXQ0zbTMfLttqu9Vt4ksTGwVavd2qiHhHP4qqJsuX7Sar9ZDCWdeXt0yxzDuOFbltSMid5SjqFbolTTuVdiRP6IqKnJyOTkfxkxj+55aZh23Flt2npTv2KunR2iVFO7dJGv3pvReTkavICswONwvfLZibDtBiCzVLaq318DZ6eVvNrk13+hU4KnJUVDkgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8JnzmFSZY5Y3TFM+w+qYzyNBC5f31S/VGN+5N7l9lrgMpfpBc0Vu2JKbLS01GtFanNqLmrF3SVKt7EfijGrqvtO9LTJ57N0r6y6XOqudwqJKmsq5nzzzPXV0kjlVznL4qqqp6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKA9BXN76X4PXAl8qtq+WOFP1V73dqppE3N+90e5q+Cs47yfxz2X+K7vgfGNsxTY5vJV1vmSRmv1Xt4OY70tc1VavgoFegfOZZ4ytGP8EWzFdkk2qWuhRyxquroZE3Pjd7TXaov3apuVD6MAAAAAAAADo/ph5RJmZl46utNMj8S2Vrp6HZTtVEfGSDx1RNW+0iJu2lJsORWqrXIqKm5UXkWXJ/dOrKJMH4wTHVjptix32Zf1ljG9mmrF1VyeDZNFcnij03JoBz/AEAc2/Nd3flffarSir3ums75Hboqhd74d/BH8UT7SKm9Xm4iNlHU1FHVw1dJNJBUQSNkiljdsuY9q6o5FTgqKiLqVB6MmadNmrlrTXSWSNt7otmmu0Ld2zMibpETk16JtJyRdpP4QO0gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACdXTizRXHGZjsN2yo27Hhx76duyvZmqtdJZPFEVNhP5VVPrGtelpmf/xllVU1FDOjL7ddqitiIvaY5U7c39jV11+0rE5kyHKrnK5yqqquqqvMDwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANGdB7N36D44+iF7qtjD9+la1jnr2aWrXRrH+DXbmO/tVdzVKGEZyj3QwzcTMXL5LJd6nbxJYo2Q1Kvd2qmDhHN4ru2XeKIq/WQDvoAAAAAAAA4HMLCdoxzgy54VvkPlKK4QrG5UTtRu4tkb6HNciOTxQ54ASKzLwdd8A43ueFL3Hs1dBMrEeiaNmYu9kjfZc1UVPv0Xeh9Z0aM0ajKrMykvEj5HWar0pbtC3ftQqv10Tm5i9pPTvT+JTXnTiyiXHGCUxhZKVX4gsMTnPYxurqqk4vZ4uZve3+9N6qhPQCyVBV01fQwV1FPHUUtRE2WGWN2rZGOTVrkXmioqKfsZG6AObiXC1vytvtVrV0bXTWZ73b5IeL4fvZvcifZVU4NNcgAAAAAAAAAAAAAAAAAAAAAAAAAAAPD3NYxz3uRrWpq5yroiJ6TyZ06deaK4My5TCVqqNi84jY6Jytd2oaRN0rvBXa7CeCv03oBkrpUZnPzPzVrK+lmc6x27WjtTddyxNXtS6el7tXenTZTkdTgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPrsoceXXLbH9txZaVVz6V+zPArtG1ELtz43eCpwXkqIvI+RAFgsH4htWLML27ElkqEqLfcIGzwP56LxRU5ORdUVOSoqHLGEegTm95gxEuWt+qtm13aXbtcki7oKpf/AF+DZOXtIn2lN3AAAAAAAAACcPTNyi/44zAW82el2MNX17paZGJ2aabjJD4Jv2m+yuifVUo8fI5wYCtWZOX9ywndUa1tSzapp9nV1NO393Kn3LxTmiqnMCU2Gb1csOYgoL9Z6l1LcKCds9PK3+F7V1T705KnNNUNEddXNP1Bgz/p1P8A+gz5jDD11wnie44bvdMtNcbfO6CeNeGqc0Xm1U0VF5oqKcSBpnrq5p+oMGf9Op//AEHlOmtmlzw/g1fupKn55mUAab662aHd7B3/AFan555662Z/d3B//VqfnmYwBp3rr5nd3cH/APWqfnjrr5m93MIf9ap+cZiAGnuuvmZ3cwh/16j5w66+ZfdvCP8A16j5xmEAaf66+ZXdrCXuKj5w67GZPdrCXuKj5xmAAag67GZHdnCfuaj5x567GY/dnCfuaj5pl4Aah67GY3djCnuqj5p567GYvdjCnuqj5pl0Aai67OYndfCvu6j5p567OYndbC3u5/mmXABqPrs5h91sLf6T/NPPXZzC7q4X/wBJ/mGWwBqXrs5g91cL/wCs/wAwddrMDuphj/Wf5hloAam67WP+6mGf8T/MOhs2sf3zMvG9Xiu/rE2pnayOOGHVIoI2po1jEVVVE4rx3qqrzPkgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/cEssEzJ4ZHxSxuRzHsdo5rkXVFRU4KU26KObEWaeW0MtbM1cRWpG011ZwV7tOxMieh6Iq/zI5OCITGOwcgMyq/KzMihxJT+UloXfsLlTNX9/TuVNpP5k3Ob4tTkqgVXB6dkudBerPR3e11UdVQ1kLZ6eaNdWyMcmqKn9FPcAAAAAAAAAyp098ovP2Hm5lWKl1uVqi2LpHG3fPSpwk3cXR67/YVfsoYSLKzxRTwvhmjZLFI1WvY9NWuaqaKiovFCZPSsymlyrzIlgoon/R66bVTapF3oxuvbhVfSxVRPFqtXiqgdQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2P0AM3fJSuyqv1Tox6vnskkjuDvrSU/wDXe9vjtpzRDaJHC119Za7nS3K3VMlNWUkzZoJo10dG9qorXIvpRURSo/RzzOo81ctaO/NdGy6QIlPdadu7yVQ1N6onJrk7TfBdOKKB2QAAAAAAAAdfdIHLSgzUy3rsOT+Tjr2J+sW2pcn7moai7Kqv2Xaq13gq80Q7BAEc71bK+zXestF0ppKWuopnwVEL00dHI1VRzV+5UPTNodP/ACi2425q2Gl7TEbBfI404pubHUf03Md4bC8lUxeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADtfou5rT5VZkwV9TJIthuGzTXaFu/8AZ69mVE5uYq6+lUVyczqgAWUpaiCrpYqqmmjmgmYkkUjHI5r2qmqORU4oqb9T9DJfQEzdS7WZ2V99qda63xultEkjt8tOm90O/irOKJ9lVTgw1oAAAAAAAAB610oKO6Wyqtlxpo6qjq4nQzwyJq2Rjk0c1U9Coqkt+kVljW5VZk1lgekklsm1qLXUuT97TuVdEVftNXsu8U14KhVE6n6UmVMOauWs9DTRsS/W7aqrTKuiayadqJV5NeiIngqNXkBL8H61VPPSVUtLVQyQzwvWOWORqtcxyLorVReCoqaaH5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHJYXvlzwziKgxBZql1NcLfO2enlTk5q6705ovBU5oqoVSyUzCteZ2XlvxVbdmN8rfJ1lOjtVpqhqJtxr/VUVF5tVq8yTZ3j0PM3FyzzDbQXap2MNXtzYK7aXs08nCOfw0VdHeyqrv2UApOA1UciOaqKi70VOYAAAAAAAAAwz0+sovNF6bmfYaXSguMiR3hjG7oahdzZvBH8F9pNeLzJpYbFNiteJ8OV+H71StqrfXwOgqInc2qnJeSpxReSoikrM6Mv7pllmHccKXPae2F3lKSoVuiVNO5V2JE+9Nypycjk5AfGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoF0Fc3fphg5cC3yq277YoU/VnvXtVNGmiNXxdHqjV8FYu9dTSxIbL3Fl3wNjO2Yqsc3k623zJI1FXsyN4Ojd6WuaqtXwUqtlpjG0Y+wRbMV2STapK+FHqxV1dC9Nz43e01yKi/drwUD6MAAAAAAAA6N6YuUaZl5eOuFppkfiWyNfPRbLe1UR6ayQeKrpq32kRN20p3kAI0ORWqrXIqKm5UXkeDSvTpyi+h2M0xxZKXZsV+mVahjG9mmrF3uTwbJvcnij03JoZqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABo3oO5upgfGy4OvdUjMP36VrWPe7RtLV8GP8ABr9zHf2LuRFM5ACzAOhuhlm7/wAj5fpZrxVbeJbExsNSr17VTDwjm8V3bLvaTVfrId8gAAAAAAAAcBmHhK0Y6wZc8K3yHylFcIVjcqfWjdxa9voc1yI5PFCVGZOD7vgLG1zwpe4tiroJlZtomjZmLvZI32XNVFT7/SV2M4dOPKL6bYJTGVkpdu/2GJzpWsb2qqkTVz2eLmb3t8NtN6qgE9gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfX5PY9uuW2YFtxZalVzqZ+zUwbWjamB37yNfvTgvJUReRVTCGIbVizDFuxJZKlKm3XCBs8EicdF5KnJyLqipyVFQj4ar6BGbvmHELstL7VaWy6y7drkkdugql4x7+DZNN3ton2lA3aAAAAAAAAFRFTRd6AATf6ZmUS5cZguvFoptjDV9e+alRjezTTcZIPBN+032V0T6qnQ5U7pPWrCt2yOxKzGEqU9vp6VaiOoRqK+Gob+6ViLxcr1Rumqa7SprvJYgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/uCWWCZk8Mj4pY3I5j2O0c1yLqioqcFP4AFOuinmzFmplvFPWys+kNr2aa6xpuV7tOxMieh6Iq+DkcnBEO3iVPR+zLr8q8yKHEcHlJKB6/q9zpmr++p3Km0iJ9puiOb4onJVKl2W50F5tFHd7XUx1VDWwsnp5mLq2SNyIrXJ96KB7YAAAAAAdZ9JTM2nysywrb2x8brvU60tqhdv253IujlTm1iauX06InNAMv8AT+zW8+Yliy1s1Trb7RIktzcxd0tVpuj8UjRd/tOXXe1DKZ+tZU1FZVzVdXNJPUTyOkllkdtOe9y6q5VXiqqqrqfkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANk9ADN3YkdlVfqrsvV89jkkXgu90lP/AF3vb/enNEMbHs2qvrLXc6W526pkpayklbNBNGujo3tXVrkX0oqIBY8HXHR2zOos1ctqO/sWOO5w6U90pmr+6qGomqon2XJo5vgunFFOxwAAA8SPZHG6SRzWMaiq5zl0RETiqqTH6WGaj80Mz6iehnc7D9q2qS1t17L2ovbm09L1TX+VGJyNSdO/Nb6I4Fbgez1OxesQRKlQrF7UFHwevgsi6sTw2/QhPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7Y6Lea02VWZUFdUyPWw3HZpbtEmq6R69mVE5uYqqviiuTmU8paiCrpYqqmmjmgmYkkUjHI5r2qmqORU4oqb9SNZuboC5ved7MuWF+qta+3RrJZ5Hu3zU6b3Q681ZxRPsrpwYBrI4nGWIrXhLC1yxLep0gt9up3Tzv56Im5qJzcq6Iic1VEOWMPfpAs1vOV5hywstTrSW9zai7uYu6SfTVkXijEXaVPtKnNoGb808aXTMLHt1xbd3Kk9dMrmRbWrYIk3Mjb4NaiJ4714qfMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5PC19umGMR0GILLVOpbhQTtnp5W8nIvNOaLwVOaKqHGACkV96RVhi6N7czaBYUuVUz9Sp6BztVZcNN8apza3e/lqzT7SE5blW1dyuNTca+okqauqldNPNIurpHuVVc5V5qqqqn5rPMtM2mWaRYGvV6R7S7KOVERXacNVRETXwQ/MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/9k=" alt="FoldifyCase Logo">
@@ -1701,8 +1880,11 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 <!-- ══════════  LAYOUT  -->
 <div class="layout">
 
+  <!-- Backdrop dimmed overlay for mobile/tablet sidebar drawer -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
   <!-- ══════════  SIDEBAR  -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="appSidebar">
 
     <div class="sb-label">Stats</div>
     <div class="sb-stats">
@@ -6713,6 +6895,25 @@ function openSettings() {
   loadSettings();
   checkProxyStatus();
 }
+
+/* ── Sidebar drawer toggle (mobile/tablet) ──────────────────────────── */
+function toggleSidebar() {
+  document.body.classList.toggle('nav-open');
+}
+function closeSidebar() {
+  document.body.classList.remove('nav-open');
+}
+// Auto-close the drawer when a nav item is clicked on mobile/tablet, so the
+// user doesn't have to dismiss it manually after picking a destination.
+document.addEventListener('click', function(e) {
+  if (window.innerWidth > 1024) return;
+  if (!document.body.classList.contains('nav-open')) return;
+  var t = e.target.closest('.sb-nav-item');
+  if (t) closeSidebar();
+});
+// Close on Escape and on resize past the breakpoint.
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSidebar(); });
+window.addEventListener('resize', function(){ if (window.innerWidth > 1024) closeSidebar(); });
 function closeSettings() {
   document.getElementById('settingsOverlay').classList.remove('show');
 }
