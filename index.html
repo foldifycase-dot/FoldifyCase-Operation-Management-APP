@@ -1532,9 +1532,29 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .s-btn-save:hover { background:var(--gold-2); color:#fff; }
 
 .s-two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
-.main::-webkit-scrollbar-thumb { background:rgba(28,27,24,0.15); }
+/* ── Slim, subtle scrollbars across the app ─────────────────────────── */
+/* Firefox */
+* { scrollbar-width: thin; scrollbar-color: rgba(28,27,24,0.20) transparent; }
+.sidebar, .sidebar * { scrollbar-color: rgba(255,255,255,0.20) transparent; }
+
+/* WebKit / Blink (Chrome, Edge, Safari) */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-button, ::-webkit-scrollbar-button:single-button { display: none; height: 0; width: 0; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(28,27,24,0.20);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
+  transition: background-color .15s ease;
+}
+::-webkit-scrollbar-thumb:hover  { background: rgba(28,27,24,0.38); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:active { background: rgba(28,27,24,0.50); background-clip: padding-box; }
+
+/* Sidebar lives on a dark surface — use a light thumb instead. */
+.sidebar::-webkit-scrollbar-thumb       { background: rgba(255,255,255,0.16); background-clip: padding-box; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.30); background-clip: padding-box; }
 
 /* ════════════════════════  AD SPEND BY CHANNEL  */
 .asc-platform {
