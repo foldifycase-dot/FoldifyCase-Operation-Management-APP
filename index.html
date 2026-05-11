@@ -4393,6 +4393,16 @@ function renderAll() {
   renderBreakdown();
   renderAdChannel();
   renderAdSummary();
+  // If an ad-platform page is currently visible, re-render it too so its
+  // chart/cards reflect the latest livePlatforms data after a doSync().
+  try {
+    var pg = document.getElementById('pageGoogleAds');
+    if (pg && pg.style.display !== 'none' && typeof gaRenderPage === 'function') gaRenderPage();
+    var pm = document.getElementById('pageMetaAds');
+    if (pm && pm.style.display !== 'none' && typeof metaPageRender === 'function') metaPageRender();
+    var ps = document.getElementById('pageMsAds');
+    if (ps && ps.style.display !== 'none' && typeof msRenderPage === 'function') msRenderPage();
+  } catch(e) { console.warn('[renderAll] ad-page re-render failed:', e.message); }
 }
 
 /* ── Ad Spend by Channel — horizontal bar chart ── */
@@ -5875,16 +5885,19 @@ function gaRenderBreakdowns() {
 
   function fmt$(n) { return '$' + (Math.abs(+n)||0).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-  // Populate the campaign selector once per data load. Preserve current pick.
+  // Populate the campaign selector once per data load. Live campaigns only.
+  // Preserve current pick if it still exists in the new list.
   var sel = document.getElementById('gaChartCampaign');
   if (sel) {
     var prev = sel.value || '__all__';
-    var camps = (d.campaigns || []).slice().sort(function(a,b){ return (b.spend||0) - (a.spend||0); });
+    var camps = (d.campaigns || [])
+      .filter(function(c){ return (c.status||'').toUpperCase() === 'ENABLED'; })
+      .slice()
+      .sort(function(a,b){ return (b.spend||0) - (a.spend||0); });
     var opts = ['<option value="__all__">All campaigns</option>'].concat(
       camps.map(function(c){
         var label = c.name || ('Campaign ' + c.id);
-        var status = (c.status||'').toUpperCase() === 'PAUSED' ? ' (paused)' : '';
-        return '<option value="'+c.id+'">'+label.replace(/</g,'&lt;')+status+'</option>';
+        return '<option value="'+c.id+'">'+label.replace(/</g,'&lt;')+'</option>';
       })
     );
     sel.innerHTML = opts.join('');
@@ -5932,24 +5945,34 @@ function gaRenderChart() {
   var d = window.livePlatforms && window.livePlatforms.google;
   var el = document.getElementById('ga-chart');
   if (!el) return;
-  if (!d || !d.dailyByCampaign || !d.dailyByCampaign.length) {
+  var hasPerCamp = d && Array.isArray(d.dailyByCampaign) && d.dailyByCampaign.length;
+  var hasOverall = d && Array.isArray(d.daily) && d.daily.length;
+  if (!d || (!hasPerCamp && !hasOverall)) {
     el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:40px 0">No data for this period</div>';
     return;
   }
   var camp   = (document.getElementById('gaChartCampaign')||{value:'__all__'}).value;
   var metric = (document.getElementById('gaChartMetric')||{value:'spend'}).value;
 
-  // Aggregate per date for the selected campaign (or all)
+  // Aggregate per date for the selected campaign (or all). If per-campaign
+  // data isn't available (older cached response), fall back to overall daily.
   var perDate = {};
-  (d.dailyByCampaign || []).forEach(function(r) {
-    if (camp !== '__all__' && String(r.campaignId) !== String(camp)) return;
-    if (!perDate[r.date]) perDate[r.date] = { date:r.date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
-    perDate[r.date].spend       += +r.spend       || 0;
-    perDate[r.date].revenue     += +r.revenue     || 0;
-    perDate[r.date].conversions += +r.conversions || 0;
-    perDate[r.date].clicks      += +r.clicks      || 0;
-    perDate[r.date].impressions += +r.impressions || 0;
-  });
+  if (hasPerCamp) {
+    d.dailyByCampaign.forEach(function(r) {
+      if (camp !== '__all__' && String(r.campaignId) !== String(camp)) return;
+      if (!perDate[r.date]) perDate[r.date] = { date:r.date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      perDate[r.date].spend       += +r.spend       || 0;
+      perDate[r.date].revenue     += +r.revenue     || 0;
+      perDate[r.date].conversions += +r.conversions || 0;
+      perDate[r.date].clicks      += +r.clicks      || 0;
+      perDate[r.date].impressions += +r.impressions || 0;
+    });
+  } else {
+    // No per-campaign data — show overall daily only (campaign filter ignored).
+    d.daily.forEach(function(r) {
+      perDate[r.date] = { date:r.date, spend:+r.spend||0, revenue:+r.revenue||0, conversions:+r.conversions||0, clicks:+r.clicks||0, impressions:+r.impressions||0 };
+    });
+  }
   var rows = Object.values(perDate).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
   // Compute derived metric per date
   var metricDef = {
