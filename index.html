@@ -1643,6 +1643,27 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   color: var(--ink);
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
+/* Selectors above the Google Ads performance chart */
+.ga-chart-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23666' d='M0 0l5 6 5-6z'/></svg>") no-repeat right 8px center;
+  background-size: 8px;
+  border: 1px solid rgba(28,27,24,0.15);
+  border-radius: 6px;
+  padding: 5px 24px 5px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+  min-width: 130px;
+  max-width: 220px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ga-chart-select:hover { border-color: rgba(28,27,24,0.35); }
+.ga-chart-select:focus { border-color: #4285F4; box-shadow: 0 0 0 2px rgba(66,133,244,.15); }
 </style>
 </head>
 <body>
@@ -3508,29 +3529,39 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
     </div>
 
-    <!-- ── Bottom row: Type breakdown + Device + Setup ── -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 28px 28px">
+    <!-- ── Bottom row: Performance chart (left) + Quick Insights (right) ── -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin:0 28px 28px">
 
+      <!-- Performance chart with campaign + metric selectors -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
-          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">By Campaign Type</div>
-          <div style="font-size:10px;color:var(--c3);margin-top:2px">Search · Shopping · PMax · Display</div>
+        <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(28,27,24,0.07);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Performance Chart</div>
+            <div style="font-size:10px;color:var(--c3);margin-top:2px">Daily trend by campaign & metric</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select id="gaChartCampaign" onchange="gaRenderChart()" class="ga-chart-select">
+              <option value="__all__">All campaigns</option>
+            </select>
+            <select id="gaChartMetric" onchange="gaRenderChart()" class="ga-chart-select">
+              <option value="spend">Cost</option>
+              <option value="conversions">Conversions</option>
+              <option value="revenue">Conv. value</option>
+              <option value="clicks">Clicks</option>
+              <option value="impressions">Impressions</option>
+              <option value="roas">ROAS</option>
+              <option value="cpa">CPA</option>
+              <option value="ctr">CTR</option>
+              <option value="cpc">Avg. CPC</option>
+            </select>
+          </div>
         </div>
-        <div id="ga-type-breakdown" style="padding:14px 16px">
-          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
+        <div id="ga-chart" style="padding:14px 16px;min-height:260px">
+          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:40px 0">No data yet</div>
         </div>
       </div>
 
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
-          <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">By Device</div>
-          <div style="font-size:10px;color:var(--c3);margin-top:2px">Mobile · Desktop · Tablet</div>
-        </div>
-        <div id="ga-device-breakdown" style="padding:14px 16px">
-          <div style="color:var(--c3);font-family:'Inter',sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>
-        </div>
-      </div>
-
+      <!-- Quick Insights -->
       <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(28,27,24,0.07)">
           <div style="font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase">Quick Insights</div>
@@ -5836,58 +5867,32 @@ function gaRenderPage() {
   if (typeof gaRenderBreakdowns === 'function') gaRenderBreakdowns();
 }
 
-// Render the By-Campaign-Type, By-Device, and Quick-Insights cards. Called
-// at the end of gaRenderPage via the wrapper below.
+// Render the Performance Chart and Quick-Insights cards. Called at the end
+// of gaRenderPage via the wrapper below.
 function gaRenderBreakdowns() {
   var d = window.livePlatforms && window.livePlatforms.google;
   if (!d) return;
-  var typeLabels = {
-    SEARCH: 'Search', SHOPPING: 'Shopping', PERFORMANCE_MAX: 'PMax',
-    DISPLAY: 'Display', VIDEO: 'Video', DEMAND_GEN: 'Demand Gen',
-    DISCOVERY: 'Discovery', LOCAL: 'Local', SMART: 'Smart', HOTEL: 'Hotel',
-    MULTI_CHANNEL: 'Multi-channel', OTHER: 'Other', UNKNOWN: 'Unknown',
-  };
-  var typeColors = {
-    SEARCH: '#4285F4', SHOPPING: '#34A853', PERFORMANCE_MAX: '#A142F4',
-    DISPLAY: '#FBBC05', VIDEO: '#EA4335', DEMAND_GEN: '#FF6D00',
-    DISCOVERY: '#00ACC1', OTHER: '#8E8E93', UNKNOWN: '#8E8E93',
-  };
-  var devLabels  = { MOBILE: 'Mobile', DESKTOP: 'Desktop', TABLET: 'Tablet', CONNECTED_TV: 'Connected TV', OTHER: 'Other', UNKNOWN: 'Unknown' };
-  var devColors  = { MOBILE: '#4285F4', DESKTOP: '#34A853', TABLET: '#FBBC05', CONNECTED_TV: '#A142F4', OTHER: '#8E8E93', UNKNOWN: '#8E8E93' };
 
   function fmt$(n) { return '$' + (Math.abs(+n)||0).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-  function renderBars(containerId, items, labelMap, colorMap, keyField) {
-    var el = document.getElementById(containerId);
-    if (!el) return;
-    if (!items || !items.length) {
-      el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No data yet</div>';
-      return;
-    }
-    var totalSpend = items.reduce(function(s,i){ return s + (+i.spend||0); }, 0);
-    if (totalSpend <= 0) {
-      el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:20px 0">No spend in this period</div>';
-      return;
-    }
-    el.innerHTML = items.map(function(it) {
-      var raw   = it[keyField] || 'OTHER';
-      var label = labelMap[raw] || raw.replace(/_/g,' ');
-      var color = colorMap[raw] || '#8E8E93';
-      var pct   = totalSpend > 0 ? ((+it.spend||0) / totalSpend * 100) : 0;
-      return '<div style="margin-bottom:10px">' +
-        '<div style="display:flex;justify-content:space-between;font-family:Inter,sans-serif;font-size:11px;margin-bottom:3px">' +
-          '<span style="color:var(--ink);font-weight:600">'+label+'</span>' +
-          '<span style="color:var(--c2);font-weight:600">'+fmt$(it.spend)+' · '+pct.toFixed(1)+'%</span>' +
-        '</div>' +
-        '<div style="height:6px;background:rgba(28,27,24,0.06);border-radius:3px;overflow:hidden">' +
-          '<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+color+'"></div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+  // Populate the campaign selector once per data load. Preserve current pick.
+  var sel = document.getElementById('gaChartCampaign');
+  if (sel) {
+    var prev = sel.value || '__all__';
+    var camps = (d.campaigns || []).slice().sort(function(a,b){ return (b.spend||0) - (a.spend||0); });
+    var opts = ['<option value="__all__">All campaigns</option>'].concat(
+      camps.map(function(c){
+        var label = c.name || ('Campaign ' + c.id);
+        var status = (c.status||'').toUpperCase() === 'PAUSED' ? ' (paused)' : '';
+        return '<option value="'+c.id+'">'+label.replace(/</g,'&lt;')+status+'</option>';
+      })
+    );
+    sel.innerHTML = opts.join('');
+    if ([].slice.call(sel.options).some(function(o){ return o.value === prev; })) sel.value = prev;
   }
 
-  renderBars('ga-type-breakdown',   d.byType   || [], typeLabels, typeColors, 'type');
-  renderBars('ga-device-breakdown', d.byDevice || [], devLabels,  devColors,  'device');
+  // Render the chart with the current selectors
+  if (typeof gaRenderChart === 'function') gaRenderChart();
 
   // Quick Insights: top ROAS, biggest spender, attention-needed (high spend / no conv)
   var insEl = document.getElementById('ga-insights');
@@ -5920,6 +5925,139 @@ function gaRenderBreakdowns() {
   // Remove bottom border on the last row visually
   html = html.replace(/(border-bottom:1px solid rgba\(28,27,24,0\.05\))(?![\s\S]*\1)/, 'border-bottom:none');
   insEl.innerHTML = html;
+}
+
+// Google Ads performance chart — campaign × metric, daily SVG line chart.
+function gaRenderChart() {
+  var d = window.livePlatforms && window.livePlatforms.google;
+  var el = document.getElementById('ga-chart');
+  if (!el) return;
+  if (!d || !d.dailyByCampaign || !d.dailyByCampaign.length) {
+    el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:40px 0">No data for this period</div>';
+    return;
+  }
+  var camp   = (document.getElementById('gaChartCampaign')||{value:'__all__'}).value;
+  var metric = (document.getElementById('gaChartMetric')||{value:'spend'}).value;
+
+  // Aggregate per date for the selected campaign (or all)
+  var perDate = {};
+  (d.dailyByCampaign || []).forEach(function(r) {
+    if (camp !== '__all__' && String(r.campaignId) !== String(camp)) return;
+    if (!perDate[r.date]) perDate[r.date] = { date:r.date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+    perDate[r.date].spend       += +r.spend       || 0;
+    perDate[r.date].revenue     += +r.revenue     || 0;
+    perDate[r.date].conversions += +r.conversions || 0;
+    perDate[r.date].clicks      += +r.clicks      || 0;
+    perDate[r.date].impressions += +r.impressions || 0;
+  });
+  var rows = Object.values(perDate).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+  // Compute derived metric per date
+  var metricDef = {
+    spend:       { label:'Cost',         color:'#4285F4', fmt:function(v){return '$'+(+v||0).toFixed(2);}, get:function(r){return r.spend;} },
+    conversions: { label:'Conversions',  color:'#34A853', fmt:function(v){return (+v||0).toFixed(2);},      get:function(r){return r.conversions;} },
+    revenue:     { label:'Conv. value',  color:'#34A853', fmt:function(v){return '$'+(+v||0).toFixed(2);}, get:function(r){return r.revenue;} },
+    clicks:      { label:'Clicks',       color:'#4285F4', fmt:function(v){return (+v||0).toLocaleString();}, get:function(r){return r.clicks;} },
+    impressions: { label:'Impressions',  color:'#A142F4', fmt:function(v){return (+v||0).toLocaleString();}, get:function(r){return r.impressions;} },
+    roas:        { label:'ROAS',         color:'#C8A96E', fmt:function(v){return (+v||0).toFixed(2)+'×';},   get:function(r){return r.spend>0 ? r.revenue / r.spend : 0;} },
+    cpa:         { label:'CPA',          color:'#EA4335', fmt:function(v){return '$'+(+v||0).toFixed(2);}, get:function(r){return r.conversions>0 ? r.spend / r.conversions : 0;} },
+    ctr:         { label:'CTR',          color:'#FBBC05', fmt:function(v){return (+v||0).toFixed(2)+'%';},   get:function(r){return r.impressions>0 ? r.clicks / r.impressions * 100 : 0;} },
+    cpc:         { label:'Avg. CPC',     color:'#00ACC1', fmt:function(v){return '$'+(+v||0).toFixed(2);}, get:function(r){return r.clicks>0 ? r.spend / r.clicks : 0;} },
+  };
+  var def = metricDef[metric] || metricDef.spend;
+  var points = rows.map(function(r){ return { date:r.date, value: +def.get(r) || 0 }; });
+  if (!points.length) {
+    el.innerHTML = '<div style="color:var(--c3);font-family:Inter,sans-serif;font-size:11px;text-align:center;padding:40px 0">No data for this campaign in this period</div>';
+    return;
+  }
+
+  // SVG dimensions
+  var W = el.clientWidth || 600;
+  var H = 260;
+  var padL = 50, padR = 16, padT = 16, padB = 30;
+  var iw = W - padL - padR, ih = H - padT - padB;
+  var maxV = Math.max.apply(null, points.map(function(p){ return p.value; }));
+  var minV = 0;
+  if (maxV === 0) maxV = 1; // avoid divide-by-zero — flat line at 0
+
+  // "Nice" Y-axis ticks
+  function niceTicks(max, count) {
+    if (max <= 0) return [0];
+    var raw = max / (count - 1);
+    var pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    var mult = raw / pow;
+    var step = (mult < 1.5 ? 1 : mult < 3 ? 2 : mult < 7 ? 5 : 10) * pow;
+    var ticks = [];
+    for (var v = 0; v <= max + step*0.001; v += step) ticks.push(v);
+    return ticks;
+  }
+  var yTicks = niceTicks(maxV, 5);
+  var yMax = yTicks[yTicks.length - 1];
+
+  function xCoord(i){ return padL + (points.length === 1 ? iw/2 : (i / (points.length - 1)) * iw); }
+  function yCoord(v){ return padT + ih - (v / yMax) * ih; }
+
+  // Build SVG path
+  var pathD = points.map(function(p,i){ return (i===0?'M':'L') + xCoord(i).toFixed(1) + ',' + yCoord(p.value).toFixed(1); }).join(' ');
+  var areaD = pathD + ' L' + xCoord(points.length-1).toFixed(1) + ',' + (padT+ih).toFixed(1) + ' L' + xCoord(0).toFixed(1) + ',' + (padT+ih).toFixed(1) + ' Z';
+
+  // Y gridlines + labels
+  var grid = yTicks.map(function(t){
+    var y = yCoord(t);
+    return '<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(padL+iw).toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="rgba(28,27,24,0.07)" stroke-width="1"/>'
+         + '<text x="'+(padL-6).toFixed(1)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-size="9" fill="#999">'+def.fmt(t)+'</text>';
+  }).join('');
+
+  // X tick labels (max ~8)
+  var xLabelCount = Math.min(points.length, 8);
+  var xStep = Math.max(1, Math.floor(points.length / xLabelCount));
+  var xLabels = '';
+  for (var i = 0; i < points.length; i += xStep) {
+    var d2 = points[i].date;
+    var dt = new Date(d2 + 'T00:00:00');
+    var lbl = dt.toLocaleDateString('en-AU', { day:'2-digit', month:'short' });
+    xLabels += '<text x="'+xCoord(i).toFixed(1)+'" y="'+(padT+ih+16)+'" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#999">'+lbl+'</text>';
+  }
+
+  // Data point dots + hover targets (one transparent rect per point with <title>)
+  var dots = points.map(function(p,i){
+    return '<circle cx="'+xCoord(i).toFixed(1)+'" cy="'+yCoord(p.value).toFixed(1)+'" r="2.5" fill="'+def.color+'"/>';
+  }).join('');
+  var hovers = points.map(function(p,i){
+    var dt = new Date(p.date+'T00:00:00').toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'});
+    var w  = points.length > 1 ? (iw / (points.length - 1)) : iw;
+    var cx = xCoord(i);
+    return '<rect x="'+(cx-w/2).toFixed(1)+'" y="'+padT+'" width="'+w.toFixed(1)+'" height="'+ih+'" fill="transparent">' +
+           '<title>'+dt+' — '+def.label+': '+def.fmt(p.value)+'</title></rect>';
+  }).join('');
+
+  // Total / average summary above chart
+  var total = points.reduce(function(s,p){ return s + p.value; }, 0);
+  var ratioMetrics = { roas:1, cpa:1, ctr:1, cpc:1 };
+  var summary = ratioMetrics[metric]
+    ? 'Avg: '+def.fmt(total / points.length)
+    : 'Total: '+def.fmt(total);
+  var campLabel = camp === '__all__' ? 'All campaigns' : (function(){
+    var c = (d.campaigns||[]).find(function(x){ return String(x.id) === String(camp); });
+    return c ? c.name : 'Selected campaign';
+  })();
+
+  var gradId = 'gachart-grad-' + Math.random().toString(36).slice(2,8);
+  el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-family:Inter,sans-serif;font-size:10px;color:var(--c2)">'+
+      '<span style="color:var(--ink);font-weight:600">'+campLabel.replace(/</g,'&lt;')+' · '+def.label+'</span>'+
+      '<span style="color:var(--c2);font-weight:600">'+summary+'</span>'+
+    '</div>' +
+    '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block">' +
+      '<defs><linearGradient id="'+gradId+'" x1="0" x2="0" y1="0" y2="1">'+
+        '<stop offset="0%" stop-color="'+def.color+'" stop-opacity="0.25"/>'+
+        '<stop offset="100%" stop-color="'+def.color+'" stop-opacity="0"/>'+
+      '</linearGradient></defs>' +
+      grid +
+      '<path d="'+areaD+'" fill="url(#'+gradId+')"/>' +
+      '<path d="'+pathD+'" fill="none" stroke="'+def.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      dots +
+      xLabels +
+      hovers +
+    '</svg>';
 }
 
 // Google Ads campaign-table status filter (Live / Paused / All). Default: Live.

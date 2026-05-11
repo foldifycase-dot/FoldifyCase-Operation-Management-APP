@@ -1296,10 +1296,11 @@ module.exports = async function handler(req, res) {
 
     console.log("[google-ads] rows returned:", rows.length, "from:", from, "to:", to);
 
-    // Aggregate by date and campaign
+    // Aggregate by date, campaign, and date-x-campaign
     const round2 = n => Math.round(n * 100) / 100;
-    const byDate     = {};
-    const byCampaign = {};
+    const byDate            = {};
+    const byCampaign        = {};
+    const byCampaignDateMap = {}; // key: campId + "|" + date
 
     rows.forEach(function(row) {
       var date        = (row.segments && row.segments.date) || "";
@@ -1329,6 +1330,20 @@ module.exports = async function handler(req, res) {
       byCampaign[campId].conversions = round2(byCampaign[campId].conversions + conversions);
       byCampaign[campId].clicks      += clicks;
       byCampaign[campId].impressions += impressions;
+
+      // Per-campaign per-date bucket for the chart
+      var k = campId + "|" + date;
+      if (!byCampaignDateMap[k]) byCampaignDateMap[k] = { campaignId: campId, campaignName: campName, date: date, spend:0, revenue:0, conversions:0, clicks:0, impressions:0 };
+      byCampaignDateMap[k].campaignName = campName;
+      byCampaignDateMap[k].spend       = round2(byCampaignDateMap[k].spend + spend);
+      byCampaignDateMap[k].revenue     = round2(byCampaignDateMap[k].revenue + revenue);
+      byCampaignDateMap[k].conversions = round2(byCampaignDateMap[k].conversions + conversions);
+      byCampaignDateMap[k].clicks      += clicks;
+      byCampaignDateMap[k].impressions += impressions;
+    });
+
+    var dailyByCampaign = Object.values(byCampaignDateMap).sort(function(a,b){
+      return a.date === b.date ? (a.campaignId < b.campaignId ? -1 : 1) : (a.date < b.date ? -1 : 1);
     });
 
     var daily = Object.values(byDate).sort(function(a,b){ return a.date < b.date ? -1 : 1; }).map(function(d) {
@@ -1432,7 +1447,7 @@ module.exports = async function handler(req, res) {
     total.cpa  = total.conversions > 0 ? round2(total.spend / total.conversions) : 0;
     total.ctr  = total.impressions > 0 ? round2(total.clicks / total.impressions * 100) : 0;
 
-    return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns, byType: byType, byDevice: byDevice });
+    return res.status(200).json({ platform: "google", daily: daily, total: total, campaigns: campaigns, byType: byType, byDevice: byDevice, dailyByCampaign: dailyByCampaign });
   }
 
   if (service === "ms-ads")     return res.status(200).json({ platform: "microsoft", daily: [], total: { spend:0, revenue:0, roas:0 } });
