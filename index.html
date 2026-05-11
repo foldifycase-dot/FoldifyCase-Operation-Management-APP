@@ -1612,6 +1612,15 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .refresh-btn:active .refresh-icon { transform: rotate(-90deg); }
 .refresh-btn.is-spinning .refresh-icon { animation: refresh-spin .9s linear infinite; }
 @keyframes refresh-spin { to { transform: rotate(360deg); } }
+/* Larger sidebar variant of .refresh-btn (full width, more padding, wider letter-spacing). */
+.refresh-btn-lg {
+  width: 100%;
+  padding: 10px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  justify-content: center;
+  gap: 7px;
+}
 </style>
 </head>
 <body>
@@ -1667,18 +1676,8 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 
     <!-- Refresh Data button -->
     <div style="padding:0 14px 14px;">
-      <button onclick="doSync()" id="syncBtn"
-        onmouseover="this.style.background='var(--gold-2)';this.style.color='#fff'"
-        onmouseout="this.style.background='var(--gold)';this.style.color='var(--ink)'"
-        style="
-          width:100%; padding:10px; background:var(--gold);
-          color:var(--ink); border:none; border-radius:8px;
-          font-family:'Inter',sans-serif; font-weight:700;
-          font-size:12px; letter-spacing:0.08em;
-          cursor:pointer; transition:all 0.2s;
-          display:flex; align-items:center; justify-content:center; gap:7px;
-        ">
-        <span>⟳</span> REFRESH DATA
+      <button onclick="doSync()" id="syncBtn" class="refresh-btn refresh-btn-lg">
+        <span class="refresh-icon">⟳</span> REFRESH DATA
       </button>
     </div>
 
@@ -4007,7 +4006,7 @@ function getRange(key) {
 async function doSync() {
   window.GLOBAL_TX_FEE = null; // reset until OR data loads
   const btn = document.getElementById('syncBtn');
-  if (btn) { btn.innerHTML = '<span>⟳</span> SYNCING...'; btn.style.opacity='0.7'; btn.disabled=true; }
+  if (btn) { btn.classList.add('is-spinning'); btn.disabled = true; }
 
   // Always use GLOBAL date range — keeps doSync in sync with all pickers
   const from = window.GLOBAL_FROM;
@@ -4242,7 +4241,7 @@ async function doSync() {
     toast('Sync error — check console for details', 'err');
   }
 
-  if (btn) { btn.innerHTML = '<span>⟳</span> REFRESH DATA'; btn.style.opacity='1'; btn.disabled=false; }
+  if (btn) { btn.classList.remove('is-spinning'); btn.disabled = false; }
   renderAll();
 }
 
