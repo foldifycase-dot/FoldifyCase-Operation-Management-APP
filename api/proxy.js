@@ -1335,8 +1335,39 @@ module.exports = async function handler(req, res) {
         ctr:  d.impressions > 0 ? round2(d.clicks / d.impressions * 100) : 0 };
     });
 
+    // Also pull the full list of non-removed campaigns so the UI can show
+    // campaigns that exist but had no activity in the selected date range
+    // (a metrics-only GAQL hides those). Failure here is non-fatal.
+    try {
+      const campListResp = await callComposio(
+        "GOOGLEADS_SEARCH_STREAM_GAQL",
+        { query: "SELECT campaign.id, campaign.name, campaign.status FROM campaign WHERE campaign.status != 'REMOVED'" },
+        COMPOSIO_API_KEY, COMPOSIO_ACCOUNT, COMPOSIO_USER_ID
+      );
+      if (campListResp && campListResp.successful) {
+        const cp = campListResp.data || {};
+        const allCampRows =
+          (Array.isArray(cp.results) && cp.results) ||
+          (cp.data && Array.isArray(cp.data.results) && cp.data.results) ||
+          [];
+        allCampRows.forEach(function(row) {
+          const cid = row.campaign && String(row.campaign.id);
+          if (cid && !byCampaign[cid]) {
+            byCampaign[cid] = {
+              id: cid,
+              name: (row.campaign && row.campaign.name) || "Unknown",
+              status: (row.campaign && row.campaign.status) || "",
+              spend: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0,
+            };
+          } else if (cid && byCampaign[cid]) {
+            byCampaign[cid].status = (row.campaign && row.campaign.status) || byCampaign[cid].status || "";
+          }
+        });
+      }
+    } catch (e) { console.warn("[google-ads] campaign-list fallback failed:", e.message); }
+
     var campaigns = Object.values(byCampaign).sort(function(a,b){ return b.spend - a.spend; }).map(function(c) {
-      return { id:c.id, name:c.name, spend:c.spend, revenue:c.revenue, conversions:c.conversions, clicks:c.clicks, impressions:c.impressions,
+      return { id:c.id, name:c.name, status: c.status || "", spend:c.spend, revenue:c.revenue, conversions:c.conversions, clicks:c.clicks, impressions:c.impressions,
         roas: c.spend > 0 ? round2(c.revenue / c.spend) : 0,
         ctr:  c.impressions > 0 ? round2(c.clicks / c.impressions * 100) : 0,
         cpa:  c.conversions > 0 ? round2(c.spend / c.conversions) : 0 };

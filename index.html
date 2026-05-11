@@ -5760,16 +5760,34 @@ function gaRenderPage() {
       var roas = c.roas != null ? +c.roas : (spend > 0 ? revenue / spend : 0);
       var cpa  = c.cpa  != null ? +c.cpa  : (conversions > 0 ? spend / conversions : 0);
       var ctr  = c.ctr  != null ? +c.ctr  : (impressions > 0 ? clicks / impressions * 100 : 0);
+      // Show real numbers when activity exists; "0" when measured-but-zero
+      // (impressions>0 but no conversions); "—" only when truly no activity.
+      var hadActivity = impressions > 0 || clicks > 0 || spend > 0;
       var convDisp = conversions > 0
         ? (Number.isInteger(conversions) ? conversions : conversions.toFixed(2))
-        : '—';
-      return '<div style="display:grid;grid-template-columns:1fr 80px 70px 70px 80px 60px;padding:8px 16px;border-bottom:1px solid rgba(28,27,24,0.04);font-family:Inter,sans-serif;font-size:11px;align-items:center">' +
-        '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500" title="'+c.name+'">'+c.name+'</div>' +
-        '<div style="text-align:right;color:#4285F4;font-weight:600">'+gFmt(spend)+'</div>' +
-        '<div style="text-align:right;color:var(--gold);font-weight:600">'+gX(roas)+'</div>' +
-        '<div style="text-align:right">'+convDisp+'</div>' +
-        '<div style="text-align:right;color:var(--c2)">'+gFmt(cpa)+'</div>' +
-        '<div style="text-align:right;color:var(--c3)">'+gPct(ctr)+'</div>' +
+        : (hadActivity ? '0' : '—');
+      var roasDisp = spend > 0 ? roas.toFixed(2) + '×' : (hadActivity ? '—' : '—');
+      var cpaDisp  = conversions > 0 ? gFmt(cpa) : (hadActivity ? '—' : '—');
+      var ctrDisp  = impressions > 0 ? ctr.toFixed(2) + '%' : '—';
+      var spendDisp = spend > 0 ? gFmt(spend) : (hadActivity ? '$0.00' : '—');
+      // Status pill (active / paused / —)
+      var statusRaw = (c.status || '').toUpperCase();
+      var statusPill = '';
+      if (statusRaw === 'PAUSED') {
+        statusPill = '<span style="display:inline-block;padding:1px 6px;border-radius:3px;background:rgba(212,135,74,0.15);color:#A8632F;font-size:9px;font-weight:700;margin-left:6px;vertical-align:middle">PAUSED</span>';
+      } else if (statusRaw === 'ENABLED') {
+        statusPill = '<span style="display:inline-block;padding:1px 6px;border-radius:3px;background:rgba(90,158,114,0.15);color:#2F7A4A;font-size:9px;font-weight:700;margin-left:6px;vertical-align:middle">ACTIVE</span>';
+      }
+      // Dim the whole row if no activity in this date range so it visually
+      // recedes but is still readable.
+      var rowOpacity = hadActivity ? '1' : '0.55';
+      return '<div style="display:grid;grid-template-columns:1fr 90px 70px 70px 80px 60px;padding:9px 16px;border-bottom:1px solid rgba(28,27,24,0.06);font-family:Inter,sans-serif;font-size:11px;align-items:center;opacity:'+rowOpacity+'">' +
+        '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--ink)" title="'+c.name+'">'+c.name+statusPill+'</div>' +
+        '<div style="text-align:right;color:#4285F4;font-weight:700">'+spendDisp+'</div>' +
+        '<div style="text-align:right;color:'+(roas>=3?'var(--green)':roas>0?'var(--gold)':'var(--c2)')+';font-weight:700">'+roasDisp+'</div>' +
+        '<div style="text-align:right;color:var(--ink);font-weight:600">'+convDisp+'</div>' +
+        '<div style="text-align:right;color:var(--ink)">'+cpaDisp+'</div>' +
+        '<div style="text-align:right;color:var(--ink)">'+ctrDisp+'</div>' +
         '</div>';
     }).join('');
   }
