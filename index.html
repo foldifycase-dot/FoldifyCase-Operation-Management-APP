@@ -671,17 +671,15 @@ body { font-family:var(--sans); font-size:13px; background:var(--ink); color:var
   margin-bottom:8px;
 }
 .pl-wf-label { font-size:12px;color:var(--c2);width:140px;flex-shrink:0;font-weight:500; }
-.pl-wf-bar-wrap { flex:1;position:relative;height:26px;display:flex;align-items:center; }
+.pl-wf-bar-wrap { flex:1;position:relative;height:22px;display:flex;align-items:center; }
 .pl-wf-bar {
-  height:22px;border-radius:4px;
-  display:flex;align-items:center;
-  padding:0 8px;font-size:11px;font-weight:700;
-  font-family:'Inter',sans-serif;color:#fff;
-  white-space:nowrap;min-width:4px;
+  height:18px;border-radius:4px;
+  min-width:4px; max-width:100%;
   transition:width .4s ease;
 }
-.pl-wf-val { font-size:11px;font-family:'Inter',sans-serif;color:var(--c2);width:80px;text-align:right;flex-shrink:0; }
-.pl-wf-pct { font-size:10px;font-family:'Inter',sans-serif;color:var(--c3);width:44px;text-align:right;flex-shrink:0; }
+/* Right-side numeric column — match the dashboard's Inter 700 numeric style. */
+.pl-wf-val { font-size:13px;font-family:'Inter',sans-serif;font-weight:700;color:var(--c1);width:96px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums; }
+.pl-wf-pct { font-size:11px;font-family:'Inter',sans-serif;font-weight:600;color:var(--c3);width:50px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums; }
 .pl-wf-subtotal { border-top:1px dashed rgba(28,27,24,0.1);margin:4px 0 10px; }
 .pl-wf-subtotal-label { font-size:11px;font-weight:700;color:var(--ink);width:140px;flex-shrink:0; }
 
@@ -7921,15 +7919,18 @@ function plRenderWaterfall() {
     const w     = Math.max(pct, 1).toFixed(1);
     const isSub = s.type === 'sub' || s.type === 'total';
     const pctLabel = t.grossSales > 0 ? ((s.val / t.grossSales) * 100).toFixed(1) + '%' : '';
+    // Bars are pure visual indicators (proportional widths); numbers live
+    // in the right-side column so they're never clipped by a narrow bar.
+    const valColor = s.type === 'total'
+      ? (s.val >= 0 ? 'var(--green)' : 'var(--red)')
+      : (s.val < 0 ? 'var(--red)' : 'var(--c1)');
     return `
       <div class="pl-wf-row${isSub ? ' pl-wf-subtotal' : ''}">
         <div class="${isSub?'pl-wf-subtotal-label':'pl-wf-label'}">${s.label}</div>
         <div class="pl-wf-bar-wrap">
-          <div class="pl-wf-bar" style="width:${w}%;background:${s.color};opacity:${isSub?1:.85}">
-            ${Math.abs(s.val) > max*0.08 ? plFmt$(s.val) : ''}
-          </div>
+          <div class="pl-wf-bar" style="width:${w}%;background:${s.color};opacity:${isSub?1:.85}"></div>
         </div>
-        <div class="pl-wf-val" style="color:${s.val<0?'var(--red)':'var(--c2)'}">${plFmt$(s.val)}</div>
+        <div class="pl-wf-val" style="color:${valColor}">${plFmt$(s.val)}</div>
         <div class="pl-wf-pct">${pctLabel}</div>
       </div>`;
   }).join('');
