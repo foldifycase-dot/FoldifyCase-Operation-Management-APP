@@ -1581,6 +1581,37 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .ga-step { display:flex;align-items:flex-start;gap:10px;font-family:'Inter',sans-serif;font-size:11px;color:var(--c2);line-height:1.5; }
 .ga-step-num { width:20px;height:20px;border-radius:50%;background:#4285F4;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
 .ga-step-text code { background:rgba(28,27,24,0.06);padding:1px 4px;border-radius:3px;font-size:10px;color:var(--ink); }
+
+/* Refresh button shared by all report/ad pages — click feedback + spinner */
+.refresh-btn {
+  padding: 7px 16px;
+  border-radius: 7px;
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform .08s ease, background .15s ease, box-shadow .15s ease, opacity .15s ease;
+  user-select: none;
+  box-shadow: 0 1px 0 rgba(0,0,0,.06);
+}
+.refresh-btn:hover { background: var(--gold-2); color: #fff; }
+.refresh-btn:active {
+  transform: scale(.94);
+  background: var(--gold-2);
+  color: #fff;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.18);
+}
+.refresh-btn:disabled { opacity: .6; cursor: wait; }
+.refresh-btn .refresh-icon { display: inline-block; transition: transform .25s ease; }
+.refresh-btn:active .refresh-icon { transform: rotate(-90deg); }
+.refresh-btn.is-spinning .refresh-icon { animation: refresh-spin .9s linear infinite; }
+@keyframes refresh-spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -2263,11 +2294,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
       </div>
       <!-- Actions -->
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="paSync()" id="paSyncBtn" style="
-          padding:7px 16px;border-radius:7px;background:var(--gold);
-          color:var(--ink);border:none;font-size:12px;font-weight:700;
-          cursor:pointer;letter-spacing:.04em;
-        ">⟳ REFRESH</button>
+        <button onclick="paSync()" id="paSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
         <button onclick="paExportCSV()" style="
           padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);
           background:transparent;color:var(--c2);font-size:12px;cursor:pointer;
@@ -2461,7 +2488,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="orSync()" id="orSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="orSync()" id="orSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
         <button onclick="orExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
@@ -2627,7 +2654,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
 
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="plSync()" id="plSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="plSync()" id="plSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
         <button onclick="plExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
@@ -2818,7 +2845,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
         </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="maSync()" id="maSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="maSync()" id="maSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
         <button onclick="maExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
@@ -3098,7 +3125,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
           </div>
         </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="clvSync()" id="clvSyncBtn" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="clvSync()" id="clvSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
         <button onclick="clvExportCSV()" style="padding:7px 14px;border-radius:7px;border:1.5px solid var(--cream-3);background:transparent;color:var(--c2);font-size:12px;cursor:pointer;">↓ Export CSV</button>
       </div>
     </div>
@@ -3349,7 +3376,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="gaPageRefresh()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="gaPageRefresh()" id="gaSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
       </div>
     </div>
 
@@ -3538,7 +3565,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="metaPageSync()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="metaPageSync()" id="metaSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
       </div>
     </div>
 
@@ -3735,7 +3762,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="msRenderPage()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="msPageRefresh()" id="msSyncBtn" class="refresh-btn"><span class="refresh-icon">⟳</span>REFRESH</button>
       </div>
     </div>
 
@@ -5146,9 +5173,35 @@ FEE_KEYS.forEach(k => {
 
 // ── Google Ads Page ─────────────────────────────────────────────────────
 function metaPageSync() {
-  // Trigger main dashboard sync which fetches Meta data, then re-render this page
-  doSync();
-  setTimeout(metaPageRender, 3000);
+  var btn = document.getElementById('metaSyncBtn');
+  if (btn) { btn.classList.add('is-spinning'); btn.disabled = true; }
+  var done = function() {
+    if (typeof metaPageRender === 'function') metaPageRender();
+    if (btn) { btn.classList.remove('is-spinning'); btn.disabled = false; }
+  };
+  if (typeof doSync === 'function') {
+    var r = doSync();
+    if (r && typeof r.then === 'function') r.then(done).catch(done);
+    else setTimeout(done, 1500);
+  } else {
+    done();
+  }
+}
+
+function msPageRefresh() {
+  var btn = document.getElementById('msSyncBtn');
+  if (btn) { btn.classList.add('is-spinning'); btn.disabled = true; }
+  var done = function() {
+    if (typeof msRenderPage === 'function') msRenderPage();
+    if (btn) { btn.classList.remove('is-spinning'); btn.disabled = false; }
+  };
+  if (typeof doSync === 'function') {
+    var r = doSync();
+    if (r && typeof r.then === 'function') r.then(done).catch(done);
+    else setTimeout(done, 800);
+  } else {
+    done();
+  }
 }
 
 
@@ -5499,12 +5552,18 @@ function closeGoogleAdsPage() { _showMainDashboard(); }
 // Google Ads page REFRESH button: refetch from server, then re-render.
 // Falls back to a plain re-render if doSync isn't available.
 function gaPageRefresh() {
+  var btn = document.getElementById('gaSyncBtn');
+  if (btn) { btn.classList.add('is-spinning'); btn.disabled = true; }
+  var done = function() {
+    gaRenderPage();
+    if (btn) { btn.classList.remove('is-spinning'); btn.disabled = false; }
+  };
   if (typeof doSync === 'function') {
     var r = doSync();
-    if (r && typeof r.then === 'function') r.then(function(){ gaRenderPage(); });
-    else gaRenderPage();
+    if (r && typeof r.then === 'function') r.then(done).catch(done);
+    else done();
   } else {
-    gaRenderPage();
+    done();
   }
 }
 
@@ -6941,7 +7000,7 @@ async function orFetchShippingLabels(from, to) {
 
 async function orSyncWithRange(from,to){
   const btn=document.getElementById('orSyncBtn');
-  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  if(btn){btn.classList.add('is-spinning');btn.disabled=true;}
   orSetStatus(`⟳ Fetching orders ${from} → ${to}...`);
   try{
     const feeParams=getFeeParams();
@@ -6999,11 +7058,11 @@ async function orSyncWithRange(from,to){
       orSetStatus(`✓ ${orAllOrders.length} orders · ${from} → ${to}`);
     }
   }catch(e){orSetStatus(`✗ ${e.message}`,true);}
-  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+  finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
 }
 async function plSyncWithRange(from,to){
   const btn=document.getElementById('plSyncBtn');
-  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  if(btn){btn.classList.add('is-spinning');btn.disabled=true;}
   plSetStatus(`⟳ Fetching P&L ${from} → ${to}...`);
   try{
     const r=await fetch(`${PROXY}?service=shopify&action=pnl&from=${from}&to=${to}&${getFeeParams()}`);
@@ -7012,11 +7071,11 @@ async function plSyncWithRange(from,to){
     if(rows.length&&isLiveData){const mb={};rows.forEach(r=>{mb[r.date]=r.meta||0;});plData.daily.forEach(d=>{d.adSpend=mb[d.date]||0;});plData.totals.adSpend=plData.daily.reduce((s,d)=>s+d.adSpend,0);plData.totals.contribMargin=plData.daily.reduce((s,d)=>s+(d.grossProfit-d.txFee-d.adSpend),0);plData.totals.netProfit=plData.totals.contribMargin;const nr=plData.totals.netRevenue||1;plData.totals.contribPct=Math.round(plData.totals.contribMargin/nr*10000)/100;plData.totals.netMargin=Math.round(plData.totals.netProfit/nr*10000)/100;plData.totals.totalCosts=Math.round((plData.totals.cogs+plData.totals.txFee+plData.totals.adSpend)*100)/100;plData.totals.costPct=Math.round(plData.totals.totalCosts/nr*10000)/100;}
     plRender(); plSetStatus(`✓ ${plData.total_orders} orders · ${from} → ${to}`);
   }catch(e){plSetStatus(`✗ ${e.message}`,true);}
-  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+  finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
 }
 async function maSyncWithRange(from,to){
   const btn=document.getElementById('maSyncBtn');
-  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  if(btn){btn.classList.add('is-spinning');btn.disabled=true;}
   maSetStatus(`⟳ Fetching marketing data ${from} → ${to}...`);
   try{
     const metaRes=await fetch(`${PROXY}?service=meta-ads&from=${from}&to=${to}`);
@@ -7026,22 +7085,22 @@ async function maSyncWithRange(from,to){
     maData={meta:mj,storeRevByDate:srv,totalStoreRev:rows.reduce((s,r)=>s+r.revenue,0),from,to};
     maRender(); maSetStatus(`✓ Meta: ${mj.campaigns.length} campaigns · ${from} → ${to}`);
   }catch(e){maSetStatus(`✗ ${e.message}`,true);}
-  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+  finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
 }
 async function clvSyncWithRange(from,to){
   const btn=document.getElementById('clvSyncBtn');
-  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  if(btn){btn.classList.add('is-spinning');btn.disabled=true;}
   clvSetStatus(`⟳ Fetching customer data ${from} → ${to}...`);
   try{
     const r=await fetch(`${PROXY}?service=shopify&action=clv&from=${from}&to=${to}`);
     if(!r.ok){const e=await r.json().catch(()=>({}));clvSetStatus(`✗ ${e.error||r.status}`,true);return;}
     clvData=await r.json(); clvRender(); clvSetStatus(`✓ ${clvData.totals.totalCustomers} customers · ${from} → ${to}`);
   }catch(e){clvSetStatus(`✗ ${e.message}`,true);}
-  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+  finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
 }
 async function paSyncWithRange(from,to){
   const btn=document.getElementById('paSyncBtn');
-  if(btn){btn.textContent='⟳ LOADING...';btn.disabled=true;}
+  if(btn){btn.classList.add('is-spinning');btn.disabled=true;}
   paSetStatus(`⟳ Fetching product data ${from} → ${to}...`);
   try{
     const r=await fetch(`${PROXY}?service=shopify&action=product-analytics&from=${from}&to=${to}&${getFeeParams()}`);
@@ -7062,7 +7121,7 @@ async function paSyncWithRange(from,to){
     }
     paSetStatus(`✓ ${paData.total_products} products · ${from} → ${to}`);
   }catch(e){paSetStatus(`✗ ${e.message}`,true);}
-  finally{if(btn){btn.textContent='⟳ REFRESH';btn.disabled=false;}}
+  finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
 }
 let maSortKey  = 'spend';
 let maSortDir  = -1;
