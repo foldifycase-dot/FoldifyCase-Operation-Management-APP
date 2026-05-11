@@ -1361,8 +1361,8 @@ module.exports = async function handler(req, res) {
 };
 
 // ── Composio v3 REST helper ───────────────────────────────────────────────
-// Tries the v3 endpoint first (current contract: tool slug in path, x-api-key header).
-// Falls back to the v1 shape on 404 in case the user's account is on an older API.
+// Tries v3.1 and v3 endpoints. Falls back to v1 only on 404 (endpoint missing).
+// Reports per-attempt status/body so we can diagnose path/auth issues.
 async function callComposio(toolSlug, args, apiKey, connectedAccountId, userId) {
   const body = {
     arguments: args,
@@ -1372,33 +1372,41 @@ async function callComposio(toolSlug, args, apiKey, connectedAccountId, userId) 
 
   const attempts = [
     {
+      label: "v3.1",
+      url: "https://backend.composio.dev/api/v3.1/tools/execute/" + toolSlug,
+      headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    {
+      label: "v3",
       url: "https://backend.composio.dev/api/v3/tools/execute/" + toolSlug,
       headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
       body: JSON.stringify(body),
     },
     {
+      label: "v1",
       url: "https://backend.composio.dev/api/v1/actions/" + toolSlug + "/execute",
       headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
       body: JSON.stringify({ input: args, connectedAccountId, userId }),
     },
   ];
 
-  let lastErr;
+  const attemptLog = [];
   for (const a of attempts) {
     try {
       const r = await fetch(a.url, { method: "POST", headers: a.headers, body: a.body });
       const text = await r.text();
       let j; try { j = JSON.parse(text); } catch (_) { j = { raw: text }; }
-      if (r.status === 404) { lastErr = "404 from " + a.url; continue; }
+      attemptLog.push({ label: a.label, url: a.url, status: r.status, body_preview: text.substring(0, 300) });
+      if (r.status === 404) continue; // endpoint not found → try next
       if (!r.ok) {
-        return { successful: false, error: "HTTP " + r.status, debug: { url: a.url, body: text.substring(0, 500) } };
+        return { successful: false, error: "HTTP " + r.status + " on " + a.label, debug: { attempts: attemptLog } };
       }
-      // Normalise: v3 returns { successful, data }; v1 returns { response_data, ... }
       if (j && typeof j === "object" && "successful" in j) return j;
       return { successful: true, data: j };
     } catch (e) {
-      lastErr = e.message;
+      attemptLog.push({ label: a.label, url: a.url, error: e.message });
     }
   }
-  throw new Error("All Composio endpoints failed: " + (lastErr || "unknown"));
+  return { successful: false, error: "All Composio endpoints returned 404 or errored", debug: { attempts: attemptLog } };
 }
