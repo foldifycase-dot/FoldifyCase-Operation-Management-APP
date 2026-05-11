@@ -3349,7 +3349,7 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button onclick="gaRenderPage()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
+        <button onclick="gaPageRefresh()" style="padding:7px 16px;border-radius:7px;background:var(--gold);color:var(--ink);border:none;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.04em;">⟳ REFRESH</button>
       </div>
     </div>
 
@@ -3920,9 +3920,11 @@ let isLiveData   = false;
 // Ad platform live totals (populated after sync)
 let livePlatforms = {
   meta:   null,  // { spend, revenue, roas, cpa, conversions } — connected ✅
-  google: null,  // waiting for API approval ⏳
+  google: null,  // populated from /api/proxy?service=google-ads (Composio)
   ms:     null,  // skipped for now ⏳
 };
+// Expose to other script scopes (Google Ads / Meta Ads / MS Ads pages read via window.livePlatforms).
+window.livePlatforms = livePlatforms;
 
 /* ══════════════════════════════════════════
    DATE HELPERS
@@ -5493,6 +5495,18 @@ function openGoogleAdsPage() {
   gaRenderPage();
 }
 function closeGoogleAdsPage() { _showMainDashboard(); }
+
+// Google Ads page REFRESH button: refetch from server, then re-render.
+// Falls back to a plain re-render if doSync isn't available.
+function gaPageRefresh() {
+  if (typeof doSync === 'function') {
+    var r = doSync();
+    if (r && typeof r.then === 'function') r.then(function(){ gaRenderPage(); });
+    else gaRenderPage();
+  } else {
+    gaRenderPage();
+  }
+}
 
 function openMetaAdsPage() {
   _hideAllPages();
