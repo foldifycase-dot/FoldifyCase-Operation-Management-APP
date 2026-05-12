@@ -1828,6 +1828,9 @@ body.nav-open .sidebar-backdrop { display: block; opacity: 1; }
 
   /* Date-picker panels widen to viewport on smaller screens */
   .dp-panel { width: min(560px, 92vw) !important; }
+
+  /* Two months side-by-side is too wide on tablet; stack them. */
+  .dp-months { grid-template-columns: 1fr !important; gap: 8px !important; }
 }
 
 /* ───── MOBILE (≤640px) ───── */
@@ -1876,14 +1879,28 @@ body.nav-open .sidebar-backdrop { display: block; opacity: 1; }
   /* Bump base font slightly for body text */
   body { font-size: 14px; }
 
-  /* Date picker becomes nearly full screen */
+  /* Date picker becomes a viewport-anchored sheet so it can't overflow
+     off the side of the screen (the default position:absolute was anchored
+     to the trigger button, which on mobile leaves it half off-screen). */
   .dp-panel {
-    width: 96vw !important;
+    position: fixed !important;
+    top: 64px !important;
+    left: 2vw !important;
+    right: 2vw !important;
+    width: auto !important;
     max-width: 96vw !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    max-height: calc(100vh - 80px) !important;
+    overflow-y: auto !important;
+    transform: none !important;
+    flex-direction: column !important;
   }
   .dp-presets { display: none !important; } /* hide preset side rail */
+  .dp-cal-area { padding: 12px !important; }
+  .dp-inputs { flex-wrap: wrap; gap: 6px !important; }
+  .dp-date-input { min-width: 0; flex: 1 1 130px; }
+  .dp-arrow-sep { display: none; } /* arrow is unnecessary when inputs wrap */
+  .dp-months { grid-template-columns: 1fr !important; gap: 14px !important; }
+  .dp-month-name { font-size: 14px; }
 
   /* Tables: allow horizontal scroll for any dense grid header/row */
   .pa-tbl-head, .pa-tbl-row,
