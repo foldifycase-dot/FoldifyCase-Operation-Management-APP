@@ -4494,9 +4494,11 @@ const calc = r => {
   return { ad, total, profit, margin, aov, txFee, shipCost };
 };
 
-const f$   = n  => {
-  const abs = Math.abs(parseFloat(n) || 0);
-  return '$' + abs.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+const f$ = n => {
+  const v   = parseFloat(n) || 0;
+  const abs = Math.abs(v).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  // Negatives get a leading minus; positives are unprefixed. No parentheses.
+  return (v < 0 ? '-$' : '$') + abs;
 };
 const fPct = n  => parseFloat(n).toFixed(2) + '%';
 
@@ -4842,7 +4844,11 @@ function renderKPIs() {
 function renderSidebar() {
   const t      = totals();
   const margin = t.rev > 0 ? ((t.profit/t.rev)*100).toFixed(2) : '0.00';
-  document.getElementById('sb-profit').textContent  = f$(t.profit);
+  const profEl = document.getElementById('sb-profit');
+  profEl.textContent = f$(t.profit);
+  // Recolor each render so it switches red/green correctly on negative profit.
+  profEl.classList.remove('sv-green','sv-red');
+  profEl.classList.add(t.profit >= 0 ? 'sv-green' : 'sv-red');
   document.getElementById('sb-rev').textContent     = f$(t.rev);
   document.getElementById('sb-spend').textContent   = f$(t.ad);
   document.getElementById('sb-margin').textContent  = fPct(margin);
@@ -6939,9 +6945,10 @@ async function orSync() { orSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); 
 function orSetStatus(msg, isErr=false) { /* status bar removed */ }
 
 const orFmt$ = n => {
-  const v = Math.abs(parseFloat(n)||0);
-  const s = 'A$' + v.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
-  return parseFloat(n) < 0 ? `(${s})` : s;
+  const v   = parseFloat(n) || 0;
+  const abs = Math.abs(v).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  // Minus sign for negatives, no parentheses.
+  return (v < 0 ? '-A$' : 'A$') + abs;
 };
 
 
@@ -7755,7 +7762,11 @@ async function maSync() { maSyncWithRange(window.GLOBAL_FROM,window.GLOBAL_TO); 
 
 function maSetStatus(msg, isErr=false) { /* status bar removed */ }
 
-const maFmt$ = n => '$' + (Math.abs(n)||0).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
+const maFmt$ = n => {
+  const v = parseFloat(n) || 0;
+  const abs = Math.abs(v).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2});
+  return (v < 0 ? '-$' : '$') + abs;
+};
 const maFmtK = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n);
 
 function maRender() {
@@ -8031,9 +8042,10 @@ function plRender() {
 }
 
 const plFmt$ = n => {
-  const abs = Math.abs(parseFloat(n)||0);
-  const s   = '$' + abs.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
-  return n < 0 ? `(${s})` : s;
+  const v   = parseFloat(n) || 0;
+  const abs = Math.abs(v).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  // Minus sign for negatives (consistent with rest of the app).
+  return (v < 0 ? '-$' : '$') + abs;
 };
 const plFmtPct = n => `${parseFloat(n).toFixed(1)}%`;
 
@@ -8370,7 +8382,11 @@ function paRender() {
   paRenderVariants();
 }
 
-const paFmt$ = n => '$' + Math.abs(n).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+const paFmt$ = n => {
+  const v = parseFloat(n) || 0;
+  const abs = Math.abs(v).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return (v < 0 ? '-$' : '$') + abs;
+};
 const paFmtN = n => n.toLocaleString('en-AU');
 
 function paRenderKPIs() {
