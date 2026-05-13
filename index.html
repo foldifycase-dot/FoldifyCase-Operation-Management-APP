@@ -1622,6 +1622,58 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
   .s-section { padding:4px 14px; }
 }
 
+/* Subscriptions list (Integrations -> Subscriptions) */
+.s-sub-head, .s-sub-row, .s-sub-total {
+  display:grid;
+  grid-template-columns: 1fr 120px 36px;
+  column-gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+}
+.s-sub-head {
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--c3);
+  border-top: 1px solid rgba(28,27,24,0.06);
+  padding-top: 10px;
+}
+.s-sub-row {
+  border-top: 1px solid rgba(28,27,24,0.05);
+}
+.s-sub-row input {
+  background: #fff;
+  border: 1px solid rgba(28,27,24,0.15);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  width: 100%;
+}
+.s-sub-row input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(200,169,110,.18);
+}
+.s-sub-row input.s-sub-amt { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.s-sub-row .s-sub-remove {
+  appearance: none; border: none; background: transparent;
+  color: var(--c3); font-size: 16px; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s ease, color .12s ease;
+}
+.s-sub-row .s-sub-remove:hover { background: rgba(217,84,84,0.1); color: var(--red); }
+.s-sub-total {
+  border-top: 2px solid rgba(28,27,24,0.12);
+  margin-top: 6px; padding-top: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 700; color: var(--ink);
+}
+.s-sub-total > div:last-child { /* spacer for remove column */ }
+.s-sub-empty {
+  padding: 14px 0; text-align: center;
+  color: var(--c3); font-family: 'Inter', sans-serif; font-size: 12px;
+}
+
 /* Compact density (toggled by the Preferences -> Compact density switch). */
 body.compact-density .pad { padding-left:18px; padding-right:18px; padding-bottom:14px; }
 body.compact-density .card { padding:12px; }
@@ -6637,6 +6689,27 @@ function gaSetCampaignFilter(filter) {
             <span class="s-badge unknown" id="proxy-status-badge">Checking…</span>
           </div>
         </div>
+
+        <!-- ── Subscriptions ──────────────────────────────────────── -->
+        <div class="s-section">
+          <div class="s-section-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Subscriptions</span>
+            <button class="s-int-btn" onclick="addSubscriptionRow()" style="font-size:11px">+ Add</button>
+          </div>
+          <div class="s-sub-head">
+            <div>App</div>
+            <div style="text-align:right">Monthly</div>
+            <div></div>
+          </div>
+          <div id="sub-list">
+            <!-- rendered by renderSubscriptions() -->
+          </div>
+          <div class="s-sub-total">
+            <div>Total monthly</div>
+            <div id="sub-total" style="text-align:right">$0.00</div>
+            <div></div>
+          </div>
+        </div>
       </div>
 
       <!-- ── ABOUT (new) ────────────────────────────────────────────── -->
@@ -6759,6 +6832,8 @@ function loadSettings() {
   if (proxyEl) proxyEl.textContent = (typeof PROXY === 'string') ? PROXY : '—';
   // Auto-run integration status checks each open
   refreshIntegrationStatuses();
+  // Render the subscription tracker (lives under Integrations)
+  if (typeof renderSubscriptions === 'function') renderSubscriptions();
 }
 
 /* Apply settings that have side effects on the page. */
@@ -6857,6 +6932,81 @@ function clearAllData() {
   try { cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}'); } catch(e) {}
   if (typeof applySettings === 'function') applySettings(cfg);
 })();
+
+/* ── Subscriptions (Integrations -> Subscriptions) ─────────────────── */
+const SUB_KEY = 'fc_subscriptions';
+function loadSubscriptions() {
+  try { return JSON.parse(localStorage.getItem(SUB_KEY) || '[]') || []; }
+  catch (e) { return []; }
+}
+function saveSubscriptions(list) {
+  localStorage.setItem(SUB_KEY, JSON.stringify(list || []));
+}
+function renderSubscriptions() {
+  const listEl  = document.getElementById('sub-list');
+  const totalEl = document.getElementById('sub-total');
+  if (!listEl || !totalEl) return;
+  const subs = loadSubscriptions();
+  if (!subs.length) {
+    listEl.innerHTML = '<div class="s-sub-empty">No subscriptions yet — click <strong>+ Add</strong> to track one.</div>';
+  } else {
+    listEl.innerHTML = subs.map((s, i) => {
+      const name = (s.name || '').replace(/"/g, '&quot;');
+      const amt  = (typeof s.amount === 'number' && isFinite(s.amount)) ? s.amount.toFixed(2) : '';
+      return '<div class="s-sub-row">' +
+        '<input type="text" data-sub-field="name" data-sub-idx="' + i + '" placeholder="App name" value="' + name + '">' +
+        '<input type="number" class="s-sub-amt" data-sub-field="amount" data-sub-idx="' + i + '" step="0.01" min="0" placeholder="0.00" value="' + amt + '">' +
+        '<button type="button" class="s-sub-remove" data-sub-remove="' + i + '" aria-label="Remove">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+  // Total
+  const total = subs.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  totalEl.textContent = '$' + total.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function addSubscriptionRow() {
+  const subs = loadSubscriptions();
+  subs.push({ name: '', amount: 0 });
+  saveSubscriptions(subs);
+  renderSubscriptions();
+  // Focus the newly added name input for immediate typing
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#sub-list input[data-sub-field="name"]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 0);
+}
+function removeSubscriptionRow(idx) {
+  const subs = loadSubscriptions();
+  subs.splice(idx, 1);
+  saveSubscriptions(subs);
+  renderSubscriptions();
+}
+/* Delegated input handler — updates on every keystroke, persists on blur. */
+document.addEventListener('input', function(e) {
+  const t = e.target;
+  if (!t.matches || !t.matches('[data-sub-field]')) return;
+  const idx   = parseInt(t.getAttribute('data-sub-idx'), 10);
+  const field = t.getAttribute('data-sub-field');
+  const subs  = loadSubscriptions();
+  if (!subs[idx]) return;
+  if (field === 'amount') {
+    subs[idx].amount = parseFloat(t.value) || 0;
+    // Live-update the total without rerendering inputs (preserves focus).
+    const totalEl = document.getElementById('sub-total');
+    if (totalEl) {
+      const total = subs.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+      totalEl.textContent = '$' + total.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  } else {
+    subs[idx][field] = t.value;
+  }
+  saveSubscriptions(subs);
+});
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest && e.target.closest('[data-sub-remove]');
+  if (!btn) return;
+  removeSubscriptionRow(parseInt(btn.getAttribute('data-sub-remove'), 10));
+});
 
 /* Esc closes the settings modal when it's open. */
 document.addEventListener('keydown', function(e) {
