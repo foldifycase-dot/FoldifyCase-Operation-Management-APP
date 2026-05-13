@@ -6840,6 +6840,14 @@ function closeSettings() {
   // the modal was open (showMs toggle, density, subscriptions) take effect
   // immediately without requiring a manual data refresh.
   if (typeof renderAll === 'function') renderAll();
+  // Also refresh P&L and Order Report if their data has already been
+  // fetched, so the subscription drag flows through to their net-profit
+  // displays without requiring a re-fetch.
+  if (typeof plData !== 'undefined' && plData && typeof plRender === 'function') plRender();
+  if (typeof orFiltered !== 'undefined' && orFiltered.length) {
+    if (typeof orRenderKPIs === 'function') orRenderKPIs();
+    if (typeof orRenderTotalsRow === 'function') orRenderTotalsRow();
+  }
 }
 function handleOverlayClick(e) {
   if (e.target === document.getElementById('settingsOverlay')) closeSettings();
@@ -7192,9 +7200,15 @@ function orRenderKPIs() {
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
   const shipLabel = orders.reduce((s,o)=>s+(o.shippingLabel||0),0);
-  const profit    = orders.reduce((s,o)=>s+o.profit,0);
-  const aov       = total > 0 ? revenue/total : 0;
-  const margin    = revenue > 0 ? profit/revenue*100 : 0;
+  const orderProfit = orders.reduce((s,o)=>s+o.profit,0);
+  // Subscriptions are a fixed monthly cost — prorate to the report's date
+  // window so the aggregate Profit KPI reflects true profit.
+  const subs = (typeof subscriptionCostForRange === 'function')
+    ? subscriptionCostForRange(window.GLOBAL_FROM, window.GLOBAL_TO)
+    : 0;
+  const profit = +(orderProfit - subs).toFixed(2);
+  const aov    = total > 0 ? revenue/total : 0;
+  const margin = revenue > 0 ? profit/revenue*100 : 0;
 
   document.getElementById('or-total-orders').textContent   = total.toLocaleString();
   document.getElementById('or-orders-sub').textContent     = `${orAllOrders.length} total`;
@@ -7208,7 +7222,8 @@ function orRenderKPIs() {
   const profEl = document.getElementById('or-net-profit');
   profEl.textContent  = orFmt$(profit);
   profEl.style.color  = profit >= 0 ? 'var(--green)' : 'var(--red)';
-  document.getElementById('or-margin-sub').textContent = `${margin.toFixed(1)}% margin`;
+  const subSuffix = subs > 0 ? ` · subs ${orFmt$(subs)}` : '';
+  document.getElementById('or-margin-sub').textContent = `${margin.toFixed(1)}% margin${subSuffix}`;
 }
 
 function orRenderTotalsRow() {
@@ -7220,12 +7235,17 @@ function orRenderTotalsRow() {
   const shipping  = orders.reduce((s,o)=>s+o.shipping,0);
   const cogs      = orders.reduce((s,o)=>s+o.cogs,0);
   const fees      = orders.reduce((s,o)=>s+o.txFee,0);
-  const profit    = orders.reduce((s,o)=>s+o.profit,0);
+  const orderProfit = orders.reduce((s,o)=>s+o.profit,0);
+  const subs = (typeof subscriptionCostForRange === 'function')
+    ? subscriptionCostForRange(window.GLOBAL_FROM, window.GLOBAL_TO)
+    : 0;
+  const profit = +(orderProfit - subs).toFixed(2);
   const items     = orders.reduce((s,o)=>s+o.items,0);
   const shipLabel  = orders.reduce((s,o)=>s+(o.shippingLabel||0),0);
   const grossProfitTotal = orders.reduce((s,o)=>s+(o.grossProfit||0),0);
   const grossMarginTotal = revenue > 0 ? grossProfitTotal/revenue*100 : 0;
-  document.getElementById('or-totals-label').textContent    = `Total from ${orders.length} orders`;
+  const subLabel = subs > 0 ? ` (incl. -${orFmt$(subs)} subs)` : '';
+  document.getElementById('or-totals-label').textContent    = `Total from ${orders.length} orders${subLabel}`;
   document.getElementById('or-totals-items').textContent    = items;
   document.getElementById('or-totals-revenue').textContent  = orFmt$(revenue);
   document.getElementById('or-totals-discounts').textContent= discounts>0?('('+orFmt$(discounts)+')'):'—';
@@ -7826,10 +7846,36 @@ async function plSyncWithRange(from,to){
     const r=await fetch(`${PROXY}?service=shopify&action=pnl&from=${from}&to=${to}&${getFeeParams()}`);
     if(!r.ok){const e=await r.json().catch(()=>({}));plSetStatus(`✗ ${e.error||r.status}`,true);return;}
     plData=await r.json();
+    if(plData){ plData.from = from; plData.to = to; }
     if(rows.length&&isLiveData){const mb={};rows.forEach(r=>{mb[r.date]=r.meta||0;});plData.daily.forEach(d=>{d.adSpend=mb[d.date]||0;});plData.totals.adSpend=plData.daily.reduce((s,d)=>s+d.adSpend,0);plData.totals.contribMargin=plData.daily.reduce((s,d)=>s+(d.grossProfit-d.txFee-d.adSpend),0);plData.totals.netProfit=plData.totals.contribMargin;const nr=plData.totals.netRevenue||1;plData.totals.contribPct=Math.round(plData.totals.contribMargin/nr*10000)/100;plData.totals.netMargin=Math.round(plData.totals.netProfit/nr*10000)/100;plData.totals.totalCosts=Math.round((plData.totals.cogs+plData.totals.txFee+plData.totals.adSpend)*100)/100;plData.totals.costPct=Math.round(plData.totals.totalCosts/nr*10000)/100;}
+    applyPLSubscription();
     plRender(); plSetStatus(`✓ ${plData.total_orders} orders · ${from} → ${to}`);
   }catch(e){plSetStatus(`✗ ${e.message}`,true);}
   finally{if(btn){btn.classList.remove('is-spinning');btn.disabled=false;}}
+}
+
+/* Prorate fc_subscriptions to plData's date window and fold into totals.
+   Idempotent — uses _subBaseNetProfit/_subBaseTotalCosts to remember the
+   pre-subscription values so re-running this after a settings edit gives
+   the right answer instead of double-deducting. */
+function applyPLSubscription() {
+  if (!plData || !plData.totals) return;
+  const t = plData.totals;
+  if (t._subBaseNetProfit == null) {
+    t._subBaseNetProfit = t.netProfit;
+    t._subBaseTotalCosts = t.totalCosts;
+  }
+  const from = plData.from || window.GLOBAL_FROM;
+  const to   = plData.to   || window.GLOBAL_TO;
+  const subs = (typeof subscriptionCostForRange === 'function')
+    ? subscriptionCostForRange(from, to)
+    : 0;
+  t.subscriptions = subs;
+  t.netProfit  = +(t._subBaseNetProfit  - subs).toFixed(2);
+  t.totalCosts = +((t._subBaseTotalCosts || 0) + subs).toFixed(2);
+  const nr = t.netRevenue || 1;
+  t.netMargin = Math.round(t.netProfit / nr * 10000) / 100;
+  t.costPct   = Math.round(t.totalCosts / nr * 10000) / 100;
 }
 async function maSyncWithRange(from,to){
   // Redesigned page reads from window.livePlatforms (populated by doSync).
@@ -8164,6 +8210,9 @@ function plSetGranularity(g) {
 
 function plRender() {
   if (!plData) return;
+  // Reapply subscription drag each render so settings edits show up
+  // without needing a full refetch.
+  if (typeof applyPLSubscription === 'function') applyPLSubscription();
   plRenderKPIs();
   plRenderWaterfall();
   plRenderComparison();
@@ -8213,6 +8262,7 @@ function plRenderWaterfall() {
     { label:'= Gross Profit',     val: t.grossProfit,   color:'#4A7FC1',        type:'sub' },
     { label:'− Ad Spend',         val:-t.adSpend,       color:'var(--red)',     type:'neg' },
     { label:'− Transaction Fees', val:-t.txFee,         color:'#C8A96E',        type:'neg' },
+    { label:'− Subscriptions',    val:-(t.subscriptions||0), color:'#7A9C81',   type:'neg' },
     { label:'= Net Profit',       val: t.netProfit,     color: t.netProfit>=0 ? 'var(--green)' : 'var(--red)', type:'total' },
   ];
 
@@ -8404,6 +8454,8 @@ function plRenderIncomeStatement() {
       <div class="pl-is-num" style="color:var(--green)">${plFmt$(t.contribMargin)}</div>
       <div class="pl-is-pct" style="color:var(--green)">${t.contribPct?.toFixed(1)}%</div>
     </div>
+    <div class="pl-is-section">FIXED COSTS</div>
+    ${row('− Subscriptions',     -(t.subscriptions || 0))}
     <div class="pl-is-row total">
       <div>NET PROFIT</div>
       <div class="pl-is-num" style="color:${t.netProfit>=0?'var(--gold)':'var(--red)'}">${plFmt$(t.netProfit)}</div>
@@ -8421,6 +8473,7 @@ function plRenderCostBreakdown() {
     { name:'Ad Spend',         val:t.adSpend,          color:'var(--red)' },
     { name:'Transaction Fees', val:t.txFee,            color:'#C8A96E' },
     { name:'Shipping',         val:t.shippingCharged||0, color:'#4A7FC1' },
+    { name:'Subscriptions',    val:t.subscriptions||0, color:'#7A9C81' },
   ].filter(c => c.val > 0);
   const maxCost = Math.max(...costs.map(c => c.val), 1);
 
