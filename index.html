@@ -6576,6 +6576,7 @@ function gaSetCampaignFilter(filter) {
       <nav class="settings-nav">
         <button class="stab active" onclick="switchStab(this,'prefs')"><span class="stab-icon">🎛</span>Preferences</button>
         <button class="stab" onclick="switchStab(this,'integrations')"><span class="stab-icon">🔌</span>Integrations</button>
+        <button class="stab" onclick="switchStab(this,'subscriptions')"><span class="stab-icon">💳</span>Subscriptions</button>
         <button class="stab" onclick="switchStab(this,'about')"><span class="stab-icon">ℹ</span>About</button>
       </nav>
 
@@ -6690,11 +6691,17 @@ function gaSetCampaignFilter(filter) {
           </div>
         </div>
 
-        <!-- ── Subscriptions ──────────────────────────────────────── -->
+      </div>
+
+      <!-- ── SUBSCRIPTIONS (own tab) ────────────────────────────────── -->
+      <div class="stab-panel" id="panel-subscriptions">
         <div class="s-section">
           <div class="s-section-title" style="display:flex;align-items:center;justify-content:space-between">
-            <span>Subscriptions</span>
+            <span>Monthly subscriptions</span>
             <button class="s-int-btn" onclick="addSubscriptionRow()" style="font-size:11px">+ Add</button>
+          </div>
+          <div style="font-size:11px;color:var(--c3);padding:0 0 8px;line-height:1.5">
+            Track the apps and tools you pay for each month. Total updates live as you edit. Stored locally in this browser.
           </div>
           <div class="s-sub-head">
             <div>App</div>
