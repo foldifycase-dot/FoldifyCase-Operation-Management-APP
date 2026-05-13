@@ -1367,171 +1367,272 @@ tbody tr:hover td { background:rgba(200,169,110,0.04); }
 .toast.err  { border-left-color:var(--red); }
 
 /* ════════════════════════  SETTINGS MODAL  */
+/* ── Settings overlay ─────────────────────────────────────────────────
+   Light card on a dimmed backdrop, sidebar navigation (like macOS
+   Settings). Replaces the previous dark-modal layout.                  */
 .settings-overlay {
   display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.6); z-index:900;
-  backdrop-filter:blur(3px);
-  animation:fadeIn 0.2s ease;
+  background:rgba(0,0,0,0.55); z-index:900;
+  backdrop-filter:blur(4px);
+  animation:settingsFade .18s ease;
 }
-.settings-overlay.show { display:flex; align-items:center; justify-content:center; }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.settings-overlay.show { display:flex; align-items:center; justify-content:center; padding:24px; }
+@keyframes settingsFade { from{opacity:0} to{opacity:1} }
+@keyframes settingsRise { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
 
 .settings-modal {
-  background:var(--ink-2);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:14px;
-  width:720px; max-width:95vw;
-  max-height:88vh;
+  background:var(--cream);
+  color:var(--ink);
+  border-radius:16px;
+  width:860px; max-width:100%;
+  max-height:min(720px, 92vh);
   display:flex; flex-direction:column;
-  box-shadow:0 24px 80px rgba(0,0,0,0.5);
-  animation:slideUp 0.25s ease;
+  box-shadow:0 30px 80px rgba(0,0,0,0.45);
+  animation:settingsRise .22s ease;
+  overflow:hidden;
+  font-family:'Inter', sans-serif;
 }
-@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
 
+/* Header strip */
 .settings-hd {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:20px 24px 0;
+  display:flex; align-items:center; gap:12px;
+  padding:18px 22px;
+  background:#fff;
+  border-bottom:1px solid rgba(28,27,24,0.08);
+}
+.settings-hd-icon {
+  width:36px; height:36px; border-radius:9px;
+  background:var(--ink); color:var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
 }
 .settings-title {
-  font-family:var(--dis); font-weight:700;
-  font-size:18px; color:var(--t1); letter-spacing:0.02em;
+  flex:1; min-width:0;
+  font-size:16px; font-weight:700; color:var(--ink);
+  letter-spacing:-0.01em;
+}
+.settings-title small {
+  display:block; font-size:11px; font-weight:500;
+  color:var(--c3); margin-top:2px; letter-spacing:0;
 }
 .settings-close {
-  width:32px; height:32px; border-radius:6px;
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.1);
-  color:var(--t3); font-size:16px;
+  width:30px; height:30px; border-radius:8px;
+  background:transparent; border:none;
+  color:var(--c2); font-size:18px;
   cursor:pointer; display:flex; align-items:center;
-  justify-content:center; transition:all 0.15s;
+  justify-content:center; transition:background .15s ease, color .15s ease;
 }
-.settings-close:hover { background:var(--red-dim); color:var(--red); border-color:rgba(217,84,84,0.3); }
+.settings-close:hover { background:rgba(28,27,24,0.08); color:var(--ink); }
 
-/* Tab bar */
-.settings-tabs {
-  display:flex; gap:2px;
-  padding:16px 24px 0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
+/* Main split: vertical nav + content */
+.settings-main {
+  flex:1; min-height:0;
+  display:grid; grid-template-columns:180px 1fr;
+}
+.settings-nav {
+  background:#FBF9F2;
+  border-right:1px solid rgba(28,27,24,0.06);
+  padding:14px 10px;
+  display:flex; flex-direction:column; gap:2px;
+  overflow-y:auto;
 }
 .stab {
-  padding:8px 16px; border-radius:6px 6px 0 0;
-  font-family:var(--sans); font-size:12px; font-weight:500;
-  color:var(--t3); background:transparent; border:none;
-  cursor:pointer; transition:all 0.14s;
-  border-bottom:2px solid transparent;
-  margin-bottom:-1px;
+  display:flex; align-items:center; gap:10px;
+  width:100%; padding:9px 12px;
+  border-radius:8px; border:none;
+  background:transparent;
+  color:var(--c2);
+  font-family:'Inter', sans-serif;
+  font-size:13px; font-weight:600;
+  cursor:pointer; text-align:left;
+  transition:background .12s ease, color .12s ease;
 }
-.stab:hover { color:var(--t2); background:rgba(255,255,255,0.04); }
-.stab.active { color:var(--gold); border-bottom-color:var(--gold); }
+.stab:hover { background:rgba(28,27,24,0.05); color:var(--ink); }
+.stab.active { background:var(--ink); color:var(--gold); }
+.stab .stab-icon { font-size:15px; flex-shrink:0; line-height:1; }
 
-/* Tab content */
+/* Body */
 .settings-body {
-  flex:1; overflow-y:auto;
-  padding:20px 24px;
+  flex:1; min-height:0;
+  overflow-y:auto;
+  padding:22px 26px 26px;
+  background:var(--cream);
 }
-.stab-panel { display:none; }
+.stab-panel { display:none; animation:settingsFade .18s ease; }
 .stab-panel.active { display:block; }
 
-/* Section within settings */
-.s-section { margin-bottom:24px; }
+/* Section header */
+.s-section {
+  background:#fff;
+  border:1px solid rgba(28,27,24,0.07);
+  border-radius:12px;
+  padding:6px 18px;
+  margin-bottom:14px;
+}
 .s-section-title {
-  font-family:var(--dis); font-weight:700;
-  font-size:11px; letter-spacing:0.18em;
-  text-transform:uppercase; color:var(--gold);
-  margin-bottom:12px; padding-bottom:8px;
-  border-bottom:1px solid rgba(255,255,255,0.07);
+  font-size:11px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--c3);
+  font-weight:700; padding:14px 0 4px;
 }
 
 /* Setting row */
 .s-row {
   display:flex; align-items:center;
   justify-content:space-between;
-  padding:11px 0;
-  border-bottom:1px solid rgba(255,255,255,0.05);
+  gap:16px;
+  padding:14px 0;
+  border-top:1px solid rgba(28,27,24,0.06);
 }
-.s-row:last-child { border-bottom:none; }
-.s-row-left { flex:1; margin-right:16px; }
+.s-row:first-of-type { border-top:none; }
+.s-row-left { flex:1; min-width:0; }
 .s-row-label {
-  font-size:13px; color:var(--t1);
-  font-weight:500; margin-bottom:2px;
+  font-size:13px; color:var(--ink);
+  font-weight:600; margin-bottom:2px;
 }
-.s-row-desc { font-size:11px; color:var(--t3); line-height:1.4; }
+.s-row-desc { font-size:11px; color:var(--c3); line-height:1.45; }
 
-/* Setting inputs */
-.s-input {
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:6px; color:var(--t1);
-  font-family:'Inter',sans-serif; font-size:12px;
-  padding:7px 11px; outline:none;
-  transition:border-color 0.2s; width:200px;
+/* Inputs */
+.s-input, .s-select {
+  background:#fff;
+  border:1px solid rgba(28,27,24,0.18);
+  border-radius:7px; color:var(--ink);
+  font-family:'Inter', sans-serif; font-size:12px; font-weight:500;
+  padding:8px 11px; outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+  min-width:160px;
 }
-.s-input:focus { border-color:var(--gold); }
-.s-input::placeholder { color:var(--t4); }
-.s-input.wide { width:100%; margin-top:8px; }
-
-.s-select {
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:6px; color:var(--t1);
-  font-family:'Inter',sans-serif; font-size:12px;
-  padding:7px 11px; outline:none;
-  cursor:pointer; width:160px;
+.s-input:focus, .s-select:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(200,169,110,.18);
 }
-.s-select option { background:var(--ink-3); }
+.s-input::placeholder { color:var(--c3); }
+.s-select { cursor:pointer; padding-right:28px;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23666' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat:no-repeat; background-position:right 10px center; background-size:8px;
+}
 
-/* Toggle in settings */
-.s-toggle { position:relative; width:42px; height:24px; flex-shrink:0; }
-.s-toggle input { opacity:0; width:0; height:0; }
+/* iOS-style toggle */
+.s-toggle { position:relative; width:40px; height:22px; flex-shrink:0; }
+.s-toggle input { opacity:0; width:0; height:0; position:absolute; }
 .s-toggle-track {
   position:absolute; inset:0;
-  background:rgba(255,255,255,0.1);
+  background:rgba(28,27,24,0.18);
   border-radius:24px; cursor:pointer;
-  transition:background 0.25s;
+  transition:background .2s ease;
 }
-.s-toggle input:checked ~ .s-toggle-track { background:var(--gold); }
+.s-toggle input:checked ~ .s-toggle-track { background:var(--green); }
 .s-toggle-thumb {
-  position:absolute; width:18px; height:18px;
+  position:absolute; width:16px; height:16px;
   background:#fff; border-radius:50%;
   top:3px; left:3px;
-  transition:transform 0.25s; pointer-events:none;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .2s ease; pointer-events:none;
 }
 .s-toggle input:checked ~ .s-toggle-thumb { transform:translateX(18px); }
 
-/* Badge pill */
+/* Status badges (used in Integrations) */
 .s-badge {
-  font-size:9px; font-family:'Inter',sans-serif;
-  padding:2px 8px; border-radius:20px;
-  letter-spacing:0.06em; font-weight:600;
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:10px; font-family:'Inter', sans-serif;
+  padding:3px 9px; border-radius:20px;
+  letter-spacing:.04em; font-weight:700;
+  text-transform:uppercase;
 }
-.s-badge.connected { background:var(--green-dim); color:var(--green); border:1px solid rgba(90,158,114,0.3); }
-.s-badge.pending   { background:var(--orange-dim); color:var(--orange); border:1px solid rgba(212,135,74,0.3); }
-.s-badge.missing   { background:var(--red-dim); color:var(--red); border:1px solid rgba(217,84,84,0.3); }
+.s-badge::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background:currentColor; flex-shrink:0;
+}
+.s-badge.connected { background:rgba(90,158,114,0.14); color:#3F7A56; }
+.s-badge.pending   { background:rgba(212,135,74,0.14); color:#A8632F; }
+.s-badge.missing   { background:rgba(217,84,84,0.12); color:#A53939; }
+.s-badge.unknown   { background:rgba(28,27,24,0.06); color:var(--c2); }
 
-/* Save button */
+/* Integration row */
+.s-int-row {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 0;
+  border-top:1px solid rgba(28,27,24,0.06);
+}
+.s-int-row:first-of-type { border-top:none; }
+.s-int-logo {
+  width:34px; height:34px; flex-shrink:0;
+  border-radius:8px; background:rgba(28,27,24,0.05);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px;
+}
+.s-int-info { flex:1; min-width:0; }
+.s-int-name { font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.s-int-meta { font-size:11px; color:var(--c3); margin-top:3px; }
+.s-int-btn {
+  padding:6px 12px; border-radius:7px;
+  background:#fff; border:1px solid rgba(28,27,24,0.18);
+  color:var(--ink); font-size:11px; font-weight:600;
+  cursor:pointer; font-family:'Inter', sans-serif;
+  transition:background .12s ease, border-color .12s ease;
+  flex-shrink:0;
+}
+.s-int-btn:hover { background:var(--gold); border-color:var(--gold); }
+.s-int-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* Footer */
 .settings-footer {
-  padding:16px 24px;
-  border-top:1px solid rgba(255,255,255,0.07);
-  display:flex; justify-content:flex-end; gap:10px;
+  padding:14px 22px;
+  border-top:1px solid rgba(28,27,24,0.08);
+  background:#fff;
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
 }
+.settings-footer-status { font-size:11px; color:var(--c3); }
 .s-btn-cancel {
-  padding:9px 20px; background:transparent;
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:7px; color:var(--t3);
-  font-family:var(--sans); font-size:13px;
-  cursor:pointer; transition:all 0.15s;
+  padding:8px 18px; background:transparent;
+  border:1px solid rgba(28,27,24,0.18);
+  border-radius:8px; color:var(--c2);
+  font-family:'Inter', sans-serif; font-size:12px; font-weight:600;
+  cursor:pointer; transition:background .12s ease, color .12s ease;
 }
-.s-btn-cancel:hover { color:var(--t1); border-color:rgba(255,255,255,0.25); }
+.s-btn-cancel:hover { background:rgba(28,27,24,0.05); color:var(--ink); }
 .s-btn-save {
-  padding:9px 24px; background:var(--gold);
-  border:none; border-radius:7px;
-  color:var(--ink); font-family:var(--dis);
-  font-weight:700; font-size:13px;
-  letter-spacing:0.06em; cursor:pointer;
-  transition:all 0.2s;
+  padding:8px 22px; background:var(--ink);
+  border:none; border-radius:8px;
+  color:var(--gold);
+  font-family:'Inter', sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:.04em; cursor:pointer;
+  transition:background .15s ease;
 }
-.s-btn-save:hover { background:var(--gold-2); color:#fff; }
+.s-btn-save:hover { background:var(--ink-2); }
+.s-btn-danger {
+  padding:6px 12px; background:transparent;
+  border:1px solid rgba(217,84,84,0.35);
+  border-radius:7px; color:var(--red);
+  font-family:'Inter', sans-serif; font-size:11px; font-weight:600;
+  cursor:pointer; transition:background .12s ease;
+}
+.s-btn-danger:hover { background:rgba(217,84,84,0.08); }
 
-.s-two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+/* Responsive: collapse sidebar nav into a top row on narrow screens. */
+@media (max-width: 720px) {
+  .settings-main { grid-template-columns:1fr; }
+  .settings-nav {
+    flex-direction:row; overflow-x:auto;
+    border-right:none; border-bottom:1px solid rgba(28,27,24,0.06);
+    padding:10px;
+  }
+  .stab { flex:1 1 auto; justify-content:center; white-space:nowrap; }
+  .settings-body { padding:18px 16px; }
+  .s-section { padding:4px 14px; }
+}
+
+/* Compact density (toggled by the Preferences -> Compact density switch). */
+body.compact-density .pad { padding-left:18px; padding-right:18px; padding-bottom:14px; }
+body.compact-density .card { padding:12px; }
+body.compact-density .kpi-val,
+body.compact-density .or-kpi-val,
+body.compact-density .clv-kpi-val,
+body.compact-density .ma-kpi-val,
+body.compact-density .pl-kpi-val,
+body.compact-density .ga-kpi-val { font-size:18px; }
+body.compact-density .ad-spend { font-size:20px; }
+body.compact-density .sec { margin-bottom:8px; }
 /* ── Slim, subtle scrollbars across the app ─────────────────────────── */
 /* Firefox */
 * { scrollbar-width: thin; scrollbar-color: rgba(28,27,24,0.20) transparent; }
@@ -6406,339 +6507,51 @@ function gaSetCampaignFilter(filter) {
 </script>
 <!-- ══════════  SETTINGS MODAL  -->
 <div class="settings-overlay" id="settingsOverlay" onclick="handleOverlayClick(event)">
-  <div class="settings-modal">
+  <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
 
     <!-- Header -->
     <div class="settings-hd">
-      <div class="settings-title">⚙ Settings</div>
-      <button class="settings-close" onclick="closeSettings()">✕</button>
+      <div class="settings-hd-icon">⚙</div>
+      <div class="settings-title" id="settingsTitle">
+        Settings
+        <small>FoldifyCase Operation Management</small>
+      </div>
+      <button class="settings-close" onclick="closeSettings()" aria-label="Close">✕</button>
     </div>
 
-    <!-- Tabs -->
-    <div class="settings-tabs">
-      <button class="stab active" onclick="switchStab(this,'store')">🏪 Store</button>
-      <button class="stab" onclick="switchStab(this,'apis')">🔌 API Connections</button>
-      <button class="stab" onclick="switchStab(this,'alerts')">🔔 Alerts</button>
-      <button class="stab" onclick="switchStab(this,'display')">🎨 Display</button>
-    </div>
+    <!-- Sidebar nav + body -->
+    <div class="settings-main">
+      <nav class="settings-nav">
+        <button class="stab active" onclick="switchStab(this,'prefs')"><span class="stab-icon">🎛</span>Preferences</button>
+        <button class="stab" onclick="switchStab(this,'integrations')"><span class="stab-icon">🔌</span>Integrations</button>
+        <button class="stab" onclick="switchStab(this,'about')"><span class="stab-icon">ℹ</span>About</button>
+      </nav>
 
-    <!-- Body -->
-    <div class="settings-body">
+      <div class="settings-body">
 
-      <!-- ── STORE ── -->
-      <div class="stab-panel active" id="panel-store">
-        <div class="s-section">
-          <div class="s-section-title">Store Information</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Store Name</div>
-              <div class="s-row-desc">Displayed across the dashboard and reports</div>
-            </div>
-            <input class="s-input" id="cfg-store-name" placeholder="FoldifyCase" value="FoldifyCase">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Shopify Store URL</div>
-              <div class="s-row-desc">Your myshopify.com domain</div>
-            </div>
-            <input class="s-input" id="cfg-shopify-store" placeholder="scnd9y-a1.myshopify.com" value="scnd9y-a1.myshopify.com">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Shopify Admin Token</div>
-              <div class="s-row-desc">Stored securely in Vercel env vars — update here to sync</div>
-            </div>
-            <input class="s-input" type="password" id="cfg-shopify-token" placeholder="shpat_xxxxxxxxxxxx">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Default Currency</div>
-              <div class="s-row-desc">Currency shown across all financial figures</div>
-            </div>
-            <select class="s-select" id="cfg-currency">
-              <option value="AUD" selected>AUD — Australian Dollar</option>
-              <option value="USD">USD — US Dollar</option>
-              <option value="GBP">GBP — British Pound</option>
-            </select>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Active Markets</div>
-              <div class="s-row-desc">Which warehouse markets this dashboard tracks</div>
-            </div>
-            <div style="display:flex;gap:8px">
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);cursor:pointer">
-                <input type="checkbox" checked id="mkt-us" style="accent-color:var(--gold)"> 🇺🇸 US
-              </label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);cursor:pointer">
-                <input type="checkbox" checked id="mkt-uk" style="accent-color:var(--gold)"> 🇬🇧 UK
-              </label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);cursor:pointer">
-                <input type="checkbox" checked id="mkt-au" style="accent-color:var(--gold)"> 🇦🇺 AU
-              </label>
-            </div>
-          </div>
-        </div>
+      <!-- ── PREFERENCES (new) ──────────────────────────────────────── -->
+      <div class="stab-panel active" id="panel-prefs">
 
         <div class="s-section">
-          <div class="s-section-title">Proxy & Data Sync</div>
+          <div class="s-section-title">Dashboard</div>
           <div class="s-row">
             <div class="s-row-left">
-              <div class="s-row-label">Proxy Server URL</div>
-              <div class="s-row-desc">Your Vercel proxy that handles all API calls securely</div>
-            </div>
-            <input class="s-input" id="cfg-proxy" value="https://foldify-case-operation-management-a.vercel.app/api/proxy">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Auto-Sync on Load</div>
-              <div class="s-row-desc">Automatically fetch live data when dashboard opens</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" checked id="cfg-auto-sync">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Default Date Range</div>
-              <div class="s-row-desc">Date range shown when dashboard first loads</div>
+              <div class="s-row-label">Default date range</div>
+              <div class="s-row-desc">Time window applied when the dashboard first loads.</div>
             </div>
             <select class="s-select" id="cfg-default-range">
-              <option value="today" selected>Today</option>
+              <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
-              <option value="7d">Last 7 Days</option>
-              <option value="30d">Last 30 Days</option>
-              <option value="thismonth">This Month</option>
+              <option value="7d" selected>Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="thismonth">This month</option>
+              <option value="90d">Last 90 days</option>
             </select>
           </div>
-        </div>
-      </div>
-
-
-      <!-- ── API CONNECTIONS ── -->
-      <div class="stab-panel" id="panel-apis">
-        <div class="s-section">
-          <div class="s-section-title">Connected Platforms</div>
-
           <div class="s-row">
             <div class="s-row-left">
-              <div class="s-row-label" style="display:flex;align-items:center;gap:8px">
-                Shopify <span class="s-badge connected">● CONNECTED</span>
-              </div>
-              <div class="s-row-desc">scnd9y-a1.myshopify.com — pulling revenue, orders, COGS</div>
-            </div>
-            <button onclick="testConnection('shopify')" style="padding:6px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:var(--t2);font-size:12px;cursor:pointer;">Test</button>
-          </div>
-
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label" style="display:flex;align-items:center;gap:8px">
-                Meta Ads <span class="s-badge connected">● CONNECTED</span>
-              </div>
-              <div class="s-row-desc">Marketing API — pulling daily spend, ROAS, conversions</div>
-            </div>
-            <button onclick="testConnection('meta')" style="padding:6px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:var(--t2);font-size:12px;cursor:pointer;">Test</button>
-          </div>
-
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label" style="display:flex;align-items:center;gap:8px">
-                Google Ads <span class="s-badge pending">⏳ PENDING APPROVAL</span>
-              </div>
-              <div class="s-row-desc">Applied — awaiting Google API Center approval (1–3 days)</div>
-            </div>
-            <button onclick="testConnection('google')" style="padding:6px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:var(--t2);font-size:12px;cursor:pointer;">Test</button>
-          </div>
-
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label" style="display:flex;align-items:center;gap:8px">
-                Microsoft Ads <span class="s-badge missing">○ NOT CONNECTED</span>
-              </div>
-              <div class="s-row-desc">Add credentials to Vercel env vars to activate</div>
-            </div>
-            <button onclick="testConnection('ms')" style="padding:6px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:var(--t2);font-size:12px;cursor:pointer;">Test</button>
-          </div>
-        </div>
-
-        <div class="s-section">
-          <div class="s-section-title">Meta Ads Credentials</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Ad Account ID</div>
-              <div class="s-row-desc">Format: act_XXXXXXXXX from Meta Business Suite</div>
-            </div>
-            <input class="s-input" id="cfg-meta-account" placeholder="act_XXXXXXXXX">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Access Token</div>
-              <div class="s-row-desc">Never-expiring system user token from Meta</div>
-            </div>
-            <input class="s-input" type="password" id="cfg-meta-token" placeholder="EAAxxxxxxxxxxxxxxx">
-          </div>
-        </div>
-
-        <div class="s-section">
-          <div class="s-section-title">Google Ads Credentials</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Customer ID</div>
-              <div class="s-row-desc">10-digit number from Google Ads (no dashes)</div>
-            </div>
-            <input class="s-input" id="cfg-google-cid" placeholder="3316223623" value="3316223623">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Developer Token</div>
-              <div class="s-row-desc">From Google Ads API Center — add to Vercel env vars</div>
-            </div>
-            <input class="s-input" type="password" id="cfg-google-token" placeholder="Pending approval...">
-          </div>
-        </div>
-
-        <div class="s-section">
-          <div class="s-section-title">Microsoft Ads Credentials</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Account ID</div>
-              <div class="s-row-desc">From Microsoft Ads → Account Settings</div>
-            </div>
-            <input class="s-input" id="cfg-ms-account" placeholder="188114060" value="188114060">
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Developer Token</div>
-              <div class="s-row-desc">From Microsoft Ads → Developer Settings</div>
-            </div>
-            <input class="s-input" type="password" id="cfg-ms-token" placeholder="120H8M8H6X891863">
-          </div>
-        </div>
-      </div>
-
-      <!-- ── ALERTS ── -->
-      <div class="stab-panel" id="panel-alerts">
-        <div class="s-section">
-          <div class="s-section-title">Profit Alerts</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Low Margin Alert</div>
-              <div class="s-row-desc">Highlight days where profit margin drops below target</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" checked id="cfg-alert-margin">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Negative Profit Day Alert</div>
-              <div class="s-row-desc">Show warning banner if any day results in a loss</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" checked id="cfg-alert-loss">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Low ROAS Alert</div>
-              <div class="s-row-desc">Flag ad platforms performing below your ROAS target</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" checked id="cfg-alert-roas">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">High Ad Spend Alert</div>
-              <div class="s-row-desc">Warn when ad spend exceeds % of daily revenue</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" id="cfg-alert-spend">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Ad Spend Warning Threshold (%)</div>
-              <div class="s-row-desc">Trigger alert when ad spend exceeds this % of revenue</div>
-            </div>
-            <input class="s-input" id="cfg-spend-threshold" type="number" value="40" step="5" placeholder="40">
-          </div>
-        </div>
-
-        <div class="s-section">
-          <div class="s-section-title">Email Notifications</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Daily Profit Summary</div>
-              <div class="s-row-desc">Email you a daily P&L summary each morning</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" id="cfg-email-daily">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Weekly Report</div>
-              <div class="s-row-desc">Weekly P&L summary every Monday morning</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" id="cfg-email-weekly">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Notification Email</div>
-              <div class="s-row-desc">Where to send reports and alerts</div>
-            </div>
-            <input class="s-input" id="cfg-notif-email" type="email" placeholder="foldifycase@gmail.com" value="foldifycase@gmail.com">
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DISPLAY ── -->
-      <div class="stab-panel" id="panel-display">
-        <div class="s-section">
-          <div class="s-section-title">Dashboard Display</div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Show Sample Data Banner</div>
-              <div class="s-row-desc">Show ⚪ SAMPLE / 🟢 LIVE indicator on dashboard</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" checked id="cfg-show-banner">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Show Cost Breakdown Donuts</div>
-              <div class="s-row-desc">Display the donut chart cost breakdown section</div>
-            </div>
-            <label class="s-toggle">
-              <input type="checkbox" checked id="cfg-show-donuts">
-              <div class="s-toggle-track"></div>
-              <div class="s-toggle-thumb"></div>
-            </label>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Show Microsoft Ads Card</div>
-              <div class="s-row-desc">Hide/show the Microsoft Ads platform card until connected</div>
+              <div class="s-row-label">Show Microsoft Ads card</div>
+              <div class="s-row-desc">Hide the Microsoft Ads slot on the dashboard until you wire it up.</div>
             </div>
             <label class="s-toggle">
               <input type="checkbox" checked id="cfg-show-ms">
@@ -6748,75 +6561,132 @@ function gaSetCampaignFilter(filter) {
           </div>
           <div class="s-row">
             <div class="s-row-left">
-              <div class="s-row-label">Table Rows to Show</div>
-              <div class="s-row-desc">Max number of daily entries shown in P&L table</div>
+              <div class="s-row-label">Compact density</div>
+              <div class="s-row-desc">Tighter padding and slightly smaller numbers, fits more on screen.</div>
             </div>
-            <select class="s-select" id="cfg-table-rows">
-              <option value="7">7 days</option>
-              <option value="14">14 days</option>
-              <option value="30" selected>30 days</option>
-              <option value="all">All entries</option>
-            </select>
+            <label class="s-toggle">
+              <input type="checkbox" id="cfg-compact">
+              <div class="s-toggle-track"></div>
+              <div class="s-toggle-thumb"></div>
+            </label>
           </div>
         </div>
 
         <div class="s-section">
-          <div class="s-section-title">Number Formatting</div>
+          <div class="s-section-title">Notifications</div>
           <div class="s-row">
             <div class="s-row-left">
-              <div class="s-row-label">Currency Symbol</div>
-              <div class="s-row-desc">Symbol shown before financial values</div>
+              <div class="s-row-label">Notification email</div>
+              <div class="s-row-desc">Used for future daily/weekly digest emails. Not yet active.</div>
             </div>
-            <select class="s-select" id="cfg-currency-symbol">
-              <option value="$" selected>$ Dollar</option>
-              <option value="£">£ Pound</option>
-              <option value="€">€ Euro</option>
-            </select>
+            <input class="s-input" id="cfg-notif-email" type="email" placeholder="you@example.com" style="min-width:220px">
           </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Decimal Places</div>
-              <div class="s-row-desc">How many decimal places to show in financial figures</div>
+        </div>
+
+      </div>
+
+      <!-- ── INTEGRATIONS (new) ─────────────────────────────────────── -->
+      <div class="stab-panel" id="panel-integrations">
+        <div class="s-section">
+          <div class="s-section-title">Connected platforms</div>
+
+          <div class="s-int-row">
+            <div class="s-int-logo" style="background:rgba(149,194,61,0.15);color:#5E8E3E">🛍</div>
+            <div class="s-int-info">
+              <div class="s-int-name">Shopify <span class="s-badge unknown" id="int-shopify-badge">Checking…</span></div>
+              <div class="s-int-meta" id="int-shopify-meta">Orders · COGS · revenue · transaction fees</div>
             </div>
-            <select class="s-select" id="cfg-decimals">
-              <option value="0">0 — Rounded ($1,234)</option>
-              <option value="2" selected>2 — Standard ($1,234.56)</option>
-            </select>
+            <button class="s-int-btn" onclick="testIntegration('shopify')">Test</button>
+          </div>
+
+          <div class="s-int-row">
+            <div class="s-int-logo" style="background:rgba(24,119,242,0.12);color:#1877F2">f</div>
+            <div class="s-int-info">
+              <div class="s-int-name">Meta Ads <span class="s-badge unknown" id="int-meta-badge">Checking…</span></div>
+              <div class="s-int-meta" id="int-meta-meta">Daily spend · ROAS · conversions</div>
+            </div>
+            <button class="s-int-btn" onclick="testIntegration('meta')">Test</button>
+          </div>
+
+          <div class="s-int-row">
+            <div class="s-int-logo" style="background:linear-gradient(135deg,#4285F4,#34A853 50%,#FBBC05 75%,#EA4335);color:#fff">G</div>
+            <div class="s-int-info">
+              <div class="s-int-name">Google Ads <span class="s-badge unknown" id="int-google-badge">Checking…</span></div>
+              <div class="s-int-meta" id="int-google-meta">Via Composio — campaigns · ROAS · ROAS-by-platform</div>
+            </div>
+            <button class="s-int-btn" onclick="testIntegration('google')">Test</button>
+          </div>
+
+          <div class="s-int-row">
+            <div class="s-int-logo" style="background:rgba(0,164,239,0.12);color:#00A4EF">M</div>
+            <div class="s-int-info">
+              <div class="s-int-name">Microsoft Ads <span class="s-badge missing">Not connected</span></div>
+              <div class="s-int-meta">Wire credentials into Vercel + add a service branch in <code>api/proxy.js</code> to activate.</div>
+            </div>
+            <button class="s-int-btn" disabled>Test</button>
           </div>
         </div>
 
         <div class="s-section">
-          <div class="s-section-title">About</div>
+          <div class="s-section-title">Proxy</div>
           <div class="s-row">
             <div class="s-row-left">
-              <div class="s-row-label">App Version</div>
-              <div class="s-row-desc">FoldifyCase Operation Management Dashboard</div>
+              <div class="s-row-label">Proxy URL</div>
+              <div class="s-row-desc" id="cfg-proxy-display">—</div>
             </div>
-            <span style="font-family:'Inter',sans-serif;font-size:12px;color:var(--t3)">v1.0.0 — Apr 2026</span>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Proxy Status</div>
-              <div class="s-row-desc">foldify-case-operation-management-a.vercel.app</div>
-            </div>
-            <span class="s-badge connected" id="proxy-status-badge">● ONLINE</span>
-          </div>
-          <div class="s-row">
-            <div class="s-row-left">
-              <div class="s-row-label">Clear Cached Data</div>
-              <div class="s-row-desc">Reset all manual entries and reload sample data</div>
-            </div>
-            <button onclick="clearAllData()" style="padding:6px 14px;background:var(--red-dim);border:1px solid rgba(217,84,84,0.3);border-radius:6px;color:var(--red);font-size:12px;cursor:pointer;font-family:var(--sans);">Reset Data</button>
+            <span class="s-badge unknown" id="proxy-status-badge">Checking…</span>
           </div>
         </div>
       </div>
 
-    </div><!-- /settings-body -->
+      <!-- ── ABOUT (new) ────────────────────────────────────────────── -->
+      <div class="stab-panel" id="panel-about">
+        <div class="s-section">
+          <div class="s-section-title">App</div>
+          <div class="s-row">
+            <div class="s-row-left">
+              <div class="s-row-label">FoldifyCase Operation Management</div>
+              <div class="s-row-desc">A single-store ops dashboard for Shopify + Meta + Google Ads.</div>
+            </div>
+            <span style="font-size:12px;color:var(--c2);font-weight:600">v1.1</span>
+          </div>
+          <div class="s-row">
+            <div class="s-row-left">
+              <div class="s-row-label">Source</div>
+              <div class="s-row-desc">Hosted on Vercel · auto-deployed from <code>main</code> on GitHub push</div>
+            </div>
+            <a href="https://github.com/foldifycase-dot/FoldifyCase-Operation-Management-APP" target="_blank" rel="noopener" class="s-int-btn" style="text-decoration:none">View repo →</a>
+          </div>
+        </div>
+
+        <div class="s-section">
+          <div class="s-section-title">Local data</div>
+          <div class="s-row">
+            <div class="s-row-left">
+              <div class="s-row-label">Cached settings &amp; fee rates</div>
+              <div class="s-row-desc">Settings, transaction-fee rates, and any local overrides are stored in your browser. Reset wipes them and reloads sample data.</div>
+            </div>
+            <button class="s-btn-danger" onclick="clearAllData()">Reset cached data</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stub anchors so any cached/stale switchStab call does not error -->
+      <div class="stab-panel" id="panel-store"></div>
+      <div class="stab-panel" id="panel-apis"></div>
+      <div class="stab-panel" id="panel-alerts"></div>
+      <div class="stab-panel" id="panel-display"></div>
+
+      </div><!-- /settings-body -->
+    </div><!-- /settings-main -->
 
     <!-- Footer -->
     <div class="settings-footer">
-      <button class="s-btn-cancel" onclick="closeSettings()">Cancel</button>
-      <button class="s-btn-save" onclick="saveSettings()">SAVE SETTINGS</button>
+      <span class="settings-footer-status" id="settingsFooterStatus">Settings save instantly to this browser</span>
+      <div style="display:flex;gap:8px">
+        <button class="s-btn-cancel" onclick="closeSettings()">Close</button>
+        <button class="s-btn-save" onclick="saveSettings()">Save</button>
+      </div>
     </div>
 
   </div><!-- /settings-modal -->
@@ -6863,72 +6733,137 @@ function switchStab(btn, panel) {
 }
 
 function saveSettings() {
-  // Save to localStorage
+  const get = id => document.getElementById(id);
   const cfg = {
-    storeName:      document.getElementById('cfg-store-name').value,
-    currency:       document.getElementById('cfg-currency').value,
-    defaultRange:   document.getElementById('cfg-default-range').value,
-    notifEmail:     document.getElementById('cfg-notif-email').value,
-    alertMargin:    document.getElementById('cfg-alert-margin').checked,
-    alertLoss:      document.getElementById('cfg-alert-loss').checked,
-    alertRoas:      document.getElementById('cfg-alert-roas').checked,
-    showMs:         document.getElementById('cfg-show-ms').checked,
+    defaultRange: get('cfg-default-range') ? get('cfg-default-range').value : '7d',
+    showMs:       get('cfg-show-ms')       ? get('cfg-show-ms').checked     : true,
+    compact:      get('cfg-compact')       ? get('cfg-compact').checked     : false,
+    notifEmail:   get('cfg-notif-email')   ? get('cfg-notif-email').value   : '',
   };
   localStorage.setItem('fc_settings', JSON.stringify(cfg));
-
-  // Apply immediately
-  closeSettings();
+  applySettings(cfg);
   toast('✓ Settings saved', 'ok');
-  renderAll();
 }
 
 function loadSettings() {
-  try {
-    const cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}');
-    if (cfg.currency)     document.getElementById('cfg-currency').value      = cfg.currency;
-    if (cfg.defaultRange) document.getElementById('cfg-default-range').value = cfg.defaultRange;
-    if (cfg.notifEmail)   document.getElementById('cfg-notif-email').value   = cfg.notifEmail;
-  } catch(e) {}
+  let cfg = {};
+  try { cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}'); } catch(e) {}
+  const get = id => document.getElementById(id);
+  if (get('cfg-default-range') && cfg.defaultRange) get('cfg-default-range').value = cfg.defaultRange;
+  if (get('cfg-show-ms'))   get('cfg-show-ms').checked   = cfg.showMs !== false;
+  if (get('cfg-compact'))   get('cfg-compact').checked   = !!cfg.compact;
+  if (get('cfg-notif-email') && cfg.notifEmail) get('cfg-notif-email').value = cfg.notifEmail;
+  applySettings(cfg);
+  // Populate the proxy URL display in the Integrations tab.
+  const proxyEl = document.getElementById('cfg-proxy-display');
+  if (proxyEl) proxyEl.textContent = (typeof PROXY === 'string') ? PROXY : '—';
+  // Auto-run integration status checks each open
+  refreshIntegrationStatuses();
+}
+
+/* Apply settings that have side effects on the page. */
+function applySettings(cfg) {
+  cfg = cfg || {};
+  // Toggle the Microsoft Ads card on the dashboard.
+  const msCard = document.querySelector('.ad-card.ms');
+  if (msCard) msCard.style.display = (cfg.showMs === false) ? 'none' : '';
+  // Compact density class on <body>.
+  document.body.classList.toggle('compact-density', !!cfg.compact);
+}
+
+/* Live-check each platform via the existing proxy. Updates the badges. */
+async function refreshIntegrationStatuses() {
+  const today = new Date().toISOString().slice(0,10);
+  const lastWeek = new Date(Date.now() - 6*86400000).toISOString().slice(0,10);
+  const checks = [
+    { id:'shopify', badge:'int-shopify-badge', meta:'int-shopify-meta', url:`${PROXY}?service=shopify&action=daily-sales&from=${today}&to=${today}` },
+    { id:'meta',    badge:'int-meta-badge',    meta:'int-meta-meta',    url:`${PROXY}?service=meta-ads&from=${today}&to=${today}` },
+    { id:'google',  badge:'int-google-badge',  meta:'int-google-meta',  url:`${PROXY}?service=google-ads&from=${lastWeek}&to=${today}` },
+  ];
+  await Promise.all(checks.map(async c => {
+    const badge = document.getElementById(c.badge);
+    const meta  = document.getElementById(c.meta);
+    if (!badge) return;
+    try {
+      const r = await fetch(c.url);
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || d.error) {
+        badge.textContent = d.error ? 'Error' : 'Offline';
+        badge.className = 's-badge missing';
+        if (meta) meta.textContent = (d.error || `HTTP ${r.status}`).toString().slice(0,80);
+      } else {
+        badge.textContent = 'Connected';
+        badge.className = 's-badge connected';
+        // Show a short hint of what came back so the user can sanity-check
+        if (meta) {
+          if (c.id === 'shopify') {
+            const days = (d.days || []).length;
+            meta.textContent = `Last fetch ok · ${days} day${days===1?'':'s'} of orders returned for today`;
+          } else if (c.id === 'meta') {
+            const spend = (d.total && d.total.spend) || 0;
+            meta.textContent = `Last fetch ok · today spend ${maFmt$ ? maFmt$(spend) : '$' + spend.toFixed(2)}`;
+          } else if (c.id === 'google') {
+            const spend = (d.total && d.total.spend) || 0;
+            meta.textContent = `Last 7d via Composio · spend ${maFmt$ ? maFmt$(spend) : '$' + spend.toFixed(2)}`;
+          }
+        }
+      }
+    } catch (e) {
+      badge.textContent = 'Failed';
+      badge.className = 's-badge missing';
+      if (meta) meta.textContent = e.message;
+    }
+  }));
+}
+
+/* Per-integration "Test" button — re-runs a single status check + toast. */
+async function testIntegration(platform) {
+  toast(`Testing ${platform}…`, 'ok');
+  await refreshIntegrationStatuses();
+  const badge = document.getElementById('int-' + platform + '-badge');
+  if (!badge) return;
+  if (badge.className.includes('connected')) toast(`✓ ${platform} connected`, 'ok');
+  else toast(`${platform} check failed — see badge for details`, 'err');
 }
 
 async function checkProxyStatus() {
   const badge = document.getElementById('proxy-status-badge');
+  if (!badge) return;
   try {
     const r = await fetch(PROXY);
     const d = await r.json();
-    if (d.valid || d.error) {
-      badge.textContent = '● ONLINE';
+    if (d.valid || d.error || d.status) {
+      badge.textContent = 'Online';
       badge.className = 's-badge connected';
     } else throw new Error();
   } catch {
-    badge.textContent = '○ OFFLINE';
+    badge.textContent = 'Offline';
     badge.className = 's-badge missing';
   }
 }
 
-async function testConnection(platform) {
-  toast(`Testing ${platform} connection...`, 'ok');
-  try {
-    const today = new Date().toISOString().slice(0,10);
-    const r = await fetch(`${PROXY}?service=${platform === 'shopify' ? 'shopify&action=daily-sales' : platform + '-ads'}&from=${today}&to=${today}`);
-    const d = await r.json();
-    if (d.error && d.error.includes('Unknown service')) {
-      toast(`${platform} — service not yet in proxy`, 'err');
-    } else {
-      toast(`✓ ${platform} connection OK`, 'ok');
-    }
-  } catch {
-    toast(`${platform} connection failed`, 'err');
-  }
+function clearAllData() {
+  if (!confirm('Reset cached settings and reload sample data? Vercel-stored data is unaffected.')) return;
+  localStorage.removeItem('fc_settings');
+  if (typeof loadSampleData === 'function') loadSampleData();
+  if (typeof renderAll === 'function') renderAll();
+  closeSettings();
+  toast('Cached data reset', 'ok');
 }
 
-function clearAllData() {
-  if (!confirm('Reset to sample/demo data?')) return;
-  loadSampleData();
-  renderAll();
-  closeSettings();
-  toast('Data reset to sample', 'ok');
-}
+/* Apply saved settings on page load so they survive refreshes. */
+(function applySavedSettingsOnLoad() {
+  let cfg = {};
+  try { cfg = JSON.parse(localStorage.getItem('fc_settings') || '{}'); } catch(e) {}
+  if (typeof applySettings === 'function') applySettings(cfg);
+})();
+
+/* Esc closes the settings modal when it's open. */
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  const ov = document.getElementById('settingsOverlay');
+  if (ov && ov.classList.contains('show')) closeSettings();
+});
 
 /* ══════════════════════════════════════════
    ORDER REPORT
