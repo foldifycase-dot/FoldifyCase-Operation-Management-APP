@@ -6705,7 +6705,7 @@ function gaSetCampaignFilter(filter) {
           </div>
           <div class="s-sub-head">
             <div>App</div>
-            <div style="text-align:right">Monthly</div>
+            <div style="text-align:right">Monthly (AUD)</div>
             <div></div>
           </div>
           <div id="sub-list">
@@ -6713,7 +6713,7 @@ function gaSetCampaignFilter(filter) {
           </div>
           <div class="s-sub-total">
             <div>Total monthly</div>
-            <div id="sub-total" style="text-align:right">$0.00</div>
+            <div id="sub-total" style="text-align:right">A$0.00</div>
             <div></div>
           </div>
         </div>
@@ -6969,7 +6969,7 @@ function renderSubscriptions() {
   }
   // Total
   const total = subs.reduce((s, x) => s + (Number(x.amount) || 0), 0);
-  totalEl.textContent = '$' + total.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  totalEl.textContent = 'A$' + total.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function addSubscriptionRow() {
   const subs = loadSubscriptions();
@@ -7002,7 +7002,7 @@ document.addEventListener('input', function(e) {
     const totalEl = document.getElementById('sub-total');
     if (totalEl) {
       const total = subs.reduce((s, x) => s + (Number(x.amount) || 0), 0);
-      totalEl.textContent = '$' + total.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      totalEl.textContent = 'A$' + total.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
   } else {
     subs[idx][field] = t.value;
